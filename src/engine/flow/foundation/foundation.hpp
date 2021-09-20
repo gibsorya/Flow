@@ -11,11 +11,12 @@
 #include <memory>
 
 
-//#define global static
-//#define local static
+#define global static
+#define local static
 
 typedef uint32_t u32;
 
 #include "platform.hpp"
+
 
 

@@ -2,6 +2,7 @@
 #define FLOW
 
 #include "foundation/foundation.hpp"
+#include "foundation/debugTools.hpp"
 
 namespace flow {
 	/*static void initVulkan(void);

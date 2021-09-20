@@ -2,7 +2,7 @@
 #include "root.hpp"
 
 #include "vk/instance.cpp"
-
+#include "flow/foundation/debugTools.cpp"
 #include <vulkan/vulkan.h>
 #include <iostream>
 
@@ -18,16 +18,20 @@ namespace flow {
 		while (!glfwWindowShouldClose(root->flowWindow->getWindow())) {
 			glfwPollEvents();
 		}
-		
 	}
 
 	void cleanup()
 	{
+		if(root->validLayers->enabledValidationLayers){
+			vulkan::debugtools::DestroyDebugUtilsMessengerEXT(root->flowInstance->instance, root->debugUtils->debugMessenger, nullptr);
+		}
+
 		vkDestroyInstance(root->flowInstance->instance, nullptr);
 
 		glfwDestroyWindow(root->flowWindow->getWindow());
-		//window->destroyWindow();
 		glfwTerminate();
+
+		system("pause");
 	}
 
 	void initWindow()
