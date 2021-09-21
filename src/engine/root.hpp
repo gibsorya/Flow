@@ -4,6 +4,11 @@
 #include "vk/instance.hpp"
 #include "window.hpp"
 
+/*
+
+	Where all the components in this Vulkan implementation come together. Hence "root"
+
+*/
 typedef struct Root Root;
 struct Root {
 	std::unique_ptr<FlowWindow> flowWindow = std::make_unique<FlowWindow>();
