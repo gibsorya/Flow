@@ -2,18 +2,17 @@
 #include "../../root.hpp"
 
 namespace flow::vulkan::devices{
-    QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device){
+    QueueFamilyIndicies findQueueFamilies(vk::PhysicalDevice device){
         QueueFamilyIndicies indices;
 
         uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-        
-        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+        device.getQueueFamilyProperties2(&queueFamilyCount, nullptr);
+        std::vector<vk::QueueFamilyProperties2> queueFamilies(queueFamilyCount);
+        device.getQueueFamilyProperties2(&queueFamilyCount, queueFamilies.data());
 
         int i = 0;
         for(const auto& queueFamily : queueFamilies){
-            if(queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
+            if(queueFamily.queueFamilyProperties.queueFlags & vk::QueueFlagBits::eGraphics){
                 indices.graphicsFamily = i;
             }
 

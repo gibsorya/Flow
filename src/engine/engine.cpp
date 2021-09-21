@@ -29,7 +29,7 @@ namespace flow {
 			vulkan::debugtools::DestroyDebugUtilsMessengerEXT(root->flowInstance->instance, root->debugUtils->debugMessenger, nullptr);
 		}
 
-		vkDestroyInstance(root->flowInstance->instance, nullptr);
+		root->flowInstance->instance.destroy();
 
 		glfwDestroyWindow(root->flowWindow->getWindow());
 		glfwTerminate();

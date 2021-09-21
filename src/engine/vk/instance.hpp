@@ -14,12 +14,10 @@ Vulkan instance for Flow.
 */
 typedef struct FlowInstance FlowInstance;
 struct FlowInstance {
-	// VkInstance instance;
 	vk::Instance instance;
 
 	std::vector<const char *> extensions;
 
-	// VkDebugUtilsMessengerCreateInfoEXT debugInfo{};
 	vk::DebugUtilsMessengerCreateInfoEXT debugInfo{};
 };
 

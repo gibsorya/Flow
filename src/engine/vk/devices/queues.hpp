@@ -11,7 +11,8 @@ struct QueueFamilyIndicies{
     std::optional<u32> graphicsFamily;
 
     u32 queueFamilyCount = 0;
-    VkQueueFamilyProperties2 queueFamilyProperties{};
+    vk::QueueFamilyProperties2 queueFamilyProperties{};
+    // VkQueueFamilyProperties2 queueFamilyProperties{};
 
     bool isComplete(){
         return graphicsFamily.has_value();
@@ -19,7 +20,7 @@ struct QueueFamilyIndicies{
 };
 
 namespace flow::vulkan::devices{
-    QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device);
+    QueueFamilyIndicies findQueueFamilies(vk::PhysicalDevice device);
 }
 
 #endif
