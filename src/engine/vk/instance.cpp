@@ -1,6 +1,8 @@
 #include "instance.hpp"
 #include "../root.hpp"
 
+
+
 namespace flow::vulkan {
 	void startFlow()
 	{
@@ -11,6 +13,7 @@ namespace flow::vulkan {
 	void initComponents()
 	{
 		debugtools::setupDebugMessenger();
+		devices::pickPhysicalDevices();
 	}
 
 	VkInstance createInstance() {
@@ -38,7 +41,7 @@ namespace flow::vulkan {
 		createInfo.ppEnabledExtensionNames = extensions.data();
 		
 		if(root->validLayers->enabledValidationLayers){
-			createInfo.enabledLayerCount = static_cast<uint32_t>(root->validLayers->layers.size());
+			createInfo.enabledLayerCount = static_cast<u32>(root->validLayers->layers.size());
 			createInfo.ppEnabledLayerNames = root->validLayers->layers.data();
 
 			debugtools::populateDebugUtilsMessengerCreateInfo(debugInfo);

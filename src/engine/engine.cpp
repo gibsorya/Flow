@@ -3,6 +3,9 @@
 
 #include "vk/instance.cpp"
 #include "flow/foundation/debugTools.cpp"
+#include "vk/devices/physicalDevice.cpp"
+#include "vk/devices/queues.cpp"
+
 #include <vulkan/vulkan.h>
 #include <iostream>
 

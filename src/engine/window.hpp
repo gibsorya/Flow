@@ -2,6 +2,12 @@
 
 #include <GLFW/glfw3.h>
 #include "flow/flow.hpp"
+
+/*
+
+GLFW Window and it's data
+
+*/
 typedef struct FlowWindow FlowWindow;
 struct FlowWindow {
 
