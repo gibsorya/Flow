@@ -14,6 +14,7 @@ namespace flow::vulkan {
 	{
 		debugtools::setupDebugMessenger();
 		devices::pickPhysicalDevices();
+		devices::createLogicalDevice();
 	}
 
 	vk::Instance createInstance() {

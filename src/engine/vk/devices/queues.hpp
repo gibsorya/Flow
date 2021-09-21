@@ -12,7 +12,8 @@ struct QueueFamilyIndicies{
 
     u32 queueFamilyCount = 0;
     vk::QueueFamilyProperties2 queueFamilyProperties{};
-    // VkQueueFamilyProperties2 queueFamilyProperties{};
+
+    float queuePriority = 1.0f;
 
     bool isComplete(){
         return graphicsFamily.has_value();

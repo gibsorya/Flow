@@ -4,6 +4,7 @@
 #include "vk/instance.cpp"
 #include "flow/foundation/debugTools.cpp"
 #include "vk/devices/physicalDevice.cpp"
+#include "vk/devices/logicalDevice.cpp"
 #include "vk/devices/queues.cpp"
 
 #include <vulkan/vulkan.hpp>
@@ -25,6 +26,8 @@ namespace flow {
 
 	void cleanup()
 	{
+		root->flowDevice->device.destroy();
+
 		if(root->validLayers->enabledValidationLayers){
 			vulkan::debugtools::DestroyDebugUtilsMessengerEXT(root->flowInstance->instance, root->debugUtils->debugMessenger, nullptr);
 		}
