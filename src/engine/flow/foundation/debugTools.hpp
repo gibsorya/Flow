@@ -1,7 +1,7 @@
 #ifndef DEBUG_TOOLS
 #define DEBUG_TOOLS
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 #include <vector>
 
@@ -20,7 +20,7 @@ struct ValidLayers
 typedef struct DebugUtils DebugUtils;
 struct DebugUtils
 {
-    VkDebugUtilsMessengerEXT debugMessenger;
+    vk::DebugUtilsMessengerEXT debugMessenger;
 };
 
 namespace flow::vulkan::debugtools
@@ -29,15 +29,15 @@ namespace flow::vulkan::debugtools
 
     std::vector<const char *> getRequiredExtensions();
 
-    void populateDebugUtilsMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+    void populateDebugUtilsMessengerCreateInfo(vk::DebugUtilsMessengerCreateInfoEXT &createInfo);
 
     static VkBool32 VKAPI_PTR VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData);
 
     void setupDebugMessenger();
 
-    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger);
+    VkResult CreateDebugUtilsMessengerEXT(vk::Instance instance, const vk::DebugUtilsMessengerCreateInfoEXT *pCreateInfo, const vk::AllocationCallbacks *pAllocator, vk::DebugUtilsMessengerEXT *pDebugMessenger);
 
-    void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
+    void DestroyDebugUtilsMessengerEXT(vk::Instance instance, vk::DebugUtilsMessengerEXT debugMessenger, const vk::AllocationCallbacks *pAllocator);
 }
 
 #endif

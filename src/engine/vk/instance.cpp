@@ -16,30 +16,19 @@ namespace flow::vulkan {
 		devices::pickPhysicalDevices();
 	}
 
-	VkInstance createInstance() {
+	vk::Instance createInstance() {
 		if(root->validLayers->enabledValidationLayers && !debugtools::checkValidationLayerSupport()){
 			throw std::runtime_error("Validation layers requested, but none are available!");
 		}
 
-		VkInstance flowInstance;
-		VkApplicationInfo appInfo{};
-		VkInstanceCreateInfo createInfo{};
-
-		appInfo.pApplicationName = "FLOW";
-		appInfo.pEngineName = "Flow Engine";
-		appInfo.applicationVersion = VK_VERSION_1_2;
-		appInfo.engineVersion = VK_VERSION_1_2;
-		appInfo.apiVersion = VK_API_VERSION_1_2;
-
-		
+		vk::Instance flowInstance;
 		auto extensions = debugtools::getRequiredExtensions();
-		VkDebugUtilsMessengerCreateInfoEXT debugInfo{};
 
-		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		createInfo.pApplicationInfo = &appInfo;
-		createInfo.enabledExtensionCount = static_cast<u32>(extensions.size());
-		createInfo.ppEnabledExtensionNames = extensions.data();
+		auto appInfo = vk::ApplicationInfo("Flow", VK_VERSION_1_2, "Flow Engine", VK_VERSION_1_2, VK_API_VERSION_1_2);
+		auto createInfo = vk::InstanceCreateInfo({}, &appInfo, 0, nullptr, static_cast<u32>(extensions.size()), extensions.data());
 		
+		auto debugInfo = vk::DebugUtilsMessengerCreateInfoEXT();
+
 		if(root->validLayers->enabledValidationLayers){
 			createInfo.enabledLayerCount = static_cast<u32>(root->validLayers->layers.size());
 			createInfo.ppEnabledLayerNames = root->validLayers->layers.data();
@@ -53,7 +42,7 @@ namespace flow::vulkan {
 
 		
 
-		if (vkCreateInstance(&createInfo, nullptr, &flowInstance) != VK_SUCCESS) {
+		if (vk::createInstance(&createInfo, nullptr, &flowInstance) != vk::Result::eSuccess) {
 			throw std::runtime_error("Failed to create instance!");
 		}
 

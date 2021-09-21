@@ -7,19 +7,15 @@
 
 typedef struct FlowPhysicalDevice FlowPhysicalDevice;
 struct FlowPhysicalDevice{
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    vk::PhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
-    VkPhysicalDeviceProperties2 deviceProperties{
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2
-    };
-    VkPhysicalDeviceFeatures2 deviceFeatures{
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2
-    };
+    vk::PhysicalDeviceProperties2 deviceProperties;
+    vk::PhysicalDeviceFeatures2 deviceFeatures;
 };
 namespace flow::vulkan::devices {
     void pickPhysicalDevices();
 
-    bool isDeviceSuitable(VkPhysicalDevice device);
+    bool isDeviceSuitable(vk::PhysicalDevice device);
 }
 
 #endif

@@ -6,7 +6,7 @@
 #include "vk/devices/physicalDevice.cpp"
 #include "vk/devices/queues.cpp"
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 #include <iostream>
 
 namespace flow {
@@ -29,7 +29,7 @@ namespace flow {
 			vulkan::debugtools::DestroyDebugUtilsMessengerEXT(root->flowInstance->instance, root->debugUtils->debugMessenger, nullptr);
 		}
 
-		vkDestroyInstance(root->flowInstance->instance, nullptr);
+		root->flowInstance->instance.destroy();
 
 		glfwDestroyWindow(root->flowWindow->getWindow());
 		glfwTerminate();
