@@ -6,7 +6,7 @@
 #include "vk/devices/physicalDevice.cpp"
 #include "vk/devices/queues.cpp"
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 #include <iostream>
 
 namespace flow {
