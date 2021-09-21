@@ -16,7 +16,7 @@ namespace flow::vulkan {
 		devices::pickPhysicalDevices();
 	}
 
-	VkInstance createInstance() {
+	vk::Instance createInstance() {
 		if(root->validLayers->enabledValidationLayers && !debugtools::checkValidationLayerSupport()){
 			throw std::runtime_error("Validation layers requested, but none are available!");
 		}

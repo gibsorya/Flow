@@ -26,6 +26,6 @@ struct FlowInstance {
 namespace flow::vulkan {
 	void startFlow();
 	void initComponents();
-	VkInstance createInstance();
+	vk::Instance createInstance();
 }
 #endif // !FLOW_INSTANCE
