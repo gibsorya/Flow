@@ -10,6 +10,7 @@ namespace flow::vulkan::devices {
             std::runtime_error("Failed to find GPU with Vulkan support!");
         }
 
+        
         std::vector<vk::PhysicalDevice> devices(deviceCount);
         root->flowInstance->instance.enumeratePhysicalDevices(&deviceCount, devices.data());
 
@@ -27,6 +28,8 @@ namespace flow::vulkan::devices {
 
     bool isDeviceSuitable(vk::PhysicalDevice device){
         QueueFamilyIndicies indices = findQueueFamilies(device);
+
+        
 
         device.getProperties2(&root->flowPDs->deviceProperties);
         device.getFeatures2(&root->flowPDs->deviceFeatures);

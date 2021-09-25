@@ -13,6 +13,7 @@ namespace flow::vulkan {
 	void initComponents()
 	{
 		debugtools::setupDebugMessenger();
+		createSurface();
 		devices::pickPhysicalDevices();
 		devices::createLogicalDevice();
 	}

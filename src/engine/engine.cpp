@@ -1,6 +1,7 @@
 #include "engine.hpp"
 #include "root.hpp"
 
+#include "vk/surface.cpp"
 #include "vk/instance.cpp"
 #include "flow/foundation/debugTools.cpp"
 #include "vk/devices/physicalDevice.cpp"
@@ -32,6 +33,7 @@ namespace flow {
 			vulkan::debugtools::DestroyDebugUtilsMessengerEXT(root->flowInstance->instance, root->debugUtils->debugMessenger, nullptr);
 		}
 
+		root->flowInstance->instance.destroySurfaceKHR(root->flowSurface->surface);
 		root->flowInstance->instance.destroy();
 
 		glfwDestroyWindow(root->flowWindow->getWindow());
