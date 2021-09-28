@@ -1,0 +1,13 @@
+target_sources(${FLOW_LIB_TARGET}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/instance.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/surface.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/devices/logicalDevice.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/devices/physicalDevice.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/devices/queues.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/instance.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/surface.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/devices/logicalDevice.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/devices/physicalDevice.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/devices/queues.hpp 
+)

@@ -14,6 +14,7 @@ Vulkan instance for Flow.
 */
 typedef struct FlowInstance FlowInstance;
 struct FlowInstance {
+	std::vector<vk::Instance> instances;
 	vk::Instance instance;
 
 	std::vector<const char *> extensions;

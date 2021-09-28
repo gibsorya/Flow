@@ -4,7 +4,7 @@
 #include "flow/flow.hpp"
 
 namespace flow {
-
+	void test();
 	void initVulkan();
 	void mainLoop();
 	void cleanup();
