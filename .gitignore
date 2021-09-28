@@ -47,3 +47,6 @@ _dep
 build/
 
 [Bb][Uu][Ii[Ll][Dd]/
+
+libs/
+external/vulkan/
