@@ -1,5 +1,5 @@
 #include "engine.hpp"
-// #include "root.hpp"
+#include "root.hpp"
 
 // #include "vk/surface.cpp"
 // #include "vk/instance.cpp"
@@ -13,8 +13,36 @@
 namespace flow {
 	void test(){
 		std::cout << "Vulkan initiated!" << std::endl;
-		system("pause");
 	}
+
+	void initVulkan(){
+		initWindow();
+	}
+
+	void mainLoop(){
+		while(!glfwWindowShouldClose(root->flowWindow->window)){
+			glfwPollEvents();
+		}
+	}
+
+	void cleanup(){
+		glfwDestroyWindow(root->flowWindow->window);
+		glfwTerminate();
+	}
+
+	void initWindow(){
+		glfwInit();
+
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+		// root->flowWindow->setWindow(root->flowWindow->createWindow());
+		root->flowWindow->window = glfwCreateWindow(root->flowWindow->WIDTH, root->flowWindow->HEIGHT, "Flow Engine", nullptr, nullptr);
+	}
+
+
+
+
 	// void initVulkan()
 	// {
 	// 	initWindow();

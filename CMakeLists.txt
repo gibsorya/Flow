@@ -29,7 +29,7 @@ target_include_directories(${FLOW_LIB_TARGET}
 set(LIBS_DIR ${PROJECT_SOURCE_DIR}/libs)
 target_link_libraries(${FLOW_LIB_TARGET}
 	PRIVATE
-		${LIBS_DIR}/glfw/lib-vc2019/glfw3.lib
+		${LIBS_DIR}/glfw/lib-mingw-w64/libglfw3.a
 )
 
 target_compile_definitions(${FLOW_LIB_TARGET} PUBLIC _FLOWENGINE_)

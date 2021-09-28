@@ -1,12 +1,13 @@
-// #pragma once
-// #include "flow/flow.hpp"
+#pragma once
+#include "flow/flow.hpp"
+#include "window.hpp"
 // #include "flow/foundation/debugTools.hpp"
 // #include "vk/instance.hpp"
 // #include "vk/surface.hpp"
 // #include "vk/devices/physicalDevice.hpp"
 // #include "vk/devices/logicalDevice.hpp"
 // #include "vk/devices/queues.hpp"
-// #include "window.hpp"
+
 
 
 // /*
@@ -14,6 +15,11 @@
 // 	Where all the data for the components in this Vulkan implementation come together. Hence "root"
 
 // */
+typedef struct Root Root;
+struct Root {
+    std::unique_ptr<FlowWindow> flowWindow = std::make_unique<FlowWindow>();
+};
+global std::unique_ptr<Root> root = std::make_unique<Root>();
 // typedef struct Root Root;
 // struct Root {
 // 	std::unique_ptr<FlowWindow> flowWindow = std::make_unique<FlowWindow>();

@@ -6,11 +6,11 @@
 
 void run() {
     flow::test();
-    // flow::initVulkan();
-    // flow::mainLoop();
-    // flow::cleanup();
+    flow::initVulkan();
+    flow::mainLoop();
+    flow::cleanup();
     std::cout << "Vulkan finished!" << std::endl;
-    // test::test();
+    system("pause");
 }
 
 int main() {

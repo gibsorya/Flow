@@ -29,7 +29,8 @@ struct FlowWindow {
 	const u32 WIDTH = 800;
 	const u32 HEIGHT = 600;
 
-private:
 	GLFWwindow* window;
+private:
+	
 
 };
