@@ -1,12 +1,8 @@
 #include "engine.hpp"
 #include "root.hpp"
 
-// #include "vk/surface.cpp"
-// #include "vk/instance.cpp"
-// #include "flow/foundation/debugTools.cpp"
-// #include "vk/devices/physicalDevice.cpp"
-// #include "vk/devices/logicalDevice.cpp"
-// #include "vk/devices/queues.cpp"
+#include "vk/instances.cpp"
+
 #include <vulkan/vulkan.hpp>
 #include <iostream>
 
@@ -17,6 +13,11 @@ namespace flow {
 
 	void initVulkan(){
 		initWindow();
+		root->flowInstances->instance = vulkan::createInstance();
+		// root->flowInstances = createFlowInstances();
+		root->debugUtils->debugMessenger = vulkan::debugtools::setupDebugMessenger(&root->flowInstances->instance);
+		vulkan::pickPhysicalDevice(&root->flowInstances->instance);
+		root->flowDevices->device = vulkan::createLogicalDevice(&root->flowDevices->currentPhysicalDevice);
 	}
 
 	void mainLoop(){
@@ -26,6 +27,18 @@ namespace flow {
 	}
 
 	void cleanup(){
+		vkDestroyDevice(root->flowDevices->device, nullptr);
+
+		if(root->validLayers->enabledValidationLayers){
+			vulkan::debugtools::DestroyDebugUtilsMessengerEXT(root->flowInstances->instance, root->debugUtils->debugMessenger, nullptr);
+		}
+
+		vkDestroyInstance(root->flowInstances->instance, nullptr);
+
+		// for(VkInstance instance : root->flowInstances->getInstances()){
+		// 	vkDestroyInstance(instance, nullptr);
+		// }
+
 		glfwDestroyWindow(root->flowWindow->window);
 		glfwTerminate();
 	}
@@ -39,9 +52,7 @@ namespace flow {
 		// root->flowWindow->setWindow(root->flowWindow->createWindow());
 		root->flowWindow->window = glfwCreateWindow(root->flowWindow->WIDTH, root->flowWindow->HEIGHT, "Flow Engine", nullptr, nullptr);
 	}
-
-
-
+}
 
 	// void initVulkan()
 	// {
@@ -87,5 +98,5 @@ namespace flow {
 
 	// 	root->flowWindow->setWindow(root->flowWindow->createWindow());
 	// }
-}
+
 

@@ -9,10 +9,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <memory>
+#include <vector>
 
 
-#define global static
-#define local static
+// #define global static
+// #define local static
 
 typedef uint32_t u32;
 

@@ -30,6 +30,7 @@ set(LIBS_DIR ${PROJECT_SOURCE_DIR}/libs)
 target_link_libraries(${FLOW_LIB_TARGET}
 	PRIVATE
 		${LIBS_DIR}/glfw/lib-mingw-w64/libglfw3.a
+		${LIBS_DIR}/vulkan/vulkan-1.lib
 )
 
 target_compile_definitions(${FLOW_LIB_TARGET} PUBLIC _FLOWENGINE_)
@@ -57,6 +58,7 @@ function(add_flowengine_target flowTarget flowRoot)
 	endif()
 
 	target_link_libraries(${flowTarget} FlowLib)
+	target_link_directories(${flowTarget} PRIVATE ${flowRoot}/external/glfw/src)
 endfunction()
 
 set(FLOW_APP_BUILD_NAME Flow)
@@ -65,6 +67,9 @@ add_executable(${FLOW_APP_BUILD_NAME} "")
 add_subdirectory(src/app)
 
 add_flowengine_target(${FLOW_APP_BUILD_NAME} ${PROJECT_SOURCE_DIR})
+
+install(TARGETS ${FLOW_APP_BUILD_NAME} DESTINATION build)
+install(FILES "main.cpp" DESTINATION src/app)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)

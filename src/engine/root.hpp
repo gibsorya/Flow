@@ -1,6 +1,9 @@
 #pragma once
 #include "flow/flow.hpp"
 #include "window.hpp"
+#include "vk/instances.hpp"
+#include "vk/devices.hpp"
+#include "vk/queues.hpp"
 // #include "flow/foundation/debugTools.hpp"
 // #include "vk/instance.hpp"
 // #include "vk/surface.hpp"
@@ -15,11 +18,17 @@
 // 	Where all the data for the components in this Vulkan implementation come together. Hence "root"
 
 // */
+
 typedef struct Root Root;
 struct Root {
     std::unique_ptr<FlowWindow> flowWindow = std::make_unique<FlowWindow>();
+    // FlowInstances flowInstances;
+    std::unique_ptr<FlowInstances> flowInstances = std::make_unique<FlowInstances>();
+    std::unique_ptr<ValidLayers> validLayers = std::make_unique<ValidLayers>();
+    std::unique_ptr<DebugUtils> debugUtils = std::make_unique<DebugUtils>();
+    std::unique_ptr<FlowDevices> flowDevices = std::make_unique<FlowDevices>();
 };
-global std::unique_ptr<Root> root = std::make_unique<Root>();
+static std::unique_ptr<Root> root = std::make_unique<Root>();
 // typedef struct Root Root;
 // struct Root {
 // 	std::unique_ptr<FlowWindow> flowWindow = std::make_unique<FlowWindow>();
