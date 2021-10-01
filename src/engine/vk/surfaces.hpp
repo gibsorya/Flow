@@ -6,15 +6,14 @@
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
-typedef struct FlowSurface FlowSurface;
-struct FlowSurface{
-    vk::SurfaceKHR surface;
+struct FlowSurfaces{
+    std::vector<VkSurfaceKHR> surfaces;
 
-    VkBuffer
+    VkPhysicalDeviceSurfaceInfo2KHR physicalSurfaceInfo;
 };
 
 namespace flow::vulkan {
-    void createSurface();
+    VkSurfaceKHR createSurface();
 }
 
 #endif

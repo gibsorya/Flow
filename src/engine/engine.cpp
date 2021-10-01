@@ -1,45 +1,64 @@
 #include "engine.hpp"
 #include "root.hpp"
 
-#include "vk/surface.cpp"
-#include "vk/instance.cpp"
-#include "flow/foundation/debugTools.cpp"
-#include "vk/devices/physicalDevice.cpp"
-#include "vk/devices/logicalDevice.cpp"
-#include "vk/devices/queues.cpp"
+#include "vk/instances.cpp"
 
 #include <vulkan/vulkan.hpp>
 #include <iostream>
 
-namespace flow {
+Root root;
+
+namespace flow
+{
+	void test()
+	{
+		std::cout << "Vulkan initiated!" << std::endl;
+	}
+
 	void initVulkan()
 	{
 		initWindow();
-		vulkan::startFlow();
+		root.flowInstances.instances.push_back(vulkan::createInstance());
+		vulkan::setupDebugMessenger();
+		root.flowSurfaces.surfaces.push_back(vulkan::createSurface());	
+		root.flowDevices.physicalDevice = vulkan::pickPhysicalDevice();
+		root.flowDevices.devices.push_back(vulkan::createLogicalDevice());
+		// root.flowSwaps.swapchains.push_back(vulkan::createSwapchain());
 	}
 
 	void mainLoop()
 	{
-		while (!glfwWindowShouldClose(root->flowWindow->getWindow())) {
+		while(!glfwWindowShouldClose(root.flowWindow.window)){
 			glfwPollEvents();
 		}
 	}
 
 	void cleanup()
 	{
-		root->flowDevice->device.destroy();
-
-		if(root->validLayers->enabledValidationLayers){
-			vulkan::debugtools::DestroyDebugUtilsMessengerEXT(root->flowInstance->instance, root->debugUtils->debugMessenger, nullptr);
+		for(VkSwapchainKHR swapchain : root.flowSwaps.swapchains){
+			vkDestroySwapchainKHR(root.flowDevices.devices.at(0), swapchain, nullptr);
 		}
 
-		root->flowInstance->instance.destroySurfaceKHR(root->flowSurface->surface);
-		root->flowInstance->instance.destroy();
+		for(VkDevice device : root.flowDevices.devices){
+			vkDestroyDevice(device, nullptr);
+		}
 
-		glfwDestroyWindow(root->flowWindow->getWindow());
+		if(enabledValidationLayers){
+			vulkan::DestroyDebugUtilsMessengerEXT(root.flowInstances.instances.at(0), root.debugUtils.debugMessenger, nullptr);
+		}
+
+		int i = 0;
+		for(VkSurfaceKHR surface : root.flowSurfaces.surfaces){
+			vkDestroySurfaceKHR(root.flowInstances.instances.at(i), surface, nullptr);
+			i++;
+		}
+
+		for(VkInstance instance : root.flowInstances.instances){
+			vkDestroyInstance(instance, nullptr);
+		}
+
+		glfwDestroyWindow(root.flowWindow.window);
 		glfwTerminate();
-
-		system("pause");
 	}
 
 	void initWindow()
@@ -49,7 +68,6 @@ namespace flow {
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-		root->flowWindow->setWindow(root->flowWindow->createWindow());
+		root.flowWindow.window = glfwCreateWindow(root.flowWindow.WIDTH, root.flowWindow.HEIGHT, "Flow Engine", nullptr, nullptr);
 	}
 }
-

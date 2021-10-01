@@ -1,43 +1,43 @@
 #ifndef DEBUG_TOOLS
 #define DEBUG_TOOLS
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 
 #include <vector>
 
-typedef struct ValidLayers ValidLayers;
-struct ValidLayers
+namespace flow
 {
 #ifdef NDEBUG
-    bool enabledValidationLayers = false;
+    const bool enabledValidationLayers = false;
 #else
-    bool enabledValidationLayers = true;
+    const bool enabledValidationLayers = true;
 #endif
-    std::vector<const char *> layers = {
-        "VK_LAYER_KHRONOS_validation"};
+    namespace validlayers
+    {
+        const std::vector<const char *> layers = {
+            "VK_LAYER_KHRONOS_validation"};
+    }
+}
+
+struct DebugUtils{
+    VkDebugUtilsMessengerEXT debugMessenger;
 };
 
-typedef struct DebugUtils DebugUtils;
-struct DebugUtils
+namespace flow::vulkan
 {
-    vk::DebugUtilsMessengerEXT debugMessenger;
-};
+    void setupDebugMessenger();
 
-namespace flow::vulkan::debugtools
-{
     bool checkValidationLayerSupport();
 
     std::vector<const char *> getRequiredExtensions();
 
-    void populateDebugUtilsMessengerCreateInfo(vk::DebugUtilsMessengerCreateInfoEXT &createInfo);
+    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+
+    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger);
+
+    void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
 
     static VkBool32 VKAPI_PTR VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData);
-
-    void setupDebugMessenger();
-
-    VkResult CreateDebugUtilsMessengerEXT(vk::Instance instance, const vk::DebugUtilsMessengerCreateInfoEXT *pCreateInfo, const vk::AllocationCallbacks *pAllocator, vk::DebugUtilsMessengerEXT *pDebugMessenger);
-
-    void DestroyDebugUtilsMessengerEXT(vk::Instance instance, vk::DebugUtilsMessengerEXT debugMessenger, const vk::AllocationCallbacks *pAllocator);
 }
 
 #endif

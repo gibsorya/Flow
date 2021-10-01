@@ -1,11 +1,13 @@
-#include "engine/engine.cpp"
-
+#include "../engine/engine.hpp"
 #include <iostream>
 
 void run() {
+    flow::test();
     flow::initVulkan();
     flow::mainLoop();
     flow::cleanup();
+    std::cout << "Vulkan finished!" << std::endl;
+    system("pause");
 }
 
 int main() {
