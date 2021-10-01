@@ -21,8 +21,8 @@ namespace flow
 		root.flowInstances.instances.push_back(vulkan::createInstance());
 		vulkan::setupDebugMessenger();
 		root.flowSurfaces.surfaces.push_back(vulkan::createSurface());
-		// root->flowDevices->pickPhysicalDevice();
-		// root->flowDevices->createLogicalDevice();
+		root.flowDevices.physicalDevice = vulkan::pickPhysicalDevice();
+		root.flowDevices.devices.push_back(vulkan::createLogicalDevice());
 	}
 
 	void mainLoop()
@@ -34,18 +34,13 @@ namespace flow
 
 	void cleanup()
 	{
-		// vkDestroyDevice(root->flowDevices->getDevices().at(0), nullptr);
+		for(VkDevice device : root.flowDevices.devices){
+			vkDestroyDevice(device, nullptr);
+		}
 
 		if(enabledValidationLayers){
 			vulkan::DestroyDebugUtilsMessengerEXT(root.flowInstances.instances.at(0), root.debugUtils.debugMessenger, nullptr);
 		}
-
-		// vkDestroySurfaceKHR(root->flowInstances->getInstance(), root->flowSurfaces->getSurfaces().at(0), nullptr);
-		// vkDestroyInstance(root->flowInstances->getInstance(), nullptr);
-
-		// // for(VkInstance instance : root->flowInstances->getInstances()){
-		// // 	vkDestroyInstance(instance, nullptr);
-		// // }
 
 		int i = 0;
 		for(VkSurfaceKHR surface : root.flowSurfaces.surfaces){
@@ -68,10 +63,6 @@ namespace flow
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-		// root->flowWindow = (FlowWindow*)malloc(sizeof(FlowWindow));
-
 		root.flowWindow.window = glfwCreateWindow(root.flowWindow.WIDTH, root.flowWindow.HEIGHT, "Flow Engine", nullptr, nullptr);
-		// // root->flowWindow->setWindow(root->flowWindow->createWindow());
-		// root->flowWindow->window = glfwCreateWindow(root->flowWindow->WIDTH, root->flowWindow->HEIGHT, "Flow Engine", nullptr, nullptr);
 	}
 }

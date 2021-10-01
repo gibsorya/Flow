@@ -107,20 +107,3 @@ namespace flow::vulkan
         }
     }
 }
-
-// const VkDebugUtilsMessengerEXT &DebugUtils::getDebugMessenger() const {
-//     return debugMessenger;
-// }
-// void DebugUtils::setupDebugMessenger()
-// {
-//     if (!flow::enabledValidationLayers)
-//         return;
-
-//     VkDebugUtilsMessengerCreateInfoEXT createInfo;
-//     flow::vulkan::populateDebugMessengerCreateInfo(createInfo);
-
-//     if (flow::vulkan::CreateDebugUtilsMessengerEXT(root->flowInstances->getInstance(), &createInfo, nullptr, &this->debugMessenger) != VK_SUCCESS)
-//     {
-//         throw std::runtime_error("failed to set up debug messenger!");
-//     }
-// }

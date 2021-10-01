@@ -8,7 +8,7 @@
                 "-g",
                 "${file}",
                 "-o",
-                "$${workspaceFolder}/build/Flow.exe"
+                "$${workspaceFolder}\\build\\Flow.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"
