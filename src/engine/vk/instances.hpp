@@ -6,7 +6,6 @@
 
 struct FlowInstances{
     std::vector<VkInstance> instances;
-    VkInstance instance;
 };
 
 namespace flow::vulkan {

@@ -21,7 +21,6 @@ namespace flow
 		root.flowInstances.instances.push_back(vulkan::createInstance());
 		vulkan::setupDebugMessenger();
 		root.flowSurfaces.surfaces.push_back(vulkan::createSurface());
-		// root->flowSurfaces->createSurface();
 		// root->flowDevices->pickPhysicalDevice();
 		// root->flowDevices->createLogicalDevice();
 	}
@@ -55,15 +54,8 @@ namespace flow
 		}
 
 		for(VkInstance instance : root.flowInstances.instances){
-			std::cout << "Loop!" << std::endl;
 			vkDestroyInstance(instance, nullptr);
 		}
-
-		// for(size_t i = 0; i < root->flowInstances.instances.size(); i++){
-		// 	std::cout << "Loop!" << std::endl;
-		// 	vkDestroyInstance(root->flowInstances.instances.at(i), nullptr);
-		// }
-		// vkDestroyInstance(root.flowInstances.instance, nullptr);
 
 		glfwDestroyWindow(root.flowWindow.window);
 		glfwTerminate();
