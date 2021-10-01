@@ -1,71 +1,106 @@
-#include "devices.hpp"
-#include <engine/root.hpp>
+// #include "devices.hpp"
+// #include <engine/root.hpp>
 
-namespace flow::vulkan{
-    void pickPhysicalDevice(VkInstance* instance){
-        u32 deviceCount;
-        vkEnumeratePhysicalDevices(*instance, &deviceCount, nullptr);
+// namespace flow::vulkan
+// {
+//     bool isDeviceSuitable(VkPhysicalDevice device)
+//     {
+//         QueueFamilyIndicies indices = findQueueFamilies(device);
 
-        if(deviceCount == 0){
-            std::runtime_error("Failed to find GPU with Vulkan support!");
-        }
-        std::vector<VkPhysicalDevice> devices(deviceCount);
-        vkEnumeratePhysicalDevices(*instance, &deviceCount, devices.data());
-        
-        for(const auto& device : devices){
-            if(isDeviceSuitable(device)){
-                root->flowDevices->currentPhysicalDevice = device;
-                break;
-            }
-        }
+//         vkGetPhysicalDeviceProperties2(device, &root->flowDevices->deviceProperties);
+//         vkGetPhysicalDeviceFeatures2(device, &root->flowDevices->deviceFeatures);
 
-        if(root->flowDevices->currentPhysicalDevice == VK_NULL_HANDLE){
-            throw std::runtime_error("Failed to find a suitable GPU!");
-        }
-    }
+//         return root->flowDevices->deviceProperties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && root->flowDevices->deviceFeatures.features.geometryShader && indices.isComplete();
+//     }
+// }
 
-    bool isDeviceSuitable(VkPhysicalDevice device){
-        QueueFamilyIndicies indices = findQueueFamilies(device);
+// void FlowDevices::pickPhysicalDevice()
+// {
+//     u32 deviceCount;
+//     vkEnumeratePhysicalDevices(root->flowInstances->getInstance(), &deviceCount, nullptr);
 
-        vkGetPhysicalDeviceProperties2(device, &root->flowDevices->deviceProperties);
-        vkGetPhysicalDeviceFeatures2(device, &root->flowDevices->deviceFeatures);
+//     if (deviceCount == 0)
+//     {
+//         std::runtime_error("Failed to find GPU with Vulkan support!");
+//     }
 
-        return root->flowDevices->deviceProperties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
-        && root->flowDevices->deviceFeatures.features.geometryShader && indices.isComplete();
-    }
+//     std::vector<VkPhysicalDevice> devices(deviceCount);
+//     vkEnumeratePhysicalDevices(root->flowInstances->getInstance(), &deviceCount, devices.data());
 
+//     for (const auto &device : devices)
+//     {
+//         if (flow::vulkan::isDeviceSuitable(device))
+//         {
+//             this->physicalDevice = device;
+//             break;
+//         }
+//     }
 
-    VkDevice createLogicalDevice(VkPhysicalDevice *physicalDevice){
-        VkDevice device;
-        QueueFamilyIndicies indices = findQueueFamilies(root->flowDevices->currentPhysicalDevice);
+//     if (this->physicalDevice == VK_NULL_HANDLE)
+//     {
+//         throw std::runtime_error("Failed to find a suitable GPU!");
+//     }
+// }
 
-        float queuePriority = 1.0f;
-        VkDeviceQueueCreateInfo queueCreateInfo{};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-        queueCreateInfo.queueCount = 1;
-        queueCreateInfo.pQueuePriorities = &queuePriority;
+// void FlowDevices::createLogicalDevice()
+// {
+//     QueueFamilyIndicies indices = flow::vulkan::findQueueFamilies(this->physicalDevice);
 
-        VkDeviceCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        createInfo.pQueueCreateInfos = &queueCreateInfo;
-        createInfo.queueCreateInfoCount = 1;
-        createInfo.pEnabledFeatures = &root->flowDevices->deviceFeatures.features;
-        createInfo.enabledExtensionCount = 0;
+//     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+//     std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
-        if(root->validLayers->enabledValidationLayers){
-            createInfo.enabledLayerCount = static_cast<u32>(root->validLayers->layers.size());
-            createInfo.ppEnabledLayerNames = root->validLayers->layers.data();
-        } else {
-            createInfo.enabledLayerCount = 0;
-        }
+//     float queuePriority = 1.0f;
+//     for(u32 queueFamily : uniqueQueueFamilies){
+//   VkDeviceQueueCreateInfo queueCreateInfo{};
+//     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+//     queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+//     queueCreateInfo.queueCount = 1;
+//     queueCreateInfo.pQueuePriorities = &queuePriority;
+//     queueCreateInfos.push_back(queueCreateInfo);
+//     }
+  
 
-        if(vkCreateDevice(root->flowDevices->currentPhysicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS){
-            throw std::runtime_error("Failed to create logical device!");
-        }
+//     VkDeviceCreateInfo createInfo{};
+//     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+//     createInfo.pQueueCreateInfos = queueCreateInfos.data();
+//     createInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
+//     createInfo.pEnabledFeatures = &this->deviceFeatures.features;
+//     createInfo.enabledExtensionCount = 0;
 
-        vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &root->flowDevices->graphicsQueue);
+//     if (flow::enabledValidationLayers)
+//     {
+//         createInfo.enabledLayerCount = static_cast<u32>(flow::validlayers::layers.size());
+//         createInfo.ppEnabledLayerNames = flow::validlayers::layers.data();
+//     }
+//     else
+//     {
+//         createInfo.enabledLayerCount = 0;
+//     }
 
-        return device;
-    }
-}
+//     if (vkCreateDevice(this->physicalDevice, &createInfo, nullptr, &this->device) != VK_SUCCESS)
+//     {
+//         throw std::runtime_error("Failed to create logical device!");
+//     }
+
+//     vkGetDeviceQueue(this->device, indices.graphicsFamily.value(), 0, &this->graphicsQueue);
+//     vkGetDeviceQueue(this->device, indices.presentFamily.value(), 0, &this->presentQueue);
+
+//     this->devices.push_back(this->device);
+// }
+
+// const std::vector<VkDevice> &FlowDevices::getDevices() const
+// {
+//     return devices;
+// }
+// const VkQueue &FlowDevices::getGraphicsQueue() const
+// {
+//     return graphicsQueue;
+// }
+// const VkQueue& FlowDevices::getPresentQueue() const
+// {
+//     return presentQueue;
+// }
+// const VkPhysicalDevice &FlowDevices::getPhysicalDevice() const
+// {
+//     return physicalDevice;
+// }

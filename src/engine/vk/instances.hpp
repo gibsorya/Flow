@@ -2,22 +2,43 @@
 #define FLOW_INSTANCES
 
 #include "../flow/flow.hpp"
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
-typedef struct FlowInstances FlowInstances;
-struct FlowInstances {
-    //std::unique_ptr<std::vector<VkInstance>> instances = std::make_unique<std::vector<VkInstance>>();
-    // FlowInstances();
-    // std::unique_ptr<VkInstance> instance;
-    VkInstance instance;
-    // [[nodiscard]] const std::vector<VkInstance>& getInstances() const;
-private:
+struct FlowInstances{
     std::vector<VkInstance> instances;
+    VkInstance instance;
 };
 
-namespace flow::vulkan{
-    // void startFlow();
+namespace flow::vulkan {
     VkInstance createInstance();
 }
+
+// typedef struct FlowInstances FlowInstances;
+
+// namespace flow {
+// struct FlowInstances {
+// public:
+//     // [[nodiscard]] const VkInstance& findInstance() const;
+//     // [[nodiscard]] const std::vector<VkInstance>& getInstances() const;
+//     [[nodiscard]] const VkInstance& getInstance() const;
+//     void createInstance();
+//     // VkInstance createInstances();
+//     // FlowInstances();
+//     // std::shared_ptr<VkInstance> flowInstance = std::make_shared<VkInstance>();
+    
+//     // vk::Instance vkInstance;
+
+// private:
+//     VkInstance instance;
+//     std::vector<VkInstance> instances;
+// };
+
+// }
+
+// namespace flow::vulkan{
+//     // void startFlow();
+//     void createInstance();
+    
+// }
 
 #endif

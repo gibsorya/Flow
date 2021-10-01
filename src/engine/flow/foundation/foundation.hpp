@@ -10,10 +10,11 @@
 #include <math.h>
 #include <memory>
 #include <vector>
+#include <set>
 
 
-// #define global static
-// #define local static
+#define global static
+#define local static
 
 typedef uint32_t u32;
 

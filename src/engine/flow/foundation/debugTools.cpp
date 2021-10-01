@@ -3,23 +3,24 @@
 
 #include <iostream>
 
-namespace flow::vulkan::debugtools
+namespace flow::vulkan
 {
-    VkDebugUtilsMessengerEXT setupDebugMessenger(VkInstance *instance)
+    void setupDebugMessenger()
     {
-        if (!root->validLayers->enabledValidationLayers)
-            return nullptr;
-        
-        VkDebugUtilsMessengerEXT debugMessenger;
-        VkDebugUtilsMessengerCreateInfoEXT createInfo;
-        populateDebugMessengerCreateInfo(createInfo);
+        if (!flow::enabledValidationLayers)
+            return;
 
-        if (CreateDebugUtilsMessengerEXT(*instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
+        VkDebugUtilsMessengerEXT debugMessenger;
+
+        VkDebugUtilsMessengerCreateInfoEXT createInfo;
+        flow::vulkan::populateDebugMessengerCreateInfo(createInfo);
+
+        if (flow::vulkan::CreateDebugUtilsMessengerEXT(root.flowInstances.instances.at(0), &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to set up debug messenger!");
         }
 
-        return debugMessenger;
+        root.debugUtils.debugMessenger = debugMessenger;
     }
 
     bool checkValidationLayerSupport()
@@ -30,7 +31,7 @@ namespace flow::vulkan::debugtools
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-        for (const char *layerName : root->validLayers->layers)
+        for (const char *layerName : validlayers::layers)
         {
             bool layerFound = false;
 
@@ -60,7 +61,7 @@ namespace flow::vulkan::debugtools
 
         std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
-        if (root->validLayers->enabledValidationLayers)
+        if (flow::enabledValidationLayers)
         {
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
@@ -85,7 +86,7 @@ namespace flow::vulkan::debugtools
 
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger)
     {
-        auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+        auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 
         if (func != nullptr)
         {
@@ -99,10 +100,27 @@ namespace flow::vulkan::debugtools
 
     void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator)
     {
-        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr)
         {
             func(instance, debugMessenger, pAllocator);
         }
     }
 }
+
+// const VkDebugUtilsMessengerEXT &DebugUtils::getDebugMessenger() const {
+//     return debugMessenger;
+// }
+// void DebugUtils::setupDebugMessenger()
+// {
+//     if (!flow::enabledValidationLayers)
+//         return;
+
+//     VkDebugUtilsMessengerCreateInfoEXT createInfo;
+//     flow::vulkan::populateDebugMessengerCreateInfo(createInfo);
+
+//     if (flow::vulkan::CreateDebugUtilsMessengerEXT(root->flowInstances->getInstance(), &createInfo, nullptr, &this->debugMessenger) != VK_SUCCESS)
+//     {
+//         throw std::runtime_error("failed to set up debug messenger!");
+//     }
+// }

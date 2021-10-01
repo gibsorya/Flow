@@ -1,37 +1,37 @@
 #ifndef DEBUG_TOOLS
 #define DEBUG_TOOLS
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 
 #include <vector>
 
-typedef struct ValidLayers ValidLayers;
-struct ValidLayers
+namespace flow
 {
 #ifdef NDEBUG
-    bool enabledValidationLayers = false;
+    const bool enabledValidationLayers = false;
 #else
-    bool enabledValidationLayers = true;
+    const bool enabledValidationLayers = true;
 #endif
-    std::vector<const char *> layers = {
-        "VK_LAYER_KHRONOS_validation"};
-};
+    namespace validlayers
+    {
+        const std::vector<const char *> layers = {
+            "VK_LAYER_KHRONOS_validation"};
+    }
+}
 
-typedef struct DebugUtils DebugUtils;
-struct DebugUtils
-{
+struct DebugUtils{
     VkDebugUtilsMessengerEXT debugMessenger;
 };
 
-namespace flow::vulkan::debugtools
+namespace flow::vulkan
 {
-    VkDebugUtilsMessengerEXT setupDebugMessenger(VkInstance *instance);
+    void setupDebugMessenger();
 
     bool checkValidationLayerSupport();
 
     std::vector<const char *> getRequiredExtensions();
 
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger);
 
@@ -39,20 +39,5 @@ namespace flow::vulkan::debugtools
 
     static VkBool32 VKAPI_PTR VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData);
 }
-
-// namespace flow::vulkan::debugtools
-// {
-//     bool checkValidationLayerSupport();
-
-//     std::vector<const char *> getRequiredExtensions();
-
-//     static VkBool32 VKAPI_PTR VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData);
-
-//     void setupDebugMessenger();
-
-//     VkResult CreateDebugUtilsMessengerEXT(vk::Instance instance, const vk::DebugUtilsMessengerCreateInfoEXT *pCreateInfo, const vk::AllocationCallbacks *pAllocator, vk::DebugUtilsMessengerEXT *pDebugMessenger);
-
-//     void DestroyDebugUtilsMessengerEXT(vk::Instance instance, vk::DebugUtilsMessengerEXT debugMessenger, const vk::AllocationCallbacks *pAllocator);
-// }
 
 #endif

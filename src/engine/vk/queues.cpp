@@ -2,31 +2,38 @@
 #include "../root.hpp"
 
 namespace flow::vulkan{
-    QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device){
-        QueueFamilyIndicies indices;
+    // QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device){
+    //     QueueFamilyIndicies indices;
 
         
-        uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties2(device, &queueFamilyCount, nullptr);
-        std::vector<VkQueueFamilyProperties2> queueFamilies(queueFamilyCount);
-        for(auto& queueFamily : queueFamilies){
-            queueFamily.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;
-        }
-        vkGetPhysicalDeviceQueueFamilyProperties2(device, &queueFamilyCount, queueFamilies.data());
+    //     uint32_t queueFamilyCount = 0;
+    //     vkGetPhysicalDeviceQueueFamilyProperties2(device, &queueFamilyCount, nullptr);
+    //     std::vector<VkQueueFamilyProperties2> queueFamilies(queueFamilyCount);
+    //     for(auto& queueFamily : queueFamilies){
+    //         queueFamily.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;
+    //     }
+    //     vkGetPhysicalDeviceQueueFamilyProperties2(device, &queueFamilyCount, queueFamilies.data());
 
-        int i = 0;
-        for(const auto& queueFamily : queueFamilies){
-            if(queueFamily.queueFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT){
-                indices.graphicsFamily = i;
-            }
+    //     int i = 0;
+    //     for(const auto& queueFamily : queueFamilies){
+    //         if(queueFamily.queueFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT){
+    //             indices.graphicsFamily = i;
+    //         }
 
-            if(indices.isComplete()){
-                break;
-            }
+    //         VkBool32 presentSupport = false;
+    //         vkGetPhysicalDeviceSurfaceSupportKHR(device, i, root->flowSurfaces->getSurfaces().at(0), &presentSupport);
 
-            i++;
-        }
+    //         if(presentSupport){
+    //             indices.presentFamily = i;
+    //         }
 
-        return indices;
-    }
+    //         if(indices.isComplete()){
+    //             break;
+    //         }
+
+    //         i++;
+    //     }
+
+    //     return indices;
+    // }
 }
