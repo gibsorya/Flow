@@ -10,9 +10,6 @@ struct QueueFamilyIndicies{
     std::optional<u32> graphicsFamily;
     std::optional<u32> presentFamily;
 
-    u32 queueFamilyCount = 0;
-    VkQueueFamilyProperties2 queueFamilyProperties{};
-
     float queuePriority = 1.0f;
 
     bool isComplete(){

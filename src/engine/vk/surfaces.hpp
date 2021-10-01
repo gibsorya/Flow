@@ -8,6 +8,8 @@
 
 struct FlowSurfaces{
     std::vector<VkSurfaceKHR> surfaces;
+
+    VkPhysicalDeviceSurfaceInfo2KHR physicalSurfaceInfo;
 };
 
 namespace flow::vulkan {

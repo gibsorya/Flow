@@ -5,7 +5,7 @@
 #include "vk/devices.hpp"
 #include "vk/queues.hpp"
 #include "vk/surfaces.hpp"
-
+#include "vk/swapchains.hpp"
 
 /*
 
@@ -18,6 +18,8 @@ struct Root
     FlowInstances flowInstances;
     DebugUtils debugUtils;
     FlowSurfaces flowSurfaces;
+    std::unique_ptr<FlowDevices> flowDevices2 = std::make_unique<FlowDevices>();
     FlowDevices flowDevices;
+    FlowSwapchains flowSwaps;
 };
 extern struct Root root;

@@ -3,6 +3,7 @@
 
 namespace flow::vulkan
 {
+
     VkPhysicalDevice pickPhysicalDevice()
     {
         VkPhysicalDevice physicalDevice;
@@ -18,7 +19,7 @@ namespace flow::vulkan
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(root.flowInstances.instances.at(0), &deviceCount, devices.data());
 
-        for (const auto &device : devices)
+        for (const auto& device : devices)
         {
             if (isDeviceSuitable(device))
             {
@@ -39,16 +40,41 @@ namespace flow::vulkan
     {
         QueueFamilyIndicies indices = findQueueFamilies(device);
 
-        vkGetPhysicalDeviceProperties2(device, &root.flowDevices.deviceProperties);
-        vkGetPhysicalDeviceFeatures2(device, &root.flowDevices.deviceFeatures);
+        bool extensionsSupported = checkDeviceExtensionSupport(device);
 
-        return root.flowDevices.deviceProperties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && root.flowDevices.deviceFeatures.features.geometryShader && indices.isComplete();
+        bool swapchainAdequate = false;
+        if (extensionsSupported)
+        {
+            SwapchainSupportDetails details = querySwapchainSupport(device);
+            swapchainAdequate = !details.formats.empty() && !details.presentModes.empty();
+        }
+
+        return extensionsSupported && indices.isComplete() && swapchainAdequate;
     }
 
-    VkDevice createLogicalDevice() {
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device)
+    {
+        u32 extensionCount;
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+        std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+        std::set<std::string> requiredExtensions(extensions::deviceExtensions.begin(), extensions::deviceExtensions.end());
+
+        for (const auto &extension : availableExtensions)
+        {
+            requiredExtensions.erase(extension.extensionName);
+        }
+
+        return requiredExtensions.empty();
+    }
+
+    VkDevice createLogicalDevice()
+    {
         VkDevice device;
 
-        QueueFamilyIndicies indices = flow::vulkan::findQueueFamilies(root.flowDevices.physicalDevice);
+        QueueFamilyIndicies indices = findQueueFamilies(root.flowDevices.physicalDevice);
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
@@ -69,7 +95,8 @@ namespace flow::vulkan
         createInfo.pQueueCreateInfos = queueCreateInfos.data();
         createInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
         createInfo.pEnabledFeatures = &root.flowDevices.deviceFeatures.features;
-        createInfo.enabledExtensionCount = 0;
+        createInfo.enabledExtensionCount = static_cast<u32>(extensions::deviceExtensions.size());
+        createInfo.ppEnabledExtensionNames = extensions::deviceExtensions.data();
 
         if (flow::enabledValidationLayers)
         {
@@ -91,4 +118,5 @@ namespace flow::vulkan
 
         return device;
     }
+
 }

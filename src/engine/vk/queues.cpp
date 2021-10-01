@@ -5,9 +5,9 @@ namespace flow::vulkan{
     QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device){
         QueueFamilyIndicies indices;
 
-        
-        uint32_t queueFamilyCount = 0;
+        u32 queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties2(device, &queueFamilyCount, nullptr);
+
         std::vector<VkQueueFamilyProperties2> queueFamilies(queueFamilyCount);
         for(auto& queueFamily : queueFamilies){
             queueFamily.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;

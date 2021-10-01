@@ -5,12 +5,14 @@
 #include <stdarg.h>
 #include <stdexcept>
 #include <cstdlib>
+#include <cstdint>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
 #include <memory>
 #include <vector>
 #include <set>
+#include <algorithm>
 
 
 #define global static

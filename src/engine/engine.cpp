@@ -20,9 +20,10 @@ namespace flow
 		initWindow();
 		root.flowInstances.instances.push_back(vulkan::createInstance());
 		vulkan::setupDebugMessenger();
-		root.flowSurfaces.surfaces.push_back(vulkan::createSurface());
+		root.flowSurfaces.surfaces.push_back(vulkan::createSurface());	
 		root.flowDevices.physicalDevice = vulkan::pickPhysicalDevice();
 		root.flowDevices.devices.push_back(vulkan::createLogicalDevice());
+		// root.flowSwaps.swapchains.push_back(vulkan::createSwapchain());
 	}
 
 	void mainLoop()
@@ -34,6 +35,10 @@ namespace flow
 
 	void cleanup()
 	{
+		for(VkSwapchainKHR swapchain : root.flowSwaps.swapchains){
+			vkDestroySwapchainKHR(root.flowDevices.devices.at(0), swapchain, nullptr);
+		}
+
 		for(VkDevice device : root.flowDevices.devices){
 			vkDestroyDevice(device, nullptr);
 		}
