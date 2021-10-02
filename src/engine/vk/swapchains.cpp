@@ -77,7 +77,7 @@ namespace flow::vulkan{
         if(formatCount != 0){
             details.formats.resize(formatCount);
 
-            for(VkSurfaceFormat2KHR format : details.formats){
+            for(auto& format : details.formats){
                 format.sType = VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR;
                 format.pNext = nullptr;
             }

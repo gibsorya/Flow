@@ -23,7 +23,8 @@ namespace flow
 		root.flowSurfaces.surfaces.push_back(vulkan::createSurface());	
 		root.flowDevices.physicalDevice = vulkan::pickPhysicalDevice();
 		root.flowDevices.devices.push_back(vulkan::createLogicalDevice());
-		// root.flowSwaps.swapchains.push_back(vulkan::createSwapchain());
+		root.flowSwaps.swapchains.push_back(vulkan::createSwapchain());
+		vulkan::createImageViews();
 	}
 
 	void mainLoop()
@@ -35,6 +36,10 @@ namespace flow
 
 	void cleanup()
 	{
+		for(auto imageView : root.imageViews.swapchainImageViews){
+			vkDestroyImageView(root.flowDevices.devices.at(0), imageView, nullptr);
+		}
+
 		for(VkSwapchainKHR swapchain : root.flowSwaps.swapchains){
 			vkDestroySwapchainKHR(root.flowDevices.devices.at(0), swapchain, nullptr);
 		}

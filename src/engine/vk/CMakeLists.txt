@@ -5,9 +5,11 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/devices.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/surfaces.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/imageviews.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/instances.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/queues.hpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/devices.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/surfaces.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/imageviews.hpp
 )

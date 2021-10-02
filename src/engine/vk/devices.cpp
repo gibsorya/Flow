@@ -90,6 +90,11 @@ namespace flow::vulkan
             queueCreateInfos.push_back(queueCreateInfo);
         }
 
+        // std::vector<const char *> extensions;
+        // extensions.reserve(extensions::deviceExtensions.size() + extensions::additionalExtensions.size());
+        // extensions.insert(extensions.end(), extensions::deviceExtensions.begin(), extensions::deviceExtensions.end());
+        // extensions.insert(extensions.end(), extensions::additionalExtensions.begin(), extensions::additionalExtensions.end());                                                           
+
         VkDeviceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         createInfo.pQueueCreateInfos = queueCreateInfos.data();

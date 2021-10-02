@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21.2)
 project(FlowVK VERSION 0.0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
-configure_file(FlowConfig.h.in FlowConfig.h)
+# configure_file(FlowConfig.h.in FlowConfig.h)
 
 set(FLOW_LIB_TARGET FlowLib)
 add_library(${FLOW_LIB_TARGET} STATIC "")

@@ -6,6 +6,7 @@
 #include "vk/queues.hpp"
 #include "vk/surfaces.hpp"
 #include "vk/swapchains.hpp"
+#include "vk/imageviews.hpp"
 
 /*
 
@@ -21,5 +22,6 @@ struct Root
     std::unique_ptr<FlowDevices> flowDevices2 = std::make_unique<FlowDevices>();
     FlowDevices flowDevices;
     FlowSwapchains flowSwaps;
+    FlowImageViews imageViews;
 };
 extern struct Root root;
