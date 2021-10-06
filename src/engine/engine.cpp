@@ -10,6 +10,7 @@ Root root;
 
 namespace flow
 {
+	//This method was here to make sure CMake was working, and I'm too lazy to delete it
 	void test()
 	{
 		std::cout << "Vulkan initiated!" << std::endl;
