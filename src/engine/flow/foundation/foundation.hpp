@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <memory>
+#include <fstream>
 #include <vector>
 #include <set>
 #include <algorithm>

@@ -27,5 +27,4 @@ namespace flow::vulkan {
             }
         }        
     }
-    
 }

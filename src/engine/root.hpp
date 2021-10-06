@@ -7,6 +7,9 @@
 #include "vk/surfaces.hpp"
 #include "vk/swapchains.hpp"
 #include "vk/imageviews.hpp"
+#include "vk/renderpasses.hpp"
+#include "vk/pipelines/pipelines.hpp"
+#include "vk/pipelines/pipelineinfos.hpp"
 
 /*
 
@@ -19,9 +22,13 @@ struct Root
     FlowInstances flowInstances;
     DebugUtils debugUtils;
     FlowSurfaces flowSurfaces;
-    std::unique_ptr<FlowDevices> flowDevices2 = std::make_unique<FlowDevices>();
     FlowDevices flowDevices;
     FlowSwapchains flowSwaps;
     FlowImageViews imageViews;
+    FlowGraphics graphicsPipelines;
+    FlowShaderModules shaderModules;
+    FlowViewports flowViewports;
+    FlowScissors flowScissors;
+    FlowRenderPasses flowRenderPasses;
 };
 extern struct Root root;
