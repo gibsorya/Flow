@@ -8,6 +8,8 @@
 #include "vk/swapchains.hpp"
 #include "vk/imageviews.hpp"
 #include "vk/renderpasses.hpp"
+#include "vk/buffers.hpp"
+#include "vk/syncobjects.hpp"
 #include "vk/pipelines/pipelines.hpp"
 #include "vk/pipelines/pipelineinfos.hpp"
 
@@ -30,5 +32,11 @@ struct Root
     FlowViewports flowViewports;
     FlowScissors flowScissors;
     FlowRenderPasses flowRenderPasses;
+    FlowFrameBuffers flowFrameBuffers;
+    FlowCommandPools flowCommandPools;
+    FlowCommandBuffers flowCommandBuffers;
+    FlowSyncObjects flowSyncObjects;
+
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 };
 extern struct Root root;

@@ -47,8 +47,16 @@ namespace flow::vulkan::pipelines
         auto vertexShaderCode = readFile("data/shaders/vert.spv");
         auto fragShaderCode = readFile("data/shaders/frag.spv");
 
-        root.shaderModules.vertexShaderModules.push_back(createShaderModule(vertexShaderCode));
-        root.shaderModules.fragShaderModules.push_back(createShaderModule(fragShaderCode));
+        if (root.shaderModules.vertexShaderModules.empty())
+        {
+            root.shaderModules.vertexShaderModules.push_back(createShaderModule(vertexShaderCode));
+            root.shaderModules.fragShaderModules.push_back(createShaderModule(fragShaderCode));
+        }
+        else
+        {
+            root.shaderModules.vertexShaderModules.at(0) = createShaderModule(vertexShaderCode);
+            root.shaderModules.fragShaderModules.at(0) = createShaderModule(fragShaderCode);
+        }
 
         VkPipelineShaderStageCreateInfo vertexInfo{};
         VkPipelineShaderStageCreateInfo fragInfo{};
@@ -57,7 +65,13 @@ namespace flow::vulkan::pipelines
         populateShaderStageInfo(fragInfo, root.shaderModules.fragShaderModules.at(0), VK_SHADER_STAGE_FRAGMENT_BIT, "main");
 
         std::vector<VkPipelineShaderStageCreateInfo> shaderStages = {vertexInfo, fragInfo};
-        root.graphicsPipelines.infos.shaderStages.push_back(shaderStages);
+
+        if(root.graphicsPipelines.infos.shaderStages.empty()){
+            root.graphicsPipelines.infos.shaderStages.push_back(shaderStages);
+        } else {
+            root.graphicsPipelines.infos.shaderStages.at(0) = shaderStages;
+        }
+        
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
@@ -69,8 +83,18 @@ namespace flow::vulkan::pipelines
         VkPipelineColorBlendStateCreateInfo colorBlend{};
         VkPipelineColorBlendAttachmentState colorBlendAttachment{};
         // VkPipelineDynamicStateCreateInfo dynamicState{}; //Implement this later
-        root.flowViewports.viewports.push_back(createViewport());
-        root.flowScissors.scissors.push_back(createScissor());
+
+        if(root.flowViewports.viewports.empty()){
+            root.flowViewports.viewports.push_back(createViewport());
+        } else {
+            root.flowViewports.viewports.at(0) = createViewport();
+        }
+
+        if(root.flowScissors.scissors.empty()){
+            root.flowScissors.scissors.push_back(createScissor());
+        } else {
+            root.flowScissors.scissors.at(0) = createScissor();
+        }
 
         populateVertexInputInfo(vertexInputInfo);
         populateInputAssemblyInfo(inputAssembly);
@@ -83,7 +107,14 @@ namespace flow::vulkan::pipelines
         populateColorBlendInfo(colorBlend, colorBlendAttachment);
         // populateDynamicStateInfo(dynamicState); //Implement this later
 
-        root.graphicsPipelines.pipelineLayouts.push_back(createPipelineLayout());
+        if (root.graphicsPipelines.pipelineLayouts.empty())
+        {
+            root.graphicsPipelines.pipelineLayouts.push_back(createPipelineLayout());
+        }
+        else
+        {
+            root.graphicsPipelines.pipelineLayouts.at(0) = createPipelineLayout();
+        }
 
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -102,7 +133,8 @@ namespace flow::vulkan::pipelines
         pipelineInfo.renderPass = root.flowRenderPasses.renderPasses.at(0);
         pipelineInfo.subpass = 0;
 
-        if(vkCreateGraphicsPipelines(root.flowDevices.devices.at(0), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS){
+        if (vkCreateGraphicsPipelines(root.flowDevices.devices.at(0), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to create graphics pipeline!");
         }
 
@@ -112,7 +144,8 @@ namespace flow::vulkan::pipelines
         return pipeline;
     }
 
-    VkViewport createViewport() {
+    VkViewport createViewport()
+    {
         VkViewport viewport;
 
         viewport.width = (float)root.flowSwaps.swapchainExtents.at(0).width;
@@ -121,20 +154,22 @@ namespace flow::vulkan::pipelines
         viewport.y = 0;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
-        
+
         return viewport;
     }
 
-    VkRect2D createScissor() {
+    VkRect2D createScissor()
+    {
         VkRect2D scissor;
-        
+
         scissor.extent = root.flowSwaps.swapchainExtents.at(0);
         scissor.offset = {0, 0};
 
         return scissor;
     }
 
-    VkPipelineLayout createPipelineLayout() {
+    VkPipelineLayout createPipelineLayout()
+    {
         VkPipelineLayout pipelineLayout;
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -142,11 +177,12 @@ namespace flow::vulkan::pipelines
         pipelineLayoutInfo.setLayoutCount = 0;
         pipelineLayoutInfo.pushConstantRangeCount = 0;
 
-        if (vkCreatePipelineLayout(root.flowDevices.devices.at(0), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+        if (vkCreatePipelineLayout(root.flowDevices.devices.at(0), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
 
-        return pipelineLayout;    
+        return pipelineLayout;
     }
 
 }

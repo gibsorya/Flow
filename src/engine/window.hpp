@@ -13,5 +13,9 @@ struct FlowWindow {
 	const u32 HEIGHT = 600;
 
 	GLFWwindow* window;
+
+	void initWindow();
+
+	// static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 	
 };

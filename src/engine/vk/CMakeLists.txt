@@ -7,6 +7,8 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/imageviews.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/renderpasses.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/buffers.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/syncobjects.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelines.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelineinfos.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/instances.hpp
@@ -16,6 +18,8 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/imageviews.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/renderpasses.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/buffers.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/syncobjects.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelines.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelineinfos.hpp
 )

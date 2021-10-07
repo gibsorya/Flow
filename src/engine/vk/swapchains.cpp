@@ -52,8 +52,18 @@ namespace flow::vulkan{
         root.flowSwaps.swapChainImages.resize(imageCount);
         vkGetSwapchainImagesKHR(root.flowDevices.devices.at(0), swapchain, &imageCount, root.flowSwaps.swapChainImages.data());
 
-        root.flowSwaps.swapchainImageFormats.push_back(surfaceFormat.surfaceFormat.format);
-        root.flowSwaps.swapchainExtents.push_back(extent);
+        if(root.flowSwaps.swapchainImageFormats.empty()){
+            root.flowSwaps.swapchainImageFormats.push_back(surfaceFormat.surfaceFormat.format);
+        } else {
+            root.flowSwaps.swapchainImageFormats.at(0) = surfaceFormat.surfaceFormat.format;
+        }
+
+        if(root.flowSwaps.swapchainExtents.empty()){
+            root.flowSwaps.swapchainExtents.push_back(extent);
+        } else {
+            root.flowSwaps.swapchainExtents.at(0) = extent;
+        }
+        
 
         return swapchain;
     }
