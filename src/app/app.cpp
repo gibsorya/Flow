@@ -6,6 +6,10 @@ namespace app {
         
         
         return SUCCESS;
+
+        error:
+
+        return ERR_INVALID;
     }
     
 }

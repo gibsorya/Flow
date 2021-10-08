@@ -1,5 +1,5 @@
-// #ifndef FLOW_ENGINE
-// #define FLOW_ENGINE
+#ifndef FLOW_ENGINE
+#define FLOW_ENGINE
 
 // #include "flow/flow.hpp"
 // #include <GLFW/glfw3.h>
@@ -17,4 +17,4 @@
 // 	// static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 // }
 
-// #endif
+#endif

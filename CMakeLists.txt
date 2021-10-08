@@ -24,7 +24,11 @@ target_include_directories(${FLOW_LIB_TARGET}
 		${PROJECT_BINARY_DIR}
 		${PROJECT_SOURCE_DIR}/external
 		${PROJECT_SOURCE_DIR}/external/glfw/include
-		${PROJECT_SOURCE_DIR}/src	
+		${PROJECT_SOURCE_DIR}/src
+		${PROJECT_SOURCE_DIR}/src/app
+		${PROJECT_SOURCE_DIR}/src/flow
+		${PROJECT_SOURCE_DIR}/src/engine
+		${PROJECT_SOURCE_DIR}/src/platform		
 )
 set(LIBS_DIR ${PROJECT_SOURCE_DIR}/libs)
 target_link_libraries(${FLOW_LIB_TARGET}
@@ -40,7 +44,11 @@ function(add_flowengine_target flowTarget flowRoot)
 		${PROJECT_BINARY_DIR}
 		${PROJECT_SOURCE_DIR}/external/
 		${PROJECT_SOURCE_DIR}/external/glfw/include
-		${PROJECT_SOURCE_DIR}/src	
+		${PROJECT_SOURCE_DIR}/src
+		${PROJECT_SOURCE_DIR}/src/app
+		${PROJECT_SOURCE_DIR}/src/flow
+		${PROJECT_SOURCE_DIR}/src/engine
+		${PROJECT_SOURCE_DIR}/src/platform	
 	)
 
 	add_custom_command(TARGET ${flowTarget} PRE_LINK
@@ -68,8 +76,8 @@ add_subdirectory(src/platform/windows)
 
 add_flowengine_target(${FLOW_APP_BUILD_NAME} ${PROJECT_SOURCE_DIR})
 
-install(TARGETS ${FLOW_APP_BUILD_NAME} DESTINATION build)
-install(FILES "main.cpp" DESTINATION src/platform/windows)
+# install(TARGETS ${FLOW_APP_BUILD_NAME} DESTINATION build)
+# install(FILES "main.cpp" DESTINATION src/platform/windows)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
