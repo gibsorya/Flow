@@ -1,19 +1,19 @@
-#ifndef FLOW_SURFACE
-#define FLOW_SURFACE
+// #ifndef FLOW_SURFACE
+// #define FLOW_SURFACE
 
-#include "../flow/flow.hpp"
+// #include "../flow/flow.hpp"
 
-#include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>
+// #include <vulkan/vulkan.h>
+// #include <GLFW/glfw3.h>
 
-struct FlowSurfaces{
-    std::vector<VkSurfaceKHR> surfaces;
+// struct FlowSurfaces{
+//     std::vector<VkSurfaceKHR> surfaces;
 
-    VkPhysicalDeviceSurfaceInfo2KHR physicalSurfaceInfo;
-};
+//     VkPhysicalDeviceSurfaceInfo2KHR physicalSurfaceInfo;
+// };
 
-namespace flow::vulkan {
-    VkSurfaceKHR createSurface();
-}
+// namespace flow::vulkan {
+//     VkSurfaceKHR createSurface();
+// }
 
-#endif
+// #endif

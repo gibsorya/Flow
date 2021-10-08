@@ -1,9 +1,9 @@
-#include "flow.hpp"
+// #include "flow.hpp"
 
-namespace flow {
-	APP_LOAD(PermLoad) {
-		platform = platform_;
+// namespace flow {
+// 	APP_LOAD(PermLoad) {
+// 		platform = platform_;
 
-		//initVulkan();
-	}
-}
+// 		//initVulkan();
+// 	}
+// }

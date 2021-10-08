@@ -1,27 +1,27 @@
-#ifndef FLOW_BUFFERS
-#define FLOW_BUFFERS
+// #ifndef FLOW_BUFFERS
+// #define FLOW_BUFFERS
 
-#include "../flow/flow.hpp"
-#include <vulkan/vulkan.hpp>
+// #include "../flow/flow.hpp"
+// #include <vulkan/vulkan.hpp>
 
-struct FlowFrameBuffers {
-    std::vector<std::vector<VkFramebuffer>> swapchainFrameBuffers;
-};
+// struct FlowFrameBuffers {
+//     std::vector<std::vector<VkFramebuffer>> swapchainFrameBuffers;
+// };
 
-struct FlowCommandPools {
-    std::vector<VkCommandPool> commandPools;
-};
+// struct FlowCommandPools {
+//     std::vector<VkCommandPool> commandPools;
+// };
 
-struct FlowCommandBuffers {
-    std::vector<std::vector<VkCommandBuffer>> commandBuffers;
-};
+// struct FlowCommandBuffers {
+//     std::vector<std::vector<VkCommandBuffer>> commandBuffers;
+// };
 
-namespace flow::vulkan {
-    std::vector<VkFramebuffer> createFramebuffers();
+// namespace flow::vulkan {
+//     std::vector<VkFramebuffer> createFramebuffers();
 
-    VkCommandPool createCommandPool();
+//     VkCommandPool createCommandPool();
 
-    std::vector<VkCommandBuffer> createCommandBuffers();
-}
+//     std::vector<VkCommandBuffer> createCommandBuffers();
+// }
 
-#endif
+// #endif

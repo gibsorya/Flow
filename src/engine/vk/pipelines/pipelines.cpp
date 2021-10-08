@@ -1,188 +1,188 @@
-#include "pipelines.hpp"
-#include "../../root.hpp"
-namespace flow::vulkan::pipelines
-{
+// #include "pipelines.hpp"
+// #include "../../root.hpp"
+// namespace flow::vulkan::pipelines
+// {
 
-    local std::vector<char> readFile(const std::string &fileName)
-    {
-        std::ifstream file(fileName, std::ios::ate | std::ios::binary);
+//     local std::vector<char> readFile(const std::string &fileName)
+//     {
+//         std::ifstream file(fileName, std::ios::ate | std::ios::binary);
 
-        if (!file.is_open())
-        {
-            throw std::runtime_error("Failed to open file!");
-        }
+//         if (!file.is_open())
+//         {
+//             throw std::runtime_error("Failed to open file!");
+//         }
 
-        size_t fileSize = (size_t)file.tellg();
-        std::vector<char> buffer(fileSize);
+//         size_t fileSize = (size_t)file.tellg();
+//         std::vector<char> buffer(fileSize);
 
-        file.seekg(0);
-        file.read(buffer.data(), fileSize);
+//         file.seekg(0);
+//         file.read(buffer.data(), fileSize);
 
-        file.close();
+//         file.close();
 
-        return buffer;
-    }
+//         return buffer;
+//     }
 
-    VkShaderModule createShaderModule(const std::vector<char> &code)
-    {
-        VkShaderModule shaderModule;
+//     VkShaderModule createShaderModule(const std::vector<char> &code)
+//     {
+//         VkShaderModule shaderModule;
 
-        VkShaderModuleCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = code.size();
-        createInfo.pCode = reinterpret_cast<const u32 *>(code.data());
+//         VkShaderModuleCreateInfo createInfo{};
+//         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+//         createInfo.codeSize = code.size();
+//         createInfo.pCode = reinterpret_cast<const u32 *>(code.data());
 
-        if (vkCreateShaderModule(root.flowDevices.devices.at(0), &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
-        {
-            throw std::runtime_error("Failed to create shader module!");
-        }
+//         if (vkCreateShaderModule(root.flowDevices.devices.at(0), &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+//         {
+//             throw std::runtime_error("Failed to create shader module!");
+//         }
 
-        return shaderModule;
-    }
+//         return shaderModule;
+//     }
 
-    VkPipeline createGraphicsPipeline()
-    {
-        VkPipeline pipeline;
+//     VkPipeline createGraphicsPipeline()
+//     {
+//         VkPipeline pipeline;
 
-        auto vertexShaderCode = readFile("data/shaders/vert.spv");
-        auto fragShaderCode = readFile("data/shaders/frag.spv");
+//         auto vertexShaderCode = readFile("data/shaders/vert.spv");
+//         auto fragShaderCode = readFile("data/shaders/frag.spv");
 
-        if (root.shaderModules.vertexShaderModules.empty())
-        {
-            root.shaderModules.vertexShaderModules.push_back(createShaderModule(vertexShaderCode));
-            root.shaderModules.fragShaderModules.push_back(createShaderModule(fragShaderCode));
-        }
-        else
-        {
-            root.shaderModules.vertexShaderModules.at(0) = createShaderModule(vertexShaderCode);
-            root.shaderModules.fragShaderModules.at(0) = createShaderModule(fragShaderCode);
-        }
+//         if (root.shaderModules.vertexShaderModules.empty())
+//         {
+//             root.shaderModules.vertexShaderModules.push_back(createShaderModule(vertexShaderCode));
+//             root.shaderModules.fragShaderModules.push_back(createShaderModule(fragShaderCode));
+//         }
+//         else
+//         {
+//             root.shaderModules.vertexShaderModules.at(0) = createShaderModule(vertexShaderCode);
+//             root.shaderModules.fragShaderModules.at(0) = createShaderModule(fragShaderCode);
+//         }
 
-        VkPipelineShaderStageCreateInfo vertexInfo{};
-        VkPipelineShaderStageCreateInfo fragInfo{};
+//         VkPipelineShaderStageCreateInfo vertexInfo{};
+//         VkPipelineShaderStageCreateInfo fragInfo{};
 
-        populateShaderStageInfo(vertexInfo, root.shaderModules.vertexShaderModules.at(0), VK_SHADER_STAGE_VERTEX_BIT, "main");
-        populateShaderStageInfo(fragInfo, root.shaderModules.fragShaderModules.at(0), VK_SHADER_STAGE_FRAGMENT_BIT, "main");
+//         populateShaderStageInfo(vertexInfo, root.shaderModules.vertexShaderModules.at(0), VK_SHADER_STAGE_VERTEX_BIT, "main");
+//         populateShaderStageInfo(fragInfo, root.shaderModules.fragShaderModules.at(0), VK_SHADER_STAGE_FRAGMENT_BIT, "main");
 
-        std::vector<VkPipelineShaderStageCreateInfo> shaderStages = {vertexInfo, fragInfo};
+//         std::vector<VkPipelineShaderStageCreateInfo> shaderStages = {vertexInfo, fragInfo};
 
-        if(root.graphicsPipelines.infos.shaderStages.empty()){
-            root.graphicsPipelines.infos.shaderStages.push_back(shaderStages);
-        } else {
-            root.graphicsPipelines.infos.shaderStages.at(0) = shaderStages;
-        }
+//         if(root.graphicsPipelines.infos.shaderStages.empty()){
+//             root.graphicsPipelines.infos.shaderStages.push_back(shaderStages);
+//         } else {
+//             root.graphicsPipelines.infos.shaderStages.at(0) = shaderStages;
+//         }
         
 
-        VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-        VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-        // VkPipelineTessellationStateCreateInfo tessellation{}; //Implement this later
-        VkPipelineViewportStateCreateInfo viewportInfo{};
-        VkPipelineRasterizationStateCreateInfo rasterization{};
-        VkPipelineMultisampleStateCreateInfo multisampler{};
-        // VkPipelineDepthStencilStateCreateInfo depthStencil{}; //Implement this later
-        VkPipelineColorBlendStateCreateInfo colorBlend{};
-        VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-        // VkPipelineDynamicStateCreateInfo dynamicState{}; //Implement this later
+//         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+//         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+//         // VkPipelineTessellationStateCreateInfo tessellation{}; //Implement this later
+//         VkPipelineViewportStateCreateInfo viewportInfo{};
+//         VkPipelineRasterizationStateCreateInfo rasterization{};
+//         VkPipelineMultisampleStateCreateInfo multisampler{};
+//         // VkPipelineDepthStencilStateCreateInfo depthStencil{}; //Implement this later
+//         VkPipelineColorBlendStateCreateInfo colorBlend{};
+//         VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+//         // VkPipelineDynamicStateCreateInfo dynamicState{}; //Implement this later
 
-        if(root.flowViewports.viewports.empty()){
-            root.flowViewports.viewports.push_back(createViewport());
-        } else {
-            root.flowViewports.viewports.at(0) = createViewport();
-        }
+//         if(root.flowViewports.viewports.empty()){
+//             root.flowViewports.viewports.push_back(createViewport());
+//         } else {
+//             root.flowViewports.viewports.at(0) = createViewport();
+//         }
 
-        if(root.flowScissors.scissors.empty()){
-            root.flowScissors.scissors.push_back(createScissor());
-        } else {
-            root.flowScissors.scissors.at(0) = createScissor();
-        }
+//         if(root.flowScissors.scissors.empty()){
+//             root.flowScissors.scissors.push_back(createScissor());
+//         } else {
+//             root.flowScissors.scissors.at(0) = createScissor();
+//         }
 
-        populateVertexInputInfo(vertexInputInfo);
-        populateInputAssemblyInfo(inputAssembly);
-        // populateTesselationInfo(tessellation); //Implement this later
-        populateViewportInfo(viewportInfo);
-        populateRasterizationInfo(rasterization);
-        populateMultisamplerInfo(multisampler);
-        // populateDepthStencilInfo(depthStencil); //Implement this later
-        populateColorBlendAttachmentInfo(colorBlendAttachment);
-        populateColorBlendInfo(colorBlend, colorBlendAttachment);
-        // populateDynamicStateInfo(dynamicState); //Implement this later
+//         populateVertexInputInfo(vertexInputInfo);
+//         populateInputAssemblyInfo(inputAssembly);
+//         // populateTesselationInfo(tessellation); //Implement this later
+//         populateViewportInfo(viewportInfo);
+//         populateRasterizationInfo(rasterization);
+//         populateMultisamplerInfo(multisampler);
+//         // populateDepthStencilInfo(depthStencil); //Implement this later
+//         populateColorBlendAttachmentInfo(colorBlendAttachment);
+//         populateColorBlendInfo(colorBlend, colorBlendAttachment);
+//         // populateDynamicStateInfo(dynamicState); //Implement this later
 
-        if (root.graphicsPipelines.pipelineLayouts.empty())
-        {
-            root.graphicsPipelines.pipelineLayouts.push_back(createPipelineLayout());
-        }
-        else
-        {
-            root.graphicsPipelines.pipelineLayouts.at(0) = createPipelineLayout();
-        }
+//         if (root.graphicsPipelines.pipelineLayouts.empty())
+//         {
+//             root.graphicsPipelines.pipelineLayouts.push_back(createPipelineLayout());
+//         }
+//         else
+//         {
+//             root.graphicsPipelines.pipelineLayouts.at(0) = createPipelineLayout();
+//         }
 
-        VkGraphicsPipelineCreateInfo pipelineInfo{};
-        pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineInfo.stageCount = 2;
-        pipelineInfo.pStages = shaderStages.data();
-        pipelineInfo.pVertexInputState = &vertexInputInfo;
-        pipelineInfo.pInputAssemblyState = &inputAssembly;
-        pipelineInfo.pViewportState = &viewportInfo;
-        // pipelineInfo.pTessellationState = &tessellation; //Implement this later
-        pipelineInfo.pRasterizationState = &rasterization;
-        pipelineInfo.pMultisampleState = &multisampler;
-        // pipelineInfo.pDepthStencilState = &depthStencil; //Implement this later
-        pipelineInfo.pColorBlendState = &colorBlend;
-        // pipelineInfo.pDynamicState = &dynamicState; //Implement this later
-        pipelineInfo.layout = root.graphicsPipelines.pipelineLayouts.back();
-        pipelineInfo.renderPass = root.flowRenderPasses.renderPasses.at(0);
-        pipelineInfo.subpass = 0;
+//         VkGraphicsPipelineCreateInfo pipelineInfo{};
+//         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+//         pipelineInfo.stageCount = 2;
+//         pipelineInfo.pStages = shaderStages.data();
+//         pipelineInfo.pVertexInputState = &vertexInputInfo;
+//         pipelineInfo.pInputAssemblyState = &inputAssembly;
+//         pipelineInfo.pViewportState = &viewportInfo;
+//         // pipelineInfo.pTessellationState = &tessellation; //Implement this later
+//         pipelineInfo.pRasterizationState = &rasterization;
+//         pipelineInfo.pMultisampleState = &multisampler;
+//         // pipelineInfo.pDepthStencilState = &depthStencil; //Implement this later
+//         pipelineInfo.pColorBlendState = &colorBlend;
+//         // pipelineInfo.pDynamicState = &dynamicState; //Implement this later
+//         pipelineInfo.layout = root.graphicsPipelines.pipelineLayouts.back();
+//         pipelineInfo.renderPass = root.flowRenderPasses.renderPasses.at(0);
+//         pipelineInfo.subpass = 0;
 
-        if (vkCreateGraphicsPipelines(root.flowDevices.devices.at(0), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS)
-        {
-            throw std::runtime_error("Failed to create graphics pipeline!");
-        }
+//         if (vkCreateGraphicsPipelines(root.flowDevices.devices.at(0), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS)
+//         {
+//             throw std::runtime_error("Failed to create graphics pipeline!");
+//         }
 
-        vkDestroyShaderModule(root.flowDevices.devices.at(0), root.shaderModules.vertexShaderModules.at(0), nullptr);
-        vkDestroyShaderModule(root.flowDevices.devices.at(0), root.shaderModules.fragShaderModules.at(0), nullptr);
+//         vkDestroyShaderModule(root.flowDevices.devices.at(0), root.shaderModules.vertexShaderModules.at(0), nullptr);
+//         vkDestroyShaderModule(root.flowDevices.devices.at(0), root.shaderModules.fragShaderModules.at(0), nullptr);
 
-        return pipeline;
-    }
+//         return pipeline;
+//     }
 
-    VkViewport createViewport()
-    {
-        VkViewport viewport;
+//     VkViewport createViewport()
+//     {
+//         VkViewport viewport;
 
-        viewport.width = (float)root.flowSwaps.swapchainExtents.at(0).width;
-        viewport.height = (float)root.flowSwaps.swapchainExtents.at(0).height;
-        viewport.x = 0;
-        viewport.y = 0;
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
+//         viewport.width = (float)root.flowSwaps.swapchainExtents.at(0).width;
+//         viewport.height = (float)root.flowSwaps.swapchainExtents.at(0).height;
+//         viewport.x = 0;
+//         viewport.y = 0;
+//         viewport.minDepth = 0.0f;
+//         viewport.maxDepth = 1.0f;
 
-        return viewport;
-    }
+//         return viewport;
+//     }
 
-    VkRect2D createScissor()
-    {
-        VkRect2D scissor;
+//     VkRect2D createScissor()
+//     {
+//         VkRect2D scissor;
 
-        scissor.extent = root.flowSwaps.swapchainExtents.at(0);
-        scissor.offset = {0, 0};
+//         scissor.extent = root.flowSwaps.swapchainExtents.at(0);
+//         scissor.offset = {0, 0};
 
-        return scissor;
-    }
+//         return scissor;
+//     }
 
-    VkPipelineLayout createPipelineLayout()
-    {
-        VkPipelineLayout pipelineLayout;
+//     VkPipelineLayout createPipelineLayout()
+//     {
+//         VkPipelineLayout pipelineLayout;
 
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 0;
-        pipelineLayoutInfo.pushConstantRangeCount = 0;
+//         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+//         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+//         pipelineLayoutInfo.setLayoutCount = 0;
+//         pipelineLayoutInfo.pushConstantRangeCount = 0;
 
-        if (vkCreatePipelineLayout(root.flowDevices.devices.at(0), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
-        {
-            throw std::runtime_error("Failed to create pipeline layout!");
-        }
+//         if (vkCreatePipelineLayout(root.flowDevices.devices.at(0), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+//         {
+//             throw std::runtime_error("Failed to create pipeline layout!");
+//         }
 
-        return pipelineLayout;
-    }
+//         return pipelineLayout;
+//     }
 
-}
+// }
