@@ -7,11 +7,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(FLOW_LIB_TARGET FlowLib)
 add_library(${FLOW_LIB_TARGET} STATIC "")
 
+
+add_subdirectory(src/app)
+add_subdirectory(src/flow)
 add_subdirectory(src/engine)
-add_subdirectory(src/engine/flow)
 add_subdirectory(src/engine/vk)
-
-
 
 find_package(Vulkan REQUIRED)
 include_directories(${Vulkan_INCLUDE_DIR})
@@ -64,12 +64,12 @@ endfunction()
 set(FLOW_APP_BUILD_NAME Flow)
 add_executable(${FLOW_APP_BUILD_NAME} "")
 
-add_subdirectory(src/app)
+add_subdirectory(src/platform/windows)
 
 add_flowengine_target(${FLOW_APP_BUILD_NAME} ${PROJECT_SOURCE_DIR})
 
 install(TARGETS ${FLOW_APP_BUILD_NAME} DESTINATION build)
-install(FILES "main.cpp" DESTINATION src/app)
+install(FILES "main.cpp" DESTINATION src/platform/windows)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
