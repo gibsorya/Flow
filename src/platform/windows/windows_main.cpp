@@ -1,9 +1,10 @@
 #include "os_windows.hpp"
+#include <app/app.hpp>
 
 int run(){
     int result = 0;
 
-    Error err = app::setup();
+    Error err = flow::setup();
 
     if(err != SUCCESS){
         return 255;

@@ -11,7 +11,6 @@ add_library(${FLOW_LIB_TARGET} STATIC "")
 add_subdirectory(src/app)
 add_subdirectory(src/flow)
 add_subdirectory(src/engine)
-add_subdirectory(src/engine/vk)
 
 find_package(Vulkan REQUIRED)
 include_directories(${Vulkan_INCLUDE_DIR})
@@ -24,11 +23,7 @@ target_include_directories(${FLOW_LIB_TARGET}
 		${PROJECT_BINARY_DIR}
 		${PROJECT_SOURCE_DIR}/external
 		${PROJECT_SOURCE_DIR}/external/glfw/include
-		${PROJECT_SOURCE_DIR}/src
-		${PROJECT_SOURCE_DIR}/src/app
-		${PROJECT_SOURCE_DIR}/src/flow
-		${PROJECT_SOURCE_DIR}/src/engine
-		${PROJECT_SOURCE_DIR}/src/platform		
+		${PROJECT_SOURCE_DIR}/src	
 )
 set(LIBS_DIR ${PROJECT_SOURCE_DIR}/libs)
 target_link_libraries(${FLOW_LIB_TARGET}
@@ -45,10 +40,6 @@ function(add_flowengine_target flowTarget flowRoot)
 		${PROJECT_SOURCE_DIR}/external/
 		${PROJECT_SOURCE_DIR}/external/glfw/include
 		${PROJECT_SOURCE_DIR}/src
-		${PROJECT_SOURCE_DIR}/src/app
-		${PROJECT_SOURCE_DIR}/src/flow
-		${PROJECT_SOURCE_DIR}/src/engine
-		${PROJECT_SOURCE_DIR}/src/platform	
 	)
 
 	add_custom_command(TARGET ${flowTarget} PRE_LINK
@@ -72,7 +63,7 @@ endfunction()
 set(FLOW_APP_BUILD_NAME Flow)
 add_executable(${FLOW_APP_BUILD_NAME} "")
 
-add_subdirectory(src/platform/windows)
+add_subdirectory(src/platform)
 
 add_flowengine_target(${FLOW_APP_BUILD_NAME} ${PROJECT_SOURCE_DIR})
 
