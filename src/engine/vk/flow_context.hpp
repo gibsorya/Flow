@@ -4,12 +4,23 @@
 #include <flow/foundation.hpp>
 #include <vulkan/vulkan.h>
 
+#include "components/surfaces.hpp"
+#include "components/instances.hpp"
+
+
 struct FlowContext{
-    std::vector<VkInstance> instances;
+
+    FlowSurfaces flowSurfaces;
+    FlowInstances flowInstances;
+
 };
 
 namespace flow::vulkan {
     Error initialize(FlowContext *flow);
+
+    void mainLoop(FlowContext *flow);
+
+    void cleanup(FlowContext *flow);
 }
 
 #endif

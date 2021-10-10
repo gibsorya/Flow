@@ -14,8 +14,4 @@ struct FlowSurfaces {
     std::vector<vk::PresentModeKHR> presentModes;
 };
 
-namespace flow::vulkan::surfaces {
-    Error initWindow(GLFWwindow* &window, u32 WIDTH, u32 HEIGHT, const char *title);
-}
-
 #endif

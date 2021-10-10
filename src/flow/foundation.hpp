@@ -30,6 +30,7 @@ typedef int32_t  i32;
 typedef int64_t  i64;
 
 #include "errors/error.hpp"
-
+#include "errors/error_macros.hpp"
+#include "debug/debug_tools.hpp"
 
 

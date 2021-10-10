@@ -10,6 +10,9 @@ int run(){
         return 255;
     }
 
+    flow::mainLoop();
+    flow::cleanup();
+
     return result;
 }
 

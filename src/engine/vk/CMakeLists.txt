@@ -1,8 +1,12 @@
 target_sources(${FLOW_LIB_TARGET}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.cpp
-        
+        ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/windows.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/windows.hpp
+        
         ${CMAKE_CURRENT_SOURCE_DIR}/components/queues.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/devices.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.cpp
@@ -13,8 +17,6 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelines.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/queues.hpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/components/devices.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.hpp
