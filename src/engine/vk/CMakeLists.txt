@@ -4,12 +4,11 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/windows.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/windows.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.hpp
         
         ${CMAKE_CURRENT_SOURCE_DIR}/components/queues.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/devices.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/swapchains.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/imageviews.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/renderpasses.cpp
@@ -19,7 +18,6 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/queues.hpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/components/devices.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/swapchains.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/imageviews.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/renderpasses.hpp
