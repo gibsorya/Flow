@@ -1,6 +1,6 @@
 #include "queues.hpp"
 
-namespace flow::vulkan::devices
+namespace flow::vulkan
 {
 
     QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceKHR surface)
@@ -23,7 +23,7 @@ namespace flow::vulkan::devices
             }
 
             VkBool32 presentSupport = false;
-            device.getSurfaceSupportKHR(i, surface, &presentSupport);
+            vk::Result result = device.getSurfaceSupportKHR(i, surface, &presentSupport);
 
             if(presentSupport){
                 indices.presentFamily = i;

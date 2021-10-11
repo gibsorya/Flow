@@ -8,6 +8,7 @@
 #include "components/instances.hpp"
 #include "components/devices.hpp"
 #include "components/queues.hpp"
+#include "components/swapchains.hpp"
 
 
 struct FlowContext{
@@ -15,7 +16,7 @@ struct FlowContext{
     FlowSurfaces flowSurfaces;
     FlowInstances flowInstances;
     FlowDevices flowDevices;
-
+    FlowSwapchains flowSwaps;
 };
 
 namespace flow::vulkan {

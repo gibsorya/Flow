@@ -12,7 +12,8 @@ struct FlowSurfaces
 
     GLFWwindow *window;
     std::vector<vk::SurfaceKHR> surfaces; //In case we need multiple surfaces?
-    std::vector<vk::PresentModeKHR> presentModes;
+    std::vector<vk::PhysicalDeviceSurfaceInfo2KHR> physicalSurfaceInfo;
+    // std::vector<vk::PresentModeKHR> presentModes;
 };
 
 namespace flow::vulkan::surfaces

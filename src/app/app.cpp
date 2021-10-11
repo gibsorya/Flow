@@ -44,6 +44,10 @@ namespace flow
 
     void cleanup()
     {
+        for(size_t i = 0; i < flow->flowSwaps.swapchains.size(); i++){
+            flow->flowDevices.devices.at(0).destroySwapchainKHR(flow->flowSwaps.swapchains.at(i));
+        }
+        
         for(auto device : flow->flowDevices.devices){
             device.destroy();
         }

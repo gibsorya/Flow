@@ -38,8 +38,17 @@ namespace flow::vulkan
 
             err = devices::createLogicalDevice(flow->flowDevices.devices, flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0), graphicsQueue, presentQueue);
 
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create logical device!");
+
             flow->flowDevices.graphicsQueues.push_back(graphicsQueue);
             flow->flowDevices.presentQueues.push_back(presentQueue);
+        }
+
+        //*Swapchains
+        {
+            err = swapchains::createSwapchain(flow->flowSwaps, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0), flow->flowSurfaces.window);
+
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create swapchain!");
         }
 
         return SUCCESS;
