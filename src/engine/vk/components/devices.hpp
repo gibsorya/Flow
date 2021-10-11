@@ -6,9 +6,8 @@
 
 // namespace flow::extensions
 // {
-//     const std::vector<const char *> deviceExtensions = {
-//         VK_KHR_SWAPCHAIN_EXTENSION_NAME
-//     };
+const std::vector<const char *> deviceExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 //     const std::vector<const char *> additionalExtensions = {
 //         VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME
@@ -29,12 +28,12 @@ struct FlowDevices
 
 namespace flow::vulkan::devices
 {
-    Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance);
-    bool isDeviceSuitable(vk::PhysicalDevice device);
+    Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance, vk::SurfaceKHR surface);
+    bool isDeviceSuitable(vk::PhysicalDevice device, vk::SurfaceKHR surface);
     bool checkDeviceExtensionSupport(vk::PhysicalDevice device);
     int rateDeviceSuitability(vk::PhysicalDevice device);
 
-    Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice);
+    Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue);
 }
 
 #endif

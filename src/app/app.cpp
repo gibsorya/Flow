@@ -44,6 +44,9 @@ namespace flow
 
     void cleanup()
     {
+        for(auto device : flow->flowDevices.devices){
+            device.destroy();
+        }
         
         if (enabledValidationLayers)
         {

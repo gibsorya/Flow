@@ -3,7 +3,7 @@
 
 namespace flow::vulkan::devices
 {
-    Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance)
+    Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance, vk::SurfaceKHR surface)
     {
         Error err;
         vk::PhysicalDevice physicalDevice;
@@ -40,7 +40,7 @@ namespace flow::vulkan::devices
         }
         else
         {
-            if(isDeviceSuitable(physicalDevices.at(0))){
+            if(isDeviceSuitable(physicalDevices.at(0), surface)){
                 return SUCCESS;
             } else {
                 return ERR_NOT_FOUND;
@@ -75,11 +75,76 @@ namespace flow::vulkan::devices
         return score;
     }
 
-    bool isDeviceSuitable(vk::PhysicalDevice device)
+    bool isDeviceSuitable(vk::PhysicalDevice device, vk::SurfaceKHR surface)
     {
-        QueueFamilyIndices indices = findQueueFamilies(device);
+        QueueFamilyIndices indices = findQueueFamilies(device, surface);
 
-        return indices.isComplete();
+        bool extensionsSupported = checkDeviceExtensionSupport(device);
+
+        return extensionsSupported && indices.isComplete();
+    }
+
+    Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue){
+        Error err;
+
+        vk::Device device;
+
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
+
+        std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+        std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+        float queuePriority = 1.0f;
+        for(u32 queueFamily : uniqueQueueFamilies){
+            auto createInfo = vk::DeviceQueueCreateInfo({}, indices.graphicsFamily.value(), 1, &queuePriority);
+            queueCreateInfos.push_back(createInfo);
+        }
+
+        vk::PhysicalDeviceFeatures2 deviceFeatures;
+        physicalDevice.getFeatures2(&deviceFeatures);
+
+        auto createInfo = vk::DeviceCreateInfo({}, static_cast<u32>(queueCreateInfos.size()), queueCreateInfos.data(), 0, nullptr, 
+        static_cast<u32>(deviceExtensions.size()), deviceExtensions.data(), &deviceFeatures.features);
+
+        if(enabledValidationLayers){
+            createInfo.enabledLayerCount = static_cast<u32>(layers.size());
+            createInfo.ppEnabledLayerNames = layers.data();
+        }
+
+        if(physicalDevice.createDevice(&createInfo, nullptr, &device) != vk::Result::eSuccess){
+            return ERR_CANT_CREATE;
+        }
+        
+        auto graphicsQueueInfo = vk::DeviceQueueInfo2({}, indices.graphicsFamily.value(), 0);
+        auto presentQueueInfo = vk::DeviceQueueInfo2({}, indices.presentFamily.value(), 0);
+
+        device.getQueue2(&graphicsQueueInfo, &graphicsQueue);
+        device.getQueue2(&presentQueueInfo, &presentQueue);
+
+        devices.push_back(device);
+
+        return SUCCESS;
+    }
+
+    bool checkDeviceExtensionSupport(vk::PhysicalDevice device){
+        u32 extensionCount;
+
+        vk::Result result = device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, nullptr);
+        if(result != vk::Result::eSuccess){
+            return false;
+        }
+        std::vector<vk::ExtensionProperties> availableExtensions(extensionCount);
+        result = device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
+
+        std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+        for (const auto &extension : availableExtensions)
+        {
+            requiredExtensions.erase(extension.extensionName);
+        }
+
+        return requiredExtensions.empty();
+
     }
 
 }
@@ -87,37 +152,6 @@ namespace flow::vulkan::devices
 // namespace flow::vulkan
 // {
 
-//     VkPhysicalDevice pickPhysicalDevice()
-//     {
-//         VkPhysicalDevice physicalDevice;
-
-//         u32 deviceCount;
-//         vkEnumeratePhysicalDevices(root.flowInstances.instances.at(0), &deviceCount, nullptr);
-
-//         if (deviceCount == 0)
-//         {
-//             std::runtime_error("Failed to find GPU with Vulkan support!");
-//         }
-
-//         std::vector<VkPhysicalDevice> devices(deviceCount);
-//         vkEnumeratePhysicalDevices(root.flowInstances.instances.at(0), &deviceCount, devices.data());
-
-//         for (const auto& device : devices)
-//         {
-//             if (isDeviceSuitable(device))
-//             {
-//                 physicalDevice = device;
-//                 break;
-//             }
-//         }
-
-//         if (physicalDevice == VK_NULL_HANDLE)
-//         {
-//             throw std::runtime_error("Failed to find a suitable GPU!");
-//         }
-
-//         return physicalDevice;
-//     }
 
 //     bool isDeviceSuitable(VkPhysicalDevice device)
 //     {
@@ -135,23 +169,6 @@ namespace flow::vulkan::devices
 //         return extensionsSupported && indices.isComplete() && swapchainAdequate;
 //     }
 
-//     bool checkDeviceExtensionSupport(VkPhysicalDevice device)
-//     {
-//         u32 extensionCount;
-//         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
-
-//         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-//         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
-
-//         std::set<std::string> requiredExtensions(extensions::deviceExtensions.begin(), extensions::deviceExtensions.end());
-
-//         for (const auto &extension : availableExtensions)
-//         {
-//             requiredExtensions.erase(extension.extensionName);
-//         }
-
-//         return requiredExtensions.empty();
-//     }
 
 //     VkDevice createLogicalDevice()
 //     {

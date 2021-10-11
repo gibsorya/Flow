@@ -32,6 +32,14 @@ namespace flow::vulkan
             err = devices::pickPhysicalDevice(flow->flowDevices.physicalDevices, flow->flowInstances.instances.at(0), flow->flowSurfaces.surfaces.at(0));
 
             ERROR_FAIL_COND(err != SUCCESS, ERR_NOT_FOUND, "Cannot pick suitable GPU!");
+
+            vk::Queue graphicsQueue;
+            vk::Queue presentQueue;
+
+            err = devices::createLogicalDevice(flow->flowDevices.devices, flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0), graphicsQueue, presentQueue);
+
+            flow->flowDevices.graphicsQueues.push_back(graphicsQueue);
+            flow->flowDevices.presentQueues.push_back(presentQueue);
         }
 
         return SUCCESS;
