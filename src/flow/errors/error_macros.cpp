@@ -8,7 +8,7 @@ void print_error(const char *error, const char *message) {
     HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
     SetConsoleTextAttribute(console, 12);
-    std::cout << error << " " << message << std::endl;
+    std::cout << error << ": " << message << std::endl;
 
     // printf(u)
 }

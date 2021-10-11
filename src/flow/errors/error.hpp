@@ -17,6 +17,9 @@ enum Error {
     ERR_CANT_CREATE, //Cannot create [object]. Typically used for Vulkan objects if VkResult != VK_SUCCESS
     ERR_INVALID,
     ERR_NOT_FOUND,
+    MAX,
 };
+
+extern const char *errors[];
 
 #endif
