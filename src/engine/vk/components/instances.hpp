@@ -26,7 +26,7 @@ namespace flow::vulkan::instances {
 
     // void populateInstanceCreateInfo(vk::InstanceCreateInfo& createInfo);
 
-    Error findInstanceExtensions(std::vector<const char *> &extensions);
+    std::vector<const char *> findInstanceExtensions();
 
     Error setupDebugMessenger(vk::Instance instance, std::vector<vk::DebugUtilsMessengerEXT> &debugMessengers);
 

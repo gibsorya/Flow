@@ -5,17 +5,21 @@
 #include <vulkan/vulkan.hpp>
 #include <GLFW/glfw3.h>
 
-struct FlowSurfaces {
+struct FlowSurfaces
+{
     const u32 WIDTH = 1280;
     const u32 HEIGHT = 720;
 
-    GLFWwindow* window;
+    GLFWwindow *window;
     std::vector<vk::SurfaceKHR> surfaces; //In case we need multiple surfaces?
     std::vector<vk::PresentModeKHR> presentModes;
 };
 
-namespace flow::vulkan::surfaces {
-    Error initWindow(GLFWwindow* &window, u32 WIDTH, u32 HEIGHT, const char *title);
+namespace flow::vulkan::surfaces
+{
+    Error initWindow(GLFWwindow *&window, u32 WIDTH, u32 HEIGHT, const char *title);
+
+    Error createSurface(std::vector<vk::SurfaceKHR> &surfaces, vk::Instance instance, GLFWwindow* window);
 }
 
 #endif

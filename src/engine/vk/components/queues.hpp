@@ -12,12 +12,12 @@ struct QueueFamilyIndices{
     float queuePriority = 1.0f;
 
     bool isComplete(){
-        return graphicsFamily.has_value() /*&& presentFamily.has_value() */;
+        return graphicsFamily.has_value() && presentFamily.has_value();
     }
 };
 
 namespace flow::vulkan::devices{
-    QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device);
+    QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceKHR surface);
 }
 
 #endif

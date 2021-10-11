@@ -75,12 +75,13 @@ namespace flow::vulkan::instances
         return SUCCESS;
     }
 
-    Error findInstanceExtensions(std::vector<const char *> &extensions)
+    std::vector<const char *> findInstanceExtensions()
     {
         u32 glfwExtensionCount = 0;
         const char **glfwExtensions;
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
+        std::vector<const char *> extensions(glfwExtensions, glfwExtensionCount + glfwExtensions);
         extensions.push_back(*glfwExtensions);
 
         if (enabledValidationLayers)
@@ -89,8 +90,7 @@ namespace flow::vulkan::instances
         }
 
         extensions.push_back(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME);
-
-        return SUCCESS;
+        return extensions;
     }
 
     Error setupDebugMessenger(vk::Instance instance, std::vector<vk::DebugUtilsMessengerEXT> &debugMessengers)

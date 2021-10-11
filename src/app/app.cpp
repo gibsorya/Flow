@@ -20,9 +20,6 @@ namespace flow
 
                 goto error;
             }
-
-            // vulkan::mainLoop(flow);
-            // vulkan::cleanup(flow);
         }
 
         return SUCCESS;
@@ -47,12 +44,20 @@ namespace flow
 
     void cleanup()
     {
+        
         if (enabledValidationLayers)
         {
             for (auto debugMessenger : flow->flowInstances.debugMessengers)
             {
                 vulkan::instances::DestroyDebugUtilsMessengerEXT(flow->flowInstances.instances.at(0), debugMessenger, nullptr);
             }
+        }
+
+        int i = 0;
+        for (auto instance : flow->flowInstances.instances)
+        {
+            instance.destroySurfaceKHR(flow->flowSurfaces.surfaces.at(i));
+            i++;
         }
 
         for (auto instance : flow->flowInstances.instances)
