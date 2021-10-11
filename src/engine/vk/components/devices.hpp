@@ -1,8 +1,8 @@
-// #ifndef FLOW_DEVICES
-// #define FLOW_DEVICES
+#ifndef FLOW_DEVICES
+#define FLOW_DEVICES
 
-// #include "../flow/flow.hpp"
-// #include <vulkan/vulkan.h>
+#include <flow/foundation.hpp>
+#include <vulkan/vulkan.hpp>
 
 // namespace flow::extensions
 // {
@@ -15,27 +15,26 @@
 //     };
 // }
 
-// struct FlowDevices
-// {
-//     VkPhysicalDeviceProperties2 deviceProperties = {
-//         .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
-//     VkPhysicalDeviceFeatures2 deviceFeatures = {
-//         .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-//     };
+struct FlowDevices
+{
+    std::vector<vk::PhysicalDevice> physicalDevices;
+    std::vector<vk::PhysicalDeviceProperties2> physicalDeviceProperties;
+    std::vector<vk::PhysicalDeviceFeatures2> physicalDeviceFeatures;
 
-//     VkPhysicalDevice physicalDevice;
-//     std::vector<VkDevice> devices;
-//     VkQueue graphicsQueue;
-//     VkQueue presentQueue;
-// };
+    std::vector<vk::Device> devices;
+    std::vector<const char *> deviceExtensions; //All extensions for each logical device will be the same for now.
+    std::vector<vk::Queue> graphicsQueues;
+    std::vector<vk::Queue> presentQueues;
+};
 
-// namespace flow::vulkan
-// {
-//     VkPhysicalDevice pickPhysicalDevice();
-//     bool isDeviceSuitable(VkPhysicalDevice device);
-//     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+namespace flow::vulkan::devices
+{
+    Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance);
+    bool isDeviceSuitable(vk::PhysicalDevice device);
+    bool checkDeviceExtensionSupport(vk::PhysicalDevice device);
+    int rateDeviceSuitability(vk::PhysicalDevice device);
 
-//     VkDevice createLogicalDevice();
-// }
+    Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice);
+}
 
-// #endif
+#endif

@@ -25,24 +25,12 @@ namespace flow::vulkan
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to setup debug messenger!");
         }
 
+        {
+            err = devices::pickPhysicalDevice(flow->flowDevices.physicalDevices, flow->flowInstances.instances.at(0));
+
+            ERROR_FAIL_COND(err != SUCCESS, ERR_NOT_FOUND, "Cannot pick suitable GPU!");
+        }
+
         return SUCCESS;
     }
-
-    // void mainLoop(FlowContext *flow)
-    // {
-    //     while (!glfwWindowShouldClose(flow->flowSurfaces.window))
-    //     {
-    //         glfwPollEvents();
-    //     }
-    // }
-
-    // void cleanup(FlowContext *flow)
-    // {
-    //     for(auto instance : flow->flowInstances.instances){
-    //         instance.destroy();
-    //     }
-
-    //     glfwDestroyWindow(flow->flowSurfaces.window);
-    //     glfwTerminate();
-    // }
 }

@@ -6,12 +6,15 @@
 
 #include "components/surfaces.hpp"
 #include "components/instances.hpp"
+#include "components/devices.hpp"
+#include "components/queues.hpp"
 
 
 struct FlowContext{
 
     FlowSurfaces flowSurfaces;
     FlowInstances flowInstances;
+    FlowDevices flowDevices;
 
 };
 

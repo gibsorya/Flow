@@ -1,24 +1,23 @@
-// #ifndef QUEUES
-// #define QUEUES
+#ifndef QUEUES
+#define QUEUES
 
-// #include "../flow/flow.hpp"
+#include <flow/foundation.hpp>
+#include <vulkan/vulkan.hpp>
+#include <optional>
 
-// #include <vulkan/vulkan.h>
-// #include <optional>
+struct QueueFamilyIndices{
+    std::optional<u32> graphicsFamily;
+    std::optional<u32> presentFamily;
 
-// struct QueueFamilyIndicies{
-//     std::optional<u32> graphicsFamily;
-//     std::optional<u32> presentFamily;
+    float queuePriority = 1.0f;
 
-//     float queuePriority = 1.0f;
+    bool isComplete(){
+        return graphicsFamily.has_value() /*&& presentFamily.has_value() */;
+    }
+};
 
-//     bool isComplete(){
-//         return graphicsFamily.has_value() && presentFamily.has_value();
-//     }
-// };
+namespace flow::vulkan::devices{
+    QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device);
+}
 
-// namespace flow::vulkan{
-//     QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device);
-// }
-
-// #endif
+#endif
