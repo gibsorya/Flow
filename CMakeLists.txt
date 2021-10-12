@@ -13,7 +13,7 @@ add_subdirectory(src/flow)
 add_subdirectory(src/engine)
 
 find_package(Vulkan REQUIRED)
-include_directories(${Vulkan_INCLUDE_DIR})
+include_directories(C:/VulkanSDK/1.2.189.2/Include)
 
 # add_subdirectory(cmake)
 add_subdirectory(external/tinyobjloader)

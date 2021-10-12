@@ -36,7 +36,7 @@ namespace flow::vulkan
     namespace swapchains
     {
 
-        Error createSwapchain(FlowSwapchains &flowSwaps, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, GLFWwindow* window)
+        Error createSwapchain(FlowSwapchains &flowSwaps, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, GLFWwindow *window)
         {
             vk::SwapchainKHR swapchain;
 
@@ -81,7 +81,8 @@ namespace flow::vulkan
             createInfo.clipped = VK_TRUE;
             createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-            if(device.createSwapchainKHR(&createInfo, nullptr, &swapchain) != vk::Result::eSuccess){
+            if (device.createSwapchainKHR(&createInfo, nullptr, &swapchain) != vk::Result::eSuccess)
+            {
                 return ERR_CANT_CREATE;
             }
 
@@ -97,8 +98,33 @@ namespace flow::vulkan
             return SUCCESS;
         }
 
-        Error createImageViews(std::vector<vk::ImageView> &swapchainImageViews)
+        Error createImageViews(FlowSwapchains &flowSwaps, vk::Device device)
         {
+            flowSwaps.swapchainImageViews.resize(flowSwaps.swapchainImages.size());
+
+            for (size_t i = 0; i < flowSwaps.swapchainImages.size(); i++)
+            {
+                auto createInfo = vk::ImageViewCreateInfo(
+                    {},                                    /* flags */
+                    flowSwaps.swapchainImages.at(i),       /* vk::Image image */
+                    vk::ImageViewType::e2D,                /* Image View Type */
+                    flowSwaps.swapchainImageFormats.at(0), /* Image Format */
+                    {
+                        vk::ComponentSwizzle::eIdentity,
+                        vk::ComponentSwizzle::eIdentity,
+                        vk::ComponentSwizzle::eIdentity,
+                        vk::ComponentSwizzle::eIdentity}, /* Components */
+                    {
+                        vk::ImageAspectFlagBits::eColor,
+                        0,
+                        1,
+                        0,
+                        1});
+
+                if(device.createImageView(&createInfo, nullptr, &flowSwaps.swapchainImageViews.at(i)) != vk::Result::eSuccess){
+                    return ERR_CANT_CREATE;
+                }
+            }
 
             return SUCCESS;
         }
@@ -129,7 +155,7 @@ namespace flow::vulkan
             return vk::PresentModeKHR::eFifo;
         }
 
-        vk::Extent2D chooseSwapExtent(vk::SurfaceCapabilities2KHR &capabilities, GLFWwindow* window)
+        vk::Extent2D chooseSwapExtent(vk::SurfaceCapabilities2KHR &capabilities, GLFWwindow *window)
         {
             if (capabilities.surfaceCapabilities.currentExtent.width != UINT32_MAX)
             {

@@ -2,6 +2,11 @@
 
 namespace flow::vulkan
 {
+    /*
+
+    * Initialize function for main Flow runtime. For examples, create your own init function.
+
+    */
     Error initialize(FlowContext *flow)
     {
         Error err;
@@ -49,6 +54,10 @@ namespace flow::vulkan
             err = swapchains::createSwapchain(flow->flowSwaps, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0), flow->flowSurfaces.window);
 
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create swapchain!");
+
+            err = swapchains::createImageViews(flow->flowSwaps, flow->flowDevices.devices.at(0));
+
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create image views!");
         }
 
         return SUCCESS;

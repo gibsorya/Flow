@@ -44,6 +44,10 @@ namespace flow
 
     void cleanup()
     {
+        for(vk::ImageView imageView : flow->flowSwaps.swapchainImageViews){
+            flow->flowDevices.devices.at(0).destroyImageView(imageView);
+        }
+
         for(size_t i = 0; i < flow->flowSwaps.swapchains.size(); i++){
             flow->flowDevices.devices.at(0).destroySwapchainKHR(flow->flowSwaps.swapchains.at(i));
         }

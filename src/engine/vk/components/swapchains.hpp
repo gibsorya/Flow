@@ -28,7 +28,7 @@ namespace flow::vulkan
     {
         Error createSwapchain(FlowSwapchains &flowSwaps, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, GLFWwindow* window);
 
-        Error createImageViews(std::vector<vk::ImageView> &swapchainImageViews);
+        Error createImageViews(FlowSwapchains &flowSwaps, vk::Device device);
 
         vk::SurfaceFormat2KHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormat2KHR> &availableFormats);
         vk::PresentModeKHR chooseSwapPresentMode(const std::vector<vk::PresentModeKHR> &availablePresentModes);
