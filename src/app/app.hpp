@@ -3,7 +3,7 @@
 
 #include <flow/foundation.hpp>
 #include <engine/vk/flow_context.hpp>
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 #include <GLFW/glfw3.h>
 
 namespace flow {
