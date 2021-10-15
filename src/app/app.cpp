@@ -44,6 +44,19 @@ namespace flow
 
     void cleanup()
     {
+        for(auto pipeline : flow->flowGraphics.graphicsPipelines){
+            flow->flowDevices.devices.at(0).destroyPipeline(pipeline);
+        }
+
+        for (auto pipelineLayout : flow->flowGraphics.pipelineLayouts)
+		{
+			flow->flowDevices.devices.at(0).destroyPipelineLayout(pipelineLayout);
+		}
+
+        for(auto renderPass : flow->flowGraphics.renderPasses){
+            flow->flowDevices.devices.at(0).destroyRenderPass(renderPass);
+        }
+
         for(vk::ImageView imageView : flow->flowSwaps.swapchainImageViews){
             flow->flowDevices.devices.at(0).destroyImageView(imageView);
         }

@@ -60,6 +60,32 @@ namespace flow::vulkan
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create image views!");
         }
 
+        vk::RenderPass renderPass;
+        err = pipelines::createRenderPass(renderPass, flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageFormats.at(0));
+        ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create render pass!");
+        flow->flowGraphics.renderPasses.push_back(renderPass);
+
+        // GraphicsPipelineData data;
+        //*Graphics Pipeline Data
+        {
+            vk::PipelineLayout layout;
+            err = pipelines::createPipelineLayout(layout, flow->flowDevices.devices.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create pipeline layout!");
+            flow->flowGraphics.pipelineLayouts.push_back(layout);
+
+            vk::Pipeline pipeline;
+            err = pipelines::createGraphicsPipeline(pipeline, flow->flowDevices.devices.at(0), layout, renderPass, PIPELINE_PRIMITIVE_TRIANGLES, flow->flowSwaps.swapchainExtents.at(0), PipelineRasterizationState(), PipelineMultisampleState(), PipelineDepthStencilState());
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create graphics pipeline!");
+            flow->flowGraphics.graphicsPipelines.push_back(pipeline);
+
+        }
+
         return SUCCESS;
     }
+
+    // void populateGraphicsPipelineData(GraphicsPipelineData &data) {
+        // data.
+        // 
+    // 
+    // }
 }

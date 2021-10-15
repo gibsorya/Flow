@@ -1,23 +1,23 @@
-// #ifndef PIPELINE_INFOS
-// #define PIPELINE_INFOS
+#ifndef PIPELINE_INFOS
+#define PIPELINE_INFOS
 
-// #include "../../flow/flow.hpp"
-// #include <vulkan/vulkan.h>
+#include <flow/foundation.hpp>
+#include <vulkan/vulkan.hpp>
 
-// namespace flow::vulkan::pipelines{
-//     void populateVertexInputInfo(VkPipelineVertexInputStateCreateInfo &createInfo);
-//     void populateInputAssemblyInfo(VkPipelineInputAssemblyStateCreateInfo &createInfo);
-//     void populateTesselationInfo(VkPipelineTessellationStateCreateInfo &createInfo);
-//     void populateViewportInfo(VkPipelineViewportStateCreateInfo &createInfo);
-//     void populateRasterizationInfo(VkPipelineRasterizationStateCreateInfo &createInfo);
-//     void populateMultisamplerInfo(VkPipelineMultisampleStateCreateInfo &createInfo);
-//     void populateDepthStencilInfo(VkPipelineDepthStencilStateCreateInfo &createInfo);
-//     void populateColorBlendAttachmentInfo(VkPipelineColorBlendAttachmentState &createInfo);
-//     void populateColorBlendInfo(VkPipelineColorBlendStateCreateInfo &createInfo, VkPipelineColorBlendAttachmentState attachment);
-//     void populateDynamicStateInfo(VkPipelineDynamicStateCreateInfo &createInfo);
+namespace flow::vulkan::pipelines{
+    void populateVertexInputInfo(vk::PipelineVertexInputStateCreateInfo &createInfo);
+    void populateInputAssemblyInfo(vk::PipelineInputAssemblyStateCreateInfo &createInfo);
+    void populateTesselationInfo(vk::PipelineTessellationStateCreateInfo &createInfo);
+    void populateViewportInfo(vk::PipelineViewportStateCreateInfo &createInfo, vk::Rect2D scissor, vk::Viewport viewport);
+    void populateRasterizationInfo(vk::PipelineRasterizationStateCreateInfo &createInfo);
+    void populateMultisamplerInfo(vk::PipelineMultisampleStateCreateInfo &createInfo);
+    void populateDepthStencilInfo(vk::PipelineDepthStencilStateCreateInfo &createInfo);
+    void populateColorBlendAttachmentInfo(vk::PipelineColorBlendAttachmentState &createInfo);
+    void populateColorBlendInfo(vk::PipelineColorBlendStateCreateInfo &createInfo, vk::PipelineColorBlendAttachmentState attachment);
+    void populateDynamicStateInfo(vk::PipelineDynamicStateCreateInfo &createInfo);
     
 
-//     void populateShaderStageInfo(VkPipelineShaderStageCreateInfo &createInfo, VkShaderModule module, VkShaderStageFlagBits stageBits, const char* name);
-// }
+    void populateShaderStageInfo(vk::PipelineShaderStageCreateInfo &createInfo, vk::ShaderModule module, vk::ShaderStageFlagBits stageBits, const char* name);
+}
 
-// #endif // PIPELINE_INFOS
+#endif // PIPELINE_INFOS

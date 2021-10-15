@@ -9,6 +9,8 @@
 #include "components/devices.hpp"
 #include "components/queues.hpp"
 #include "components/swapchains.hpp"
+#include "components/pipelines/pipelines.hpp"
+#include "components/pipelines/pipelineinfos.hpp"
 
 
 struct FlowContext{
@@ -17,14 +19,17 @@ struct FlowContext{
     FlowInstances flowInstances;
     FlowDevices flowDevices;
     FlowSwapchains flowSwaps;
+    FlowGraphics flowGraphics;
 };
 
 namespace flow::vulkan {
     Error initialize(FlowContext *flow);
 
-    void mainLoop(FlowContext *flow);
+    // void mainLoop(FlowContext *flow);
 
-    void cleanup(FlowContext *flow);
+    // void cleanup(FlowContext *flow);
+
+    void populateGraphicsPipelineData(GraphicsPipelineData &data);
 }
 
 #endif

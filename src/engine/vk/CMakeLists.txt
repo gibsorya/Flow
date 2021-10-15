@@ -2,6 +2,7 @@ target_sources(${FLOW_LIB_TARGET}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/rendering_device.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.cpp
