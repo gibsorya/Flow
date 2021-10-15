@@ -13,18 +13,17 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/components/queues.hpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/components/swapchains.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/swapchains.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelines.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelines.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.hpp
         
-        
-        
-        
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/renderpasses.cpp
+
+        #Files to restructure
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelines.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/renderpasses.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelines.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.hpp
+        
+        
 )
