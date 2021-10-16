@@ -1,29 +1,23 @@
-// #include "syncobjects.hpp"
+#include "syncobjects.hpp"
 // #include "../root.hpp"
 
-// namespace flow::vulkan
-// {
-//     void createSyncObjects()
-//     {
-//         root.flowSyncObjects.imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-//         root.flowSyncObjects.renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-//         root.flowSyncObjects.inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-//         root.flowSyncObjects.imagesInFlight.resize(root.flowSwaps.swapChainImages.size(), VK_NULL_HANDLE);
+namespace flow::vulkan::syncobjects {
+        Error createSyncObjects(FlowSyncObjects &syncObjects, vk::Device device, std::vector<vk::Image> swapchainImages){
+            syncObjects.imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+            syncObjects.renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+            syncObjects.inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
-//         VkSemaphoreCreateInfo semaphoreInfo{};
-//         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vk::SemaphoreCreateInfo semaphoreInfo;
 
-//         VkFenceCreateInfo fenceInfo{};
-//         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-//         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+            vk::FenceCreateInfo fenceInfo;
+            fenceInfo.flags = vk::FenceCreateFlagBits::eSignaled;
 
-//         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-//         {
-//             if (vkCreateSemaphore(root.flowDevices.devices.at(0), &semaphoreInfo, nullptr, &root.flowSyncObjects.imageAvailableSemaphores[i]) != VK_SUCCESS || vkCreateSemaphore(root.flowDevices.devices.at(0), &semaphoreInfo, nullptr, &root.flowSyncObjects.renderFinishedSemaphores[i]) != VK_SUCCESS || vkCreateFence(root.flowDevices.devices.at(0), &fenceInfo, nullptr, &root.flowSyncObjects.inFlightFences[i]) != VK_SUCCESS)
-//             {
-//                 throw std::runtime_error("Failed to create sync objects for a frame!");
-//             }
-//         }
-//     }
+            for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+                if(device.createSemaphore(&semaphoreInfo, nullptr, &syncObjects.imageAvailableSemaphores[i]) != vk::Result::eSuccess || device.createSemaphore(&semaphoreInfo, nullptr, &syncObjects.renderFinishedSemaphores[i]) != vk::Result::eSuccess || device.createFence(&fenceInfo, nullptr, &syncObjects.inFlightFences[i]) != vk::Result::eSuccess){
+                    return ERR_CANT_CREATE;
+                }
+            }
 
-// }
+            return SUCCESS;
+        }
+}
