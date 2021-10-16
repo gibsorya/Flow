@@ -1,9 +1,0 @@
-target_sources(${FLOW_LIB_TARGET}
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/flow.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/foundation/debugTools.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/flow.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/foundation/debugTools.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/foundation/foundation.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/foundation/platform.hpp  
-)

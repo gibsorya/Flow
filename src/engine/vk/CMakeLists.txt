@@ -1,25 +1,24 @@
 target_sources(${FLOW_LIB_TARGET}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/instances.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/queues.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/devices.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/surfaces.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/imageviews.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/renderpasses.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/buffers.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/syncobjects.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelines.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelineinfos.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/instances.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/queues.hpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/devices.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/surfaces.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/imageviews.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/renderpasses.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/buffers.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/syncobjects.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelines.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/pipelines/pipelineinfos.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/flow_context.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/rendering_device.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/instances.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/surfaces.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/devices.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/devices.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/queues.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/queues.hpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/swapchains.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/swapchains.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelines.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelines.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.hpp
 )
