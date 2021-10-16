@@ -14,8 +14,8 @@
 #include "components/pipelines/pipelines.hpp"
 #include "components/pipelines/pipelineinfos.hpp"
 
-
-struct FlowContext{
+struct FlowContext
+{
 
     FlowSurfaces flowSurfaces;
     FlowInstances flowInstances;
@@ -28,7 +28,8 @@ struct FlowContext{
     FlowSyncObjects flowSyncObjects;
 };
 
-namespace flow::vulkan {
+namespace flow::vulkan
+{
     Error initialize(FlowContext *flow);
 
     // void mainLoop(FlowContext *flow);
@@ -36,6 +37,8 @@ namespace flow::vulkan {
     // void cleanup(FlowContext *flow);
 
     void populateGraphicsPipelineData(GraphicsPipelineData &data);
+
+    
 }
 
 #endif

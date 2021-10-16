@@ -26,7 +26,7 @@ namespace flow::vulkan
     SwapchainSupportDetails querySwapchainSupport(vk::PhysicalDevice device, vk::SurfaceKHR surface);
     namespace swapchains
     {
-        Error createSwapchain(FlowSwapchains &flowSwaps, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, GLFWwindow* window);
+        Error createSwapchain(vk::SwapchainKHR &swapchain, vk::Extent2D &swapExtent, std::vector<vk::Image> &swapchainImages, vk::Format &imageFormat, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, GLFWwindow* window);
 
         Error createImageViews(FlowSwapchains &flowSwaps, vk::Device device);
 

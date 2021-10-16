@@ -13,7 +13,7 @@ namespace flow::vulkan
 
         //*Instance + Window
         {
-            err = surfaces::initWindow(flow->flowSurfaces.window, flow->flowSurfaces.WIDTH, flow->flowSurfaces.HEIGHT, "Flow Engine");
+            err = surfaces::initWindow(flow->flowSurfaces.window, flow->flowSurfaces.WIDTH, flow->flowSurfaces.HEIGHT, "Flow Engine", &flow->flowSurfaces);
 
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create window!");
 
@@ -51,9 +51,15 @@ namespace flow::vulkan
 
         //*Swapchains
         {
-            err = swapchains::createSwapchain(flow->flowSwaps, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0), flow->flowSurfaces.window);
+            vk::SwapchainKHR swapchain;
+            vk::Extent2D swapExtent;
+            vk::Format swapFormat;
 
+            err = swapchains::createSwapchain(swapchain, swapExtent, flow->flowSwaps.swapchainImages, swapFormat, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0), flow->flowSurfaces.window);
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create swapchain!");
+            flow->flowSwaps.swapchains.push_back(swapchain);
+            flow->flowSwaps.swapchainExtents.push_back(swapExtent);
+            flow->flowSwaps.swapchainImageFormats.push_back(swapFormat);
 
             err = swapchains::createImageViews(flow->flowSwaps, flow->flowDevices.devices.at(0));
 
@@ -77,7 +83,6 @@ namespace flow::vulkan
             err = pipelines::createGraphicsPipeline(pipeline, flow->flowDevices.devices.at(0), layout, renderPass, PIPELINE_PRIMITIVE_TRIANGLES, flow->flowSwaps.swapchainExtents.at(0), PipelineRasterizationState(), PipelineMultisampleState(), PipelineDepthStencilState());
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create graphics pipeline!");
             flow->flowGraphics.graphicsPipelines.push_back(pipeline);
-
         }
 
         //*Buffers
@@ -103,6 +108,8 @@ namespace flow::vulkan
 
         return SUCCESS;
     }
+
+    
 
     // void populateGraphicsPipelineData(GraphicsPipelineData &data) {
         // data.

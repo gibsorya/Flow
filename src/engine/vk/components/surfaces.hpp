@@ -18,9 +18,11 @@ struct FlowSurfaces
 
 namespace flow::vulkan::surfaces
 {
-    Error initWindow(GLFWwindow *&window, u32 WIDTH, u32 HEIGHT, const char *title);
+    Error initWindow(GLFWwindow *&window, u32 WIDTH, u32 HEIGHT, const char *title, FlowSurfaces *surface);
 
     Error createSurface(std::vector<vk::SurfaceKHR> &surfaces, vk::Instance instance, GLFWwindow* window);
+
+    // global void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 }
 
 #endif

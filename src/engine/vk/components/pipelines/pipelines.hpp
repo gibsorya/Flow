@@ -7,13 +7,13 @@
 
 struct FlowGraphics
 {
-    std::vector<VkPipeline> graphicsPipelines;
-    std::vector<VkRenderPass> renderPasses;
-    std::vector<VkPipelineLayout> pipelineLayouts;
+    std::vector<vk::Pipeline> graphicsPipelines;
+    std::vector<vk::RenderPass> renderPasses;
+    std::vector<vk::PipelineLayout> pipelineLayouts;
 
     struct FlowGraphicsInfos
     {
-        std::vector<std::vector<VkPipelineShaderStageCreateInfo>> shaderStages;
+        std::vector<std::vector<vk::PipelineShaderStageCreateInfo>> shaderStages;
         std::vector<vk::PipelineVertexInputStateCreateInfo> vertexInputs;
         std::vector<vk::PipelineInputAssemblyStateCreateInfo> inputAssemblies;
         std::vector<vk::PipelineTessellationStateCreateInfo> tessallationStates;

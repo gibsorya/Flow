@@ -36,9 +36,9 @@ namespace flow::vulkan
     namespace swapchains
     {
 
-        Error createSwapchain(FlowSwapchains &flowSwaps, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, GLFWwindow *window)
+        Error createSwapchain(vk::SwapchainKHR &swapchain, vk::Extent2D &swapExtent, std::vector<vk::Image> &swapchainImages, vk::Format &imageFormat, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, GLFWwindow *window)
         {
-            vk::SwapchainKHR swapchain;
+            // vk::SwapchainKHR swapchain;
 
             QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
             u32 queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
@@ -87,13 +87,16 @@ namespace flow::vulkan
             }
 
             vk::Result result = device.getSwapchainImagesKHR(swapchain, &imageCount, nullptr);
-            flowSwaps.swapchainImages.resize(imageCount);
-            result = device.getSwapchainImagesKHR(swapchain, &imageCount, flowSwaps.swapchainImages.data());
+            swapchainImages.resize(imageCount);
+            result = device.getSwapchainImagesKHR(swapchain, &imageCount, swapchainImages.data());
 
-            flowSwaps.swapchainImageFormats.push_back(surfaceFormat.surfaceFormat.format);
-            flowSwaps.swapchainExtents.push_back(extent);
+            imageFormat = surfaceFormat.surfaceFormat.format;
+            swapExtent = extent;
+            // flowSwaps.swapchainImageFormats.push_back(surfaceFormat.surfaceFormat.format);
+            // flowSwaps.swapchainExtents.push_back(extent);
 
-            flowSwaps.swapchains.push_back(swapchain);
+
+            // flowSwaps.swapchains.push_back(swapchain);
 
             return SUCCESS;
         }

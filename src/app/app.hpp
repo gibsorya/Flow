@@ -10,7 +10,11 @@ namespace flow {
     Error setup();
     void mainLoop();
     void cleanup();
+    void cleanupSwapchain();
+    void recreateSwapchain();
     void draw();
+
+    void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 }
 
 

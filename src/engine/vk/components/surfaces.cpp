@@ -1,30 +1,18 @@
 #include "surfaces.hpp"
-
-// namespace flow::vulkan
-// {
-//     VkSurfaceKHR createSurface()
-//     {
-//         VkSurfaceKHR surface;
-
-//         if (glfwCreateWindowSurface(root.flowInstances.instances.at(0), root.flowWindow.window, nullptr, &surface) != VK_SUCCESS)
-//         {
-//             throw std::runtime_error("Failed to create window surface!");
-//         }
-
-//         return surface;
-//     }
-
-// }
+#include <engine/vk/flow_context.hpp>
+#include <app/app.hpp>
 
 namespace flow::vulkan::surfaces {
 
-    Error initWindow(GLFWwindow* &window, u32 WIDTH, u32 HEIGHT, const char *title) {
+    Error initWindow(GLFWwindow* &window, u32 WIDTH, u32 HEIGHT, const char *title, FlowSurfaces *surface) {
         glfwInit();
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-        window = glfwCreateWindow(WIDTH, HEIGHT, title, nullptr, nullptr);    
+        window = glfwCreateWindow(WIDTH, HEIGHT, title, nullptr, nullptr);
+        glfwSetWindowUserPointer(window, &surface->window);
+        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);  
 
         return SUCCESS;
     }
@@ -39,6 +27,12 @@ namespace flow::vulkan::surfaces {
         surfaces.push_back(surface);
         return SUCCESS;
     }
+
+    // global void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+    //     flow->
+        
+    
+    // }
     
 }
 
