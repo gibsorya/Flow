@@ -23,7 +23,4 @@ target_sources(${FLOW_LIB_TARGET}
         #Files to restructure
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.hpp
-        
-        
-        
 )
