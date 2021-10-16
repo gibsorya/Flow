@@ -202,10 +202,10 @@ namespace flow::vulkan
             // vk::PipelineLayout layout;
             // Error err = createPipelineLayout(layout, device);
             // ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create pipeline layout!");
-
+            
             //TODO: pass this through a parameter
-            auto vertexShaderCode = readFile("data/shaders/vert.spv");
-            auto fragShaderCode = readFile("data/shaders/frag.spv");
+            auto vertexShaderCode = readFile("data/shaders/helloTriangleVert.spv");
+            auto fragShaderCode = readFile("data/shaders/helloTriangleFrag.spv");
             vk::ShaderModule vertexShader;
             vk::ShaderModule fragmentShader;
             Error err = createShaderModule(vertexShader, vertexShaderCode, device);
