@@ -19,8 +19,6 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/components/pipelines/pipelineinfos.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.hpp
-
-        #Files to restructure
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.hpp
 )
