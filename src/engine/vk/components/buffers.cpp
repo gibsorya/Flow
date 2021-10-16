@@ -1,110 +1,96 @@
-// #include "buffers.hpp"
-// #include "../root.hpp"
+#include "buffers.hpp"
+#include <engine/vk/components/queues.hpp>
 
-// namespace flow::vulkan {
+namespace flow::vulkan::buffers {
 
-//     std::vector<VkFramebuffer> createFramebuffers() {
-//         std::vector<VkFramebuffer> framebuffers;
+    Error createFramebuffers(std::vector<vk::Framebuffer> &framebuffers, vk::Device device, std::vector<vk::ImageView> swapchainImageViews, vk::Extent2D swapExtent, vk::RenderPass renderpass){
+        framebuffers.resize(swapchainImageViews.size());
 
-//         framebuffers.resize(root.imageViews.swapchainImageViews.size());
+        for(size_t i = 0; i < swapchainImageViews.size(); i++){
+            vk::ImageView attachments[] = {
+                swapchainImageViews.at(i)
+            };
 
-//         for(size_t i = 0; i < root.imageViews.swapchainImageViews.size(); i++){
-//             VkImageView attachments[] = {
-//                 root.imageViews.swapchainImageViews.at(i)
-//             };
+            vk::FramebufferCreateInfo createInfo;
+            createInfo.renderPass = renderpass;
+            createInfo.attachmentCount = 1;
+            createInfo.pAttachments = attachments;
+            createInfo.width = swapExtent.width;
+            createInfo.height = swapExtent.height;
+            createInfo.layers = 1;
 
-//             VkFramebufferCreateInfo framebufferInfo{};
-//             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-//             framebufferInfo.renderPass = root.flowRenderPasses.renderPasses.at(0);
-//             framebufferInfo.attachmentCount = 1;
-//             framebufferInfo.pAttachments = attachments;
-//             framebufferInfo.width = root.flowSwaps.swapchainExtents.at(0).width;
-//             framebufferInfo.height = root.flowSwaps.swapchainExtents.at(0).height;
-//             framebufferInfo.layers = 1;
+            if(device.createFramebuffer(&createInfo, nullptr, &framebuffers[i]) != vk::Result::eSuccess){
+                return ERR_CANT_CREATE;
+            }
+        }
 
-//             if(vkCreateFramebuffer(root.flowDevices.devices.at(0), &framebufferInfo, nullptr, &framebuffers[i]) != VK_SUCCESS){
-//                 throw std::runtime_error("Failed to create framebuffer!");
-//             }
-//         }
+        return SUCCESS;
+    }
 
-//         return framebuffers;
-    
-//     }
+    Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface){
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
 
-//     VkCommandPool createCommandPool() {
-//         VkCommandPool commandPool;
+        vk::CommandPoolCreateInfo poolInfo;
+        poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
+        poolInfo.flags = {};
 
-//         QueueFamilyIndicies indices = findQueueFamilies(root.flowDevices.physicalDevice);
+        if(device.createCommandPool(&poolInfo, nullptr, &commandPool) != vk::Result::eSuccess){
+            return ERR_CANT_CREATE;
+        }
 
-//         VkCommandPoolCreateInfo poolInfo{};
-//         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-//         poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
-//         poolInfo.flags = 0;
+        return SUCCESS;
+    };
 
-//         if(vkCreateCommandPool(root.flowDevices.devices.at(0), &poolInfo, nullptr, &commandPool) != VK_SUCCESS){
-//             throw std::runtime_error("Failed to create command pool!");
-//         }
-        
-//         return commandPool;
-//     }
+    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline){
+        commandBuffers.resize(swapchainFramebuffers.size());
 
-//     std::vector<VkCommandBuffer> createCommandBuffers() {
-//         std::vector<VkCommandBuffer> commandBuffers;
+        vk::CommandBufferAllocateInfo allocInfo;
+        allocInfo.level = vk::CommandBufferLevel::ePrimary;
+        allocInfo.commandBufferCount = (u32)commandBuffers.size();
+        allocInfo.commandPool = commandPool;
 
-//         commandBuffers.resize(root.flowFrameBuffers.swapchainFrameBuffers.at(0).size());
+        ERROR_FAIL_COND(device.allocateCommandBuffers(&allocInfo, commandBuffers.data()) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to allocate command buffer!");
 
-//         VkCommandBufferAllocateInfo allocInfo{};
-//         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-//         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-//         allocInfo.commandBufferCount = (u32)commandBuffers.size();
-//         allocInfo.commandPool = root.flowCommandPools.commandPools.at(0);
+        for(size_t i = 0; i < commandBuffers.size(); i++){
+            vk::CommandBufferBeginInfo beginInfo;
+            beginInfo.flags = {};
+            beginInfo.pInheritanceInfo = nullptr;
 
-//         if(vkAllocateCommandBuffers(root.flowDevices.devices.at(0), &allocInfo, commandBuffers.data()) != VK_SUCCESS){
-//             throw std::runtime_error("Failed to allocate command buffers!");
-//         }
+            ERROR_FAIL_COND(commandBuffers[i].begin(&beginInfo) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to begin recording command buffer!");
 
-//         for(size_t i = 0; i < commandBuffers.size(); i++) {
-//             VkCommandBufferBeginInfo beginInfo{};
-//             beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-//             beginInfo.flags = 0;
-//             beginInfo.pInheritanceInfo = nullptr;
+            vk::ClearValue clearColor;
+            clearColor.color = { std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f} };
 
-//             if(vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS){
-//                 throw std::runtime_error("Failed to begin recording command buffer!");
-//             }
+            vk::RenderPassBeginInfo renderPassInfo;
+            renderPassInfo.renderPass = renderPass;
+            renderPassInfo.framebuffer = swapchainFramebuffers.at(i);
+            renderPassInfo.renderArea.offset.x = 0;
+            renderPassInfo.renderArea.offset.y = 0;
+            renderPassInfo.renderArea.extent = extent;
+            renderPassInfo.clearValueCount = 1;
+            renderPassInfo.pClearValues = &clearColor;
 
-//             VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+            vk::SubpassBeginInfo subpassInfo;
+            subpassInfo.contents = vk::SubpassContents::eInline;
 
-//             VkRenderPassBeginInfo renderPassInfo{};
-//             renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-//             renderPassInfo.renderPass = root.flowRenderPasses.renderPasses.at(0);
-//             renderPassInfo.framebuffer = root.flowFrameBuffers.swapchainFrameBuffers.at(0).at(i);
-//             renderPassInfo.renderArea.offset = {0, 0};
-//             renderPassInfo.renderArea.extent = root.flowSwaps.swapchainExtents.at(0);
-//             renderPassInfo.clearValueCount = 1;
-//             renderPassInfo.pClearValues = &clearColor;
+            vk::SubpassEndInfo subpassEndInfo;
 
-//             VkSubpassBeginInfo subpassBeginInfo{};
-//             subpassBeginInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO;
-//             subpassBeginInfo.contents = VK_SUBPASS_CONTENTS_INLINE;
+            commandBuffers[i].beginRenderPass2(&renderPassInfo, &subpassInfo);
 
-//             VkSubpassEndInfo subpassEndInfo{};
-//             subpassEndInfo.sType = VK_STRUCTURE_TYPE_SUBPASS_END_INFO;
+            commandBuffers[i].bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
 
-//             vkCmdBeginRenderPass2(commandBuffers[i], &renderPassInfo, &subpassBeginInfo);
+            commandBuffers[i].draw(3, 1, 0, 0);
 
-//             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, root.graphicsPipelines.graphicsPipelines.at(0));
+            commandBuffers[i].endRenderPass2(&subpassEndInfo);
 
-//             vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+            //why doesn't commandBuffers[i].end() return vk::Result? :(
+            if(vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS){
+                return ERR_CANT_CREATE;
+            }
+        }
 
-//             vkCmdEndRenderPass2(commandBuffers[i], &subpassEndInfo);
 
-//             if(vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS){
-//                 throw std::runtime_error("Failed to record command buffer!");
-//             }
-//         }
-        
-//         return commandBuffers;
-//     }
-    
-// }
+        return SUCCESS;    
+    }
+
+}

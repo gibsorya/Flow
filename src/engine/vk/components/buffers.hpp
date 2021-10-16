@@ -1,27 +1,27 @@
-// #ifndef FLOW_BUFFERS
-// #define FLOW_BUFFERS
+#ifndef FLOW_BUFFERS
+#define FLOW_BUFFERS
 
-// #include "../flow/flow.hpp"
-// #include <vulkan/vulkan.hpp>
+#include <flow/foundation.hpp>
+#include <vulkan/vulkan.hpp>
 
-// struct FlowFrameBuffers {
-//     std::vector<std::vector<VkFramebuffer>> swapchainFrameBuffers;
-// };
+struct FlowFrameBuffers {
+    std::vector<std::vector<vk::Framebuffer>> swapchainFrameBuffers;
+};
 
-// struct FlowCommandPools {
-//     std::vector<VkCommandPool> commandPools;
-// };
+struct FlowCommandPools {
+    std::vector<vk::CommandPool> commandPools;
+};
 
-// struct FlowCommandBuffers {
-//     std::vector<std::vector<VkCommandBuffer>> commandBuffers;
-// };
+struct FlowCommandBuffers {
+    std::vector<std::vector<vk::CommandBuffer>> commandBuffers;
+};
 
-// namespace flow::vulkan {
-//     std::vector<VkFramebuffer> createFramebuffers();
+namespace flow::vulkan::buffers {
+    Error createFramebuffers(std::vector<vk::Framebuffer> &frameBuffers, vk::Device device, std::vector<vk::ImageView> swapchainImageViews, vk::Extent2D swapExtent, vk::RenderPass renderpass);
 
-//     VkCommandPool createCommandPool();
+    Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface);
 
-//     std::vector<VkCommandBuffer> createCommandBuffers();
-// }
+    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffer);
+}
 
-// #endif
+#endif

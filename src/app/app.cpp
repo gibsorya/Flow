@@ -44,6 +44,10 @@ namespace flow
 
     void cleanup()
     {
+        for(auto framebuffer : flow->flowFrameBuffers.swapchainFrameBuffers.at(0)){
+            flow->flowDevices.devices.at(0).destroyFramebuffer(framebuffer);
+        }
+        
         for(auto pipeline : flow->flowGraphics.graphicsPipelines){
             flow->flowDevices.devices.at(0).destroyPipeline(pipeline);
         }

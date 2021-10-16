@@ -9,6 +9,8 @@
 #include "components/devices.hpp"
 #include "components/queues.hpp"
 #include "components/swapchains.hpp"
+#include "components/buffers.hpp"
+#include "components/syncobjects.hpp"
 #include "components/pipelines/pipelines.hpp"
 #include "components/pipelines/pipelineinfos.hpp"
 
@@ -20,6 +22,10 @@ struct FlowContext{
     FlowDevices flowDevices;
     FlowSwapchains flowSwaps;
     FlowGraphics flowGraphics;
+    FlowFrameBuffers flowFrameBuffers;
+    FlowCommandPools flowCommandPools;
+    FlowCommandBuffers flowCommandBuffers;
+    FlowSyncObjects flowSyncObjects;
 };
 
 namespace flow::vulkan {

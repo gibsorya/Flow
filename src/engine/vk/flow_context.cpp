@@ -80,6 +80,14 @@ namespace flow::vulkan
 
         }
 
+        //*Buffers
+        {
+            std::vector<vk::Framebuffer> frameBuffers;
+            err = buffers::createFramebuffers(frameBuffers, flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageViews, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create frame buffers!");
+            flow->flowFrameBuffers.swapchainFrameBuffers.push_back(frameBuffers);
+        }
+
         return SUCCESS;
     }
 
