@@ -21,7 +21,7 @@ namespace flow::vulkan::buffers {
 
     Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface);
 
-    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffer);
+    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline);
 }
 
 #endif

@@ -1,11 +1,11 @@
 #include "syncobjects.hpp"
-// #include "../root.hpp"
 
 namespace flow::vulkan::syncobjects {
         Error createSyncObjects(FlowSyncObjects &syncObjects, vk::Device device, std::vector<vk::Image> swapchainImages){
             syncObjects.imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
             syncObjects.renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
             syncObjects.inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+            syncObjects.imagesInFlight.resize(swapchainImages.size(), VK_NULL_HANDLE);
 
             vk::SemaphoreCreateInfo semaphoreInfo;
 

@@ -10,6 +10,7 @@ namespace flow {
     Error setup();
     void mainLoop();
     void cleanup();
+    void draw();
 }
 
 

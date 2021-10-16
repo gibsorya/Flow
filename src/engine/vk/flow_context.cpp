@@ -86,7 +86,20 @@ namespace flow::vulkan
             err = buffers::createFramebuffers(frameBuffers, flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageViews, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0));
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create frame buffers!");
             flow->flowFrameBuffers.swapchainFrameBuffers.push_back(frameBuffers);
+
+            vk::CommandPool commandPool;
+            err = buffers::createCommandPool(commandPool, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command pool!");
+            flow->flowCommandPools.commandPools.push_back(commandPool);
+
+            std::vector<vk::CommandBuffer> commandBuffers;
+            err = buffers::createCommandBuffers(commandBuffers, frameBuffers, flow->flowDevices.devices.at(0), commandPool, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");
+            flow->flowCommandBuffers.commandBuffers.push_back(commandBuffers);
         }
+
+        err = syncobjects::createSyncObjects(flow->flowSyncObjects, flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImages);
+        ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create sync objects!");
 
         return SUCCESS;
     }
