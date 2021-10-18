@@ -69,4 +69,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
 
+# Example projects
+add_subdirectory(examples/HelloTriangle)
+
 
