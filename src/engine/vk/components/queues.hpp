@@ -18,6 +18,8 @@ struct QueueFamilyIndices{
 
 namespace flow::vulkan{
     QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceKHR surface);
+
+    void printQueueFamilies(vk::PhysicalDevice device);
 }
 
 #endif

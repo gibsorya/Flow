@@ -14,6 +14,11 @@ namespace flow::vulkan
 
         device.getQueueFamilyProperties2(&queueFamilyCount, queueFamilies.data());
 
+        // for(const auto &queueFamily : queueFamilies) {
+        //     std::cout << "Queue number: " + queueFamily.queueFamilyProperties.queueCount << std::endl;
+        //     std::cout << "Queue flags: " + std::to_string(queueFamily.queueFamilyProperties.queueFlags) << std::endl;
+        // }
+
         int i = 0;
         for (const auto &queueFamily : queueFamilies)
         {
@@ -38,6 +43,14 @@ namespace flow::vulkan
         }
 
         return indices;
+    }
+    void printQueueFamilies(vk::PhysicalDevice device) {
+        std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
+
+        for(auto &queueFamily : queueFamilies) {
+            std::cout << "Queue number: " + std::to_string(queueFamily.queueCount)  << std::endl;
+            std::cout << "Queue flags: " + to_string(queueFamily.queueFlags) << std::endl;
+        }
     }
     //     QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device){
     //         QueueFamilyIndicies indices;

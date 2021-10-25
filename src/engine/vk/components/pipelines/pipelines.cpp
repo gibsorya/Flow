@@ -251,7 +251,9 @@ namespace flow::vulkan
         {
             vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
             pipelineLayoutInfo.setLayoutCount = 0;
+            pipelineLayoutInfo.pSetLayouts = nullptr;
             pipelineLayoutInfo.pushConstantRangeCount = 0;
+            pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
             if (device.createPipelineLayout(&pipelineLayoutInfo, nullptr, &pipelineLayout) != vk::Result::eSuccess)
             {

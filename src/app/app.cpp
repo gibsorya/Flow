@@ -36,6 +36,8 @@ namespace flow
 
     void mainLoop()
     {
+        vulkan::printQueueFamilies(flow->flowDevices.physicalDevices.at(0));
+
         while (!glfwWindowShouldClose(flow->flowSurfaces.window))
         {
             glfwPollEvents();
@@ -164,12 +166,12 @@ namespace flow
             throw std::runtime_error("Failed to create render pass!");
         }
 
-        // err = vulkan::pipelines::createPipelineLayout(flow->flowGraphics.pipelineLayouts.at(0), flow->flowDevices.devices.at(0));
+        err = vulkan::pipelines::createPipelineLayout(flow->flowGraphics.pipelineLayouts.at(0), flow->flowDevices.devices.at(0));
 
-        // if (err != SUCCESS)
-        // {
-        //     throw std::runtime_error("Failed to create pipeline layout!");
-        // }
+        if (err != SUCCESS)
+        {
+            throw std::runtime_error("Failed to create pipeline layout!");
+        }
 
         err = vulkan::pipelines::createGraphicsPipeline(flow->flowGraphics.graphicsPipelines.at(0), flow->flowDevices.devices.at(0), flow->flowGraphics.pipelineLayouts.at(0), flow->flowGraphics.renderPasses.at(0), PIPELINE_PRIMITIVE_TRIANGLES, flow->flowSwaps.swapchainExtents.at(0), PipelineRasterizationState(), PipelineMultisampleState(), PipelineDepthStencilState());
 
