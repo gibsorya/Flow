@@ -51,6 +51,14 @@ namespace flow
     {
         cleanupSwapchain();
 
+        for(auto indexBuffer : flow->flowIndexBuffers.indexBuffers){
+            flow->flowDevices.devices.at(0).destroyBuffer(indexBuffer);
+        }
+
+        for(auto bufferMemory : flow->flowIndexBuffers.bufferMemories){
+            flow->flowDevices.devices.at(0).freeMemory(bufferMemory);
+        }
+
         for(auto vertexBuffer : flow->flowVertexBuffers.vertexBuffers){
             flow->flowDevices.devices.at(0).destroyBuffer(vertexBuffer);
         }
@@ -195,7 +203,7 @@ namespace flow
             throw std::runtime_error("Failed to create frame buffers!");
         }
 
-        err = vulkan::buffers::createCommandBuffers(flow->flowCommandBuffers.commandBuffers.at(0), flow->flowFrameBuffers.swapchainFrameBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowCommandPools.commandPools.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), flow->flowVertexBuffers.vertexBuffers.at(0));
+        err = vulkan::buffers::createCommandBuffers(flow->flowCommandBuffers.commandBuffers.at(0), flow->flowFrameBuffers.swapchainFrameBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowCommandPools.commandPools.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), flow->flowVertexBuffers.vertexBuffers.at(0), flow->flowIndexBuffers.indexBuffers.at(0));
     }
 
     void draw()

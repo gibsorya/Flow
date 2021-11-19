@@ -46,7 +46,7 @@ namespace flow::vulkan::buffers
         return SUCCESS;
     };
 
-    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer)
+    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer, vk::Buffer indexBuffer)
     {
         commandBuffers.resize(swapchainFramebuffers.size());
 
@@ -91,7 +91,10 @@ namespace flow::vulkan::buffers
 
             commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
 
-            commandBuffers[i].draw(3, 1, 0, 0);
+            commandBuffers[i].bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint16);
+
+            // commandBuffers[i].draw(3, 1, 0, 0);
+            commandBuffers[i].drawIndexed(static_cast<u32>(indices.size()), 1, 0, 0, 0);
 
             commandBuffers[i].endRenderPass2(&subpassEndInfo);
 
@@ -132,6 +135,32 @@ namespace flow::vulkan::buffers
         return SUCCESS;
     }
 
+    Error createIndexBuffer(vk::Buffer &indexBuffer, vk::DeviceMemory &indexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue graphicsQueue) {
+        vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+        vk::Buffer stagingBuffer;
+        vk::DeviceMemory stagingBufferMemory;
+        Error error = createBuffer(stagingBuffer, stagingBufferMemory, bufferSize, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, device, physicalDevice);
+        
+        if(error != SUCCESS){
+            return ERR_CANT_CREATE;
+        }
+
+        void *data;
+        vk::Result result = device.mapMemory(stagingBufferMemory, 0, bufferSize, {}, &data);
+            memcpy(data, indices.data(), (size_t)bufferSize);
+        device.unmapMemory(stagingBufferMemory);
+
+        createBuffer(indexBuffer, indexBufferMemory, bufferSize, vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal, device, physicalDevice);
+
+        copyBuffer(stagingBuffer, indexBuffer, bufferSize, device, commandPool, graphicsQueue);
+
+        device.destroyBuffer(stagingBuffer, nullptr);
+        device.freeMemory(stagingBufferMemory, nullptr);
+        
+        return SUCCESS;
+    }
+
     Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Device device, vk::PhysicalDevice physicalDevice)
     {
         vk::BufferCreateInfo bufferInfo{};
@@ -168,12 +197,12 @@ namespace flow::vulkan::buffers
         allocInfo.commandBufferCount = 1;
 
         vk::CommandBuffer commandBuffer;
-        device.allocateCommandBuffers(&allocInfo, &commandBuffer);
+        vk::Result result =device.allocateCommandBuffers(&allocInfo, &commandBuffer);
         
         vk::CommandBufferBeginInfo beginInfo{};
         beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
-        commandBuffer.begin(&beginInfo);
+        result = commandBuffer.begin(&beginInfo);
 
         vk::BufferCopy copyRegion{};
         copyRegion.srcOffset = 0;
@@ -188,7 +217,7 @@ namespace flow::vulkan::buffers
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
 
-        graphicsQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+        result = graphicsQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
         graphicsQueue.waitIdle();
         
         device.freeCommandBuffers(commandPool, 1, &commandBuffer);

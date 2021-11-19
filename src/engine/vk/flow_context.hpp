@@ -25,6 +25,7 @@ struct FlowContext
     FlowCommandPools flowCommandPools;
     FlowCommandBuffers flowCommandBuffers;
     FlowVertexBuffers flowVertexBuffers;
+    FlowIndexBuffers flowIndexBuffers;
     FlowSyncObjects flowSyncObjects;
 };
 
