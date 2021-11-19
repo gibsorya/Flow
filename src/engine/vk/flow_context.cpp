@@ -99,7 +99,7 @@ namespace flow::vulkan
 
             vk::Buffer vertexBuffer;
             vk::DeviceMemory vertexBufferMemory;
-            err = buffers::createVertexBuffer(vertexBuffer, vertexBufferMemory, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0));
+            err = buffers::createVertexBuffer(vertexBuffer, vertexBufferMemory, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), commandPool, flow->flowDevices.graphicsQueues.at(0));
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create vertex buffer!");
             flow->flowVertexBuffers.vertexBuffers.push_back(vertexBuffer);
             flow->flowVertexBuffers.bufferMemories.push_back(vertexBufferMemory);
