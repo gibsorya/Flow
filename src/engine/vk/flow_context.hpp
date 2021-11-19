@@ -16,7 +16,6 @@
 
 struct FlowContext
 {
-
     FlowSurfaces flowSurfaces;
     FlowInstances flowInstances;
     FlowDevices flowDevices;
@@ -25,6 +24,7 @@ struct FlowContext
     FlowFrameBuffers flowFrameBuffers;
     FlowCommandPools flowCommandPools;
     FlowCommandBuffers flowCommandBuffers;
+    FlowVertexBuffers flowVertexBuffers;
     FlowSyncObjects flowSyncObjects;
 };
 

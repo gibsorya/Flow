@@ -97,8 +97,15 @@ namespace flow::vulkan
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command pool!");
             flow->flowCommandPools.commandPools.push_back(commandPool);
 
+            vk::Buffer vertexBuffer;
+            vk::DeviceMemory vertexBufferMemory;
+            err = buffers::createVertexBuffer(vertexBuffer, vertexBufferMemory, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create vertex buffer!");
+            flow->flowVertexBuffers.vertexBuffers.push_back(vertexBuffer);
+            flow->flowVertexBuffers.bufferMemories.push_back(vertexBufferMemory);
+
             std::vector<vk::CommandBuffer> commandBuffers;
-            err = buffers::createCommandBuffers(commandBuffers, frameBuffers, flow->flowDevices.devices.at(0), commandPool, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0));
+            err = buffers::createCommandBuffers(commandBuffers, frameBuffers, flow->flowDevices.devices.at(0), commandPool, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), vertexBuffer);
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");
             flow->flowCommandBuffers.commandBuffers.push_back(commandBuffers);
         }

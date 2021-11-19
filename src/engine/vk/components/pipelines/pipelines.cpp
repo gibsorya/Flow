@@ -1,5 +1,6 @@
 #include "pipelines.hpp"
 #include "pipelineinfos.hpp"
+#include "../buffers.hpp"
 
 namespace flow::vulkan
 {
@@ -68,12 +69,15 @@ namespace flow::vulkan
 
         Error createGraphicsPipeline(vk::Pipeline &pipeline, vk::Device device, vk::PipelineLayout layout, vk::RenderPass renderPass, PipelinePrimitive pPrimitive, vk::Extent2D pSwapExtent, const PipelineRasterizationState &pRasterizationState, const PipelineMultisampleState &pMultisampleState, const PipelineDepthStencilState &pDepthStencilState)
         {
+            auto bindingDescription = Vertex::getBindingDescription();
+            auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
             vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
 
-            vertexInputInfo.vertexBindingDescriptionCount = 0;
-            vertexInputInfo.pVertexBindingDescriptions = nullptr;
-            vertexInputInfo.vertexAttributeDescriptionCount = 0;
-            vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+            vertexInputInfo.vertexBindingDescriptionCount = 1;
+            vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+            vertexInputInfo.vertexAttributeDescriptionCount = static_cast<u32>(attributeDescriptions.size());
+            vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
             vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
 
@@ -204,8 +208,8 @@ namespace flow::vulkan
             // ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create pipeline layout!");
             
             //TODO: pass this through a parameter
-            auto vertexShaderCode = readFile("data/shaders/helloTriangleVert.spv");
-            auto fragShaderCode = readFile("data/shaders/helloTriangleFrag.spv");
+            auto vertexShaderCode = readFile("data/shaders/mainVert.spv");
+            auto fragShaderCode = readFile("data/shaders/mainFrag.spv");
             vk::ShaderModule vertexShader;
             vk::ShaderModule fragmentShader;
             Error err = createShaderModule(vertexShader, vertexShaderCode, device);

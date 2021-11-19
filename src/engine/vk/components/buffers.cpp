@@ -41,7 +41,7 @@ namespace flow::vulkan::buffers {
         return SUCCESS;
     };
 
-    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline){
+    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer){
         commandBuffers.resize(swapchainFramebuffers.size());
 
         vk::CommandBufferAllocateInfo allocInfo;
@@ -79,6 +79,11 @@ namespace flow::vulkan::buffers {
 
             commandBuffers[i].bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
 
+            vk::Buffer vertexBuffers[] = {vertexBuffer};
+            vk::DeviceSize offsets[] = {0};
+
+            commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
+
             commandBuffers[i].draw(3, 1, 0, 0);
 
             commandBuffers[i].endRenderPass2(&subpassEndInfo);
@@ -91,6 +96,78 @@ namespace flow::vulkan::buffers {
 
 
         return SUCCESS;    
+    }
+
+    Error createVertexBuffer(vk::Buffer &vertexBuffer, vk::DeviceMemory &vertexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice) {
+        // vk::BufferCreateInfo bufferInfo{};
+        // bufferInfo.size = sizeof(vertices[0]) * vertices.size();
+        // bufferInfo.usage = vk::BufferUsageFlagBits::eVertexBuffer;
+        // bufferInfo.sharingMode = vk::SharingMode::eExclusive;
+
+        // if(device.createBuffer(&bufferInfo, nullptr, &vertexBuffer) != vk::Result::eSuccess) {
+        //     return ERR_CANT_CREATE;
+        // }
+
+        // vk::MemoryRequirements memRequirements;
+        // device.getBufferMemoryRequirements(vertexBuffer, &memRequirements);
+
+        // vk::MemoryAllocateInfo allocInfo{};
+        // allocInfo.allocationSize = memRequirements.size;
+        // allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, physicalDevice);
+
+        // if(device.allocateMemory(&allocInfo, nullptr, &vertexBufferMemory) != vk::Result::eSuccess) {
+        //     ERROR_FAIL(ERR_INVALID, "Failed to allocate vertex buffer memory!");
+        // }
+
+        // device.bindBufferMemory(vertexBuffer, vertexBufferMemory, 0);
+        vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+        createBuffer(vertexBuffer, vertexBufferMemory, bufferSize, vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, device, physicalDevice);
+
+        void* data;
+        device.mapMemory(vertexBufferMemory, 0, bufferSize, {}, &data);
+        memcpy(data, vertices.data(), (size_t)bufferSize);
+        device.unmapMemory(vertexBufferMemory);
+
+        return SUCCESS;
+    }
+
+    Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Device device, vk::PhysicalDevice physicalDevice) {
+        vk::BufferCreateInfo bufferInfo{};
+        bufferInfo.size = size;
+        bufferInfo.usage = usage;
+        bufferInfo.sharingMode = vk::SharingMode::eExclusive;
+
+        if(device.createBuffer(&bufferInfo, nullptr, &buffer) != vk::Result::eSuccess) {
+            return ERR_CANT_CREATE;
+        }
+
+        vk::MemoryRequirements memRequirements;
+        device.getBufferMemoryRequirements(buffer, &memRequirements);
+
+        vk::MemoryAllocateInfo allocInfo{};
+        allocInfo.allocationSize = memRequirements.size;
+        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties, physicalDevice);
+
+        if(device.allocateMemory(&allocInfo, nullptr, &bufferMemory) != vk::Result::eSuccess) {
+            ERROR_FAIL(ERR_INVALID, "Failed to allocate vertex buffer memory!");
+        }
+
+        device.bindBufferMemory(buffer, bufferMemory, 0);
+        
+        return SUCCESS;
+    }
+
+    u32 findMemoryType(u32 typeFilter, vk::MemoryPropertyFlags properties, vk::PhysicalDevice physicalDevice) {
+        vk::PhysicalDeviceMemoryProperties2 memProperties;
+        physicalDevice.getMemoryProperties2(&memProperties);
+
+        for(u32 i = 0; i < memProperties.memoryProperties.memoryTypeCount; i++){
+            if((typeFilter & (1 << i)) && (memProperties.memoryProperties.memoryTypes[i].propertyFlags & properties) == properties){
+                return i;
+            }
+        }
+        
+        throw std::runtime_error("Failed to find suitable memory type!");
     }
 
 }
