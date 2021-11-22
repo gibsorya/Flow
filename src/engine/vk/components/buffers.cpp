@@ -259,7 +259,7 @@ namespace flow::vulkan::buffers
         ubo.proj[1][1] *= -1;
 
         void* data;
-        device.mapMemory(uniformBufferMemories.at(currentImage), 0, sizeof(ubo), {}, &data);
+        vk::Result result = device.mapMemory(uniformBufferMemories.at(currentImage), 0, sizeof(ubo), {}, &data);
             memcpy(data, &ubo, sizeof(ubo));
         device.unmapMemory(uniformBufferMemories.at(currentImage));
     }
