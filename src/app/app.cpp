@@ -158,6 +158,11 @@ namespace flow
                 flow->flowDevices.devices.at(0).freeMemory(flow->flowUniformBuffers.bufferMemories.at(0).at(i));
             }
         }
+
+        for(auto pool : flow->flowUniformBuffers.descriptorPools)
+        {
+            flow->flowDevices.devices.at(0).destroyDescriptorPool(pool);
+        }
     }
 
     void recreateSwapchain()
@@ -223,7 +228,21 @@ namespace flow
             throw std::runtime_error("Failed to create uniform buffers!");
         }
 
-        err = vulkan::buffers::createCommandBuffers(flow->flowCommandBuffers.commandBuffers.at(0), flow->flowFrameBuffers.swapchainFrameBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowCommandPools.commandPools.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), flow->flowVertexBuffers.vertexBuffers.at(0), flow->flowIndexBuffers.indexBuffers.at(0));
+        err = vulkan::buffers::createDescriptorPool(flow->flowUniformBuffers.descriptorPools.at(0), flow->flowSwaps.swapchainImages, flow->flowDevices.devices.at(0));
+
+        if(err != SUCCESS)
+        {
+            throw std::runtime_error("Failed to create descriptor pool!");
+        }
+
+        err = vulkan::buffers::createDescriptorSets(flow->flowUniformBuffers.descriptorSets.at(0), flow->flowUniformBuffers.descriptorSetLayouts.at(0), flow->flowUniformBuffers.descriptorPools.at(0), flow->flowSwaps.swapchainImages, flow->flowUniformBuffers.uniformBuffers.at(0), flow->flowDevices.devices.at(0));
+
+        if(err != SUCCESS)
+        {
+            throw std::runtime_error("Failed to create descriptor sets!");
+        }
+
+        err = vulkan::buffers::createCommandBuffers(flow->flowCommandBuffers.commandBuffers.at(0), flow->flowFrameBuffers.swapchainFrameBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowCommandPools.commandPools.at(0), flow->flowGraphics.pipelineLayouts.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), flow->flowVertexBuffers.vertexBuffers.at(0), flow->flowIndexBuffers.indexBuffers.at(0), flow->flowUniformBuffers.descriptorSets.at(0));
     }
 
     void draw()

@@ -46,7 +46,7 @@ namespace flow::vulkan::buffers
         return SUCCESS;
     };
 
-    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer, vk::Buffer indexBuffer)
+    Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Device device, vk::CommandPool commandPool, vk::PipelineLayout layout, vk::Extent2D extent, vk::RenderPass renderPass, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer, vk::Buffer indexBuffer, std::vector<vk::DescriptorSet> descriptorSets)
     {
         commandBuffers.resize(swapchainFramebuffers.size());
 
@@ -93,7 +93,7 @@ namespace flow::vulkan::buffers
 
             commandBuffers[i].bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint16);
 
-            // commandBuffers[i].draw(3, 1, 0, 0);
+            commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, layout, 0, 1, &descriptorSets.at(i), 0, nullptr);
             commandBuffers[i].drawIndexed(static_cast<u32>(indices.size()), 1, 0, 0, 0);
 
             commandBuffers[i].endRenderPass2(&subpassEndInfo);
@@ -228,6 +228,24 @@ namespace flow::vulkan::buffers
         return SUCCESS;
     }
 
+    Error createDescriptorPool(vk::DescriptorPool &descriptorPool, std::vector<vk::Image> swapchainImages, vk::Device device) {
+        vk::DescriptorPoolSize poolSize{};
+        poolSize.type = vk::DescriptorType::eUniformBuffer;
+        poolSize.descriptorCount = static_cast<u32>(swapchainImages.size());
+
+        vk::DescriptorPoolCreateInfo poolInfo{};
+        poolInfo.poolSizeCount = 1;
+        poolInfo.pPoolSizes = &poolSize;
+        poolInfo.maxSets = static_cast<u32>(swapchainImages.size());
+
+        if(device.createDescriptorPool(&poolInfo, nullptr, &descriptorPool) != vk::Result::eSuccess)
+        {
+            return ERR_CANT_CREATE;
+        }
+        
+        return SUCCESS;
+    }
+
     void updateUniformBuffer(std::vector<vk::DeviceMemory> uniformBufferMemories, u32 currentImage, vk::Extent2D swapExtent, vk::Device device) {
         local auto startTime = std::chrono::high_resolution_clock::now();
         
@@ -293,6 +311,39 @@ namespace flow::vulkan::buffers
         }
 
         throw std::runtime_error("Failed to find suitable memory type!");
+    }
+
+    Error createDescriptorSets(std::vector<vk::DescriptorSet> &descriptorSets, vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorPool pool, std::vector<vk::Image> swapchainImages, std::vector<vk::Buffer> uniformBuffers, vk::Device device) {
+        std::vector<vk::DescriptorSetLayout> layouts(swapchainImages.size(), descriptorSetLayout);
+        vk::DescriptorSetAllocateInfo allocInfo{};
+        allocInfo.descriptorPool = pool;
+        allocInfo.descriptorSetCount = static_cast<u32>(swapchainImages.size());
+        allocInfo.pSetLayouts = layouts.data();
+
+        descriptorSets.resize(swapchainImages.size());
+        ERROR_FAIL_COND(device.allocateDescriptorSets(&allocInfo, descriptorSets.data()) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to allocate descriptor sets!");
+        
+        for(size_t i = 0; i < swapchainImages.size(); i++)
+        {
+            vk::DescriptorBufferInfo bufferInfo{};
+            bufferInfo.buffer = uniformBuffers.at(i);
+            bufferInfo.offset = 0;
+            bufferInfo.range = sizeof(UniformBufferObject);
+
+            vk::WriteDescriptorSet descriptorWrite{};
+            descriptorWrite.dstSet = descriptorSets.at(i);
+            descriptorWrite.dstBinding = 0;
+            descriptorWrite.dstArrayElement = 0;
+            descriptorWrite.descriptorType = vk::DescriptorType::eUniformBuffer;
+            descriptorWrite.descriptorCount = 1;
+            descriptorWrite.pBufferInfo = &bufferInfo;
+            descriptorWrite.pImageInfo = nullptr;
+            descriptorWrite.pTexelBufferView = nullptr;
+
+            device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+        }
+        
+        return SUCCESS;
     }
 
 }

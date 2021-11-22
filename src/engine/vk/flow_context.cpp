@@ -123,8 +123,18 @@ namespace flow::vulkan
             flow->flowUniformBuffers.uniformBuffers.push_back(uniformBuffers);
             flow->flowUniformBuffers.bufferMemories.push_back(uniformBufferMemories);
 
+            vk::DescriptorPool descriptorPool;
+            err = buffers::createDescriptorPool(descriptorPool, flow->flowSwaps.swapchainImages, flow->flowDevices.devices.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create descriptor pool!");
+            flow->flowUniformBuffers.descriptorPools.push_back(descriptorPool);
+
+            std::vector<vk::DescriptorSet> descriptorSets;
+            err = buffers::createDescriptorSets(descriptorSets, flow->flowUniformBuffers.descriptorSetLayouts.at(0), descriptorPool, flow->flowSwaps.swapchainImages, uniformBuffers, flow->flowDevices.devices.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create descriptor sets!");
+            flow->flowUniformBuffers.descriptorSets.push_back(descriptorSets);
+
             std::vector<vk::CommandBuffer> commandBuffers;
-            err = buffers::createCommandBuffers(commandBuffers, frameBuffers, flow->flowDevices.devices.at(0), commandPool, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), vertexBuffer, indexBuffer);
+            err = buffers::createCommandBuffers(commandBuffers, frameBuffers, flow->flowDevices.devices.at(0), commandPool, flow->flowGraphics.pipelineLayouts.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), vertexBuffer, indexBuffer, descriptorSets);
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");
             flow->flowCommandBuffers.commandBuffers.push_back(commandBuffers);
         }
