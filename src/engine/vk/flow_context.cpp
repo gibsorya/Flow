@@ -116,6 +116,13 @@ namespace flow::vulkan
             flow->flowIndexBuffers.indexBuffers.push_back(indexBuffer);
             flow->flowIndexBuffers.bufferMemories.push_back(indexBufferMemory);
 
+            std::vector<vk::Buffer> uniformBuffers;
+            std::vector<vk::DeviceMemory> uniformBufferMemories;
+            err = buffers::createUniformBuffers(uniformBuffers, uniformBufferMemories, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSwaps.swapchainImages);
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create uniform buffers!");
+            flow->flowUniformBuffers.uniformBuffers.push_back(uniformBuffers);
+            flow->flowUniformBuffers.bufferMemories.push_back(uniformBufferMemories);
+
             std::vector<vk::CommandBuffer> commandBuffers;
             err = buffers::createCommandBuffers(commandBuffers, frameBuffers, flow->flowDevices.devices.at(0), commandPool, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), vertexBuffer, indexBuffer);
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");

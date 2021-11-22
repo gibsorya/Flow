@@ -150,6 +150,14 @@ namespace flow
         {
             flow->flowDevices.devices.at(0).destroySwapchainKHR(flow->flowSwaps.swapchains.at(i));
         }
+
+        for(auto uniformBuffers : flow->flowUniformBuffers.uniformBuffers) {
+            for(size_t i = 0; i < flow->flowSwaps.swapchainImages.size(); i++)
+            {
+                flow->flowDevices.devices.at(0).destroyBuffer(uniformBuffers[i]);
+                flow->flowDevices.devices.at(0).freeMemory(flow->flowUniformBuffers.bufferMemories.at(0).at(i));
+            }
+        }
     }
 
     void recreateSwapchain()
@@ -208,6 +216,13 @@ namespace flow
             throw std::runtime_error("Failed to create frame buffers!");
         }
 
+        err = vulkan::buffers::createUniformBuffers(flow->flowUniformBuffers.uniformBuffers.at(0), flow->flowUniformBuffers.bufferMemories.at(0), flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSwaps.swapchainImages);
+        
+        if(err != SUCCESS)
+        {
+            throw std::runtime_error("Failed to create uniform buffers!");
+        }
+
         err = vulkan::buffers::createCommandBuffers(flow->flowCommandBuffers.commandBuffers.at(0), flow->flowFrameBuffers.swapchainFrameBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowCommandPools.commandPools.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0), flow->flowGraphics.graphicsPipelines.at(0), flow->flowVertexBuffers.vertexBuffers.at(0), flow->flowIndexBuffers.indexBuffers.at(0));
     }
 
@@ -235,6 +250,8 @@ namespace flow
         {
             throw std::runtime_error("Failed to acquire swapchain image!");
         }
+
+        vulkan::buffers::updateUniformBuffer(flow->flowUniformBuffers.bufferMemories.at(0), imageIndex, flow->flowSwaps.swapchainExtents.at(0), flow->flowDevices.devices.at(0));
 
         if (flow->flowSyncObjects.imagesInFlight[imageIndex])
         {

@@ -190,6 +190,25 @@ namespace flow::vulkan::buffers
         return SUCCESS;
     }
 
+    Error createUniformBuffers(std::vector<vk::Buffer> &uniformBuffers, std::vector<vk::DeviceMemory> &uniformBufferMemories, vk::Device device, vk::PhysicalDevice physicalDevice, std::vector<vk::Image> swapchainImages) {
+        vk::DeviceSize bufferSize = sizeof(UniformBufferObject);
+
+        uniformBuffers.resize(swapchainImages.size());
+        uniformBufferMemories.resize(swapchainImages.size());
+
+        Error error;
+
+        for(size_t i = 0; i < swapchainImages.size(); i++)
+        {
+            error = createBuffer(uniformBuffers[i], uniformBufferMemories[i], bufferSize, vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, device, physicalDevice);
+            if(error != SUCCESS) {
+                return ERR_CANT_CREATE;
+            }
+        }
+        
+        return SUCCESS;
+    }
+
     Error createDescriptorSetLayout(vk::DescriptorSetLayout &descriptorSetLayout, vk::Device device) {
         vk::DescriptorSetLayoutBinding uboLayoutBinding{};
         uboLayoutBinding.binding = 0;
@@ -207,6 +226,24 @@ namespace flow::vulkan::buffers
         }
         
         return SUCCESS;
+    }
+
+    void updateUniformBuffer(std::vector<vk::DeviceMemory> uniformBufferMemories, u32 currentImage, vk::Extent2D swapExtent, vk::Device device) {
+        local auto startTime = std::chrono::high_resolution_clock::now();
+        
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        UniformBufferObject ubo{};
+        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.proj = glm::perspective(glm::radians(45.0f), swapExtent.width / (float) swapExtent.height, 0.1f, 10.0f);
+        ubo.proj[1][1] *= -1;
+
+        void* data;
+        device.mapMemory(uniformBufferMemories.at(currentImage), 0, sizeof(ubo), {}, &data);
+            memcpy(data, &ubo, sizeof(ubo));
+        device.unmapMemory(uniformBufferMemories.at(currentImage));
     }
 
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue) {
