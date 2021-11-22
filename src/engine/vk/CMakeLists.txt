@@ -21,4 +21,6 @@ target_sources(${FLOW_LIB_TARGET}
         ${CMAKE_CURRENT_SOURCE_DIR}/components/syncobjects.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/components/buffers.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/texture_mapping.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/texture_mapping.cpp
 )
