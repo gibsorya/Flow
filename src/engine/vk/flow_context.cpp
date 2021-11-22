@@ -74,8 +74,13 @@ namespace flow::vulkan
         // GraphicsPipelineData data;
         //*Graphics Pipeline Data
         {
+            vk::DescriptorSetLayout setLayout;
+            err = buffers::createDescriptorSetLayout(setLayout, flow->flowDevices.devices.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create descriptor set layout!");
+            flow->flowUniformBuffers.descriptorSetLayouts.push_back(setLayout);
+
             vk::PipelineLayout layout;
-            err = pipelines::createPipelineLayout(layout, flow->flowDevices.devices.at(0));
+            err = pipelines::createPipelineLayout(layout, flow->flowDevices.devices.at(0), setLayout);
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create pipeline layout!");
             flow->flowGraphics.pipelineLayouts.push_back(layout);
 

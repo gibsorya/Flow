@@ -51,6 +51,11 @@ namespace flow
     {
         cleanupSwapchain();
 
+        for(auto setLayout : flow->flowUniformBuffers.descriptorSetLayouts)
+        {
+            flow->flowDevices.devices.at(0).destroyDescriptorSetLayout(setLayout);
+        }
+
         for(auto indexBuffer : flow->flowIndexBuffers.indexBuffers){
             flow->flowDevices.devices.at(0).destroyBuffer(indexBuffer);
         }
@@ -182,7 +187,7 @@ namespace flow
             throw std::runtime_error("Failed to create render pass!");
         }
 
-        err = vulkan::pipelines::createPipelineLayout(flow->flowGraphics.pipelineLayouts.at(0), flow->flowDevices.devices.at(0));
+        err = vulkan::pipelines::createPipelineLayout(flow->flowGraphics.pipelineLayouts.at(0), flow->flowDevices.devices.at(0), flow->flowUniformBuffers.descriptorSetLayouts.at(0));
 
         if (err != SUCCESS)
         {

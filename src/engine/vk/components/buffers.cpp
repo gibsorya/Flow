@@ -190,6 +190,25 @@ namespace flow::vulkan::buffers
         return SUCCESS;
     }
 
+    Error createDescriptorSetLayout(vk::DescriptorSetLayout &descriptorSetLayout, vk::Device device) {
+        vk::DescriptorSetLayoutBinding uboLayoutBinding{};
+        uboLayoutBinding.binding = 0;
+        uboLayoutBinding.descriptorType = vk::DescriptorType::eUniformBuffer;
+        uboLayoutBinding.descriptorCount = 1;
+        uboLayoutBinding.stageFlags = vk::ShaderStageFlagBits::eVertex;
+        uboLayoutBinding.pImmutableSamplers = nullptr;
+
+        vk::DescriptorSetLayoutCreateInfo layoutInfo{};
+        layoutInfo.bindingCount = 1;
+        layoutInfo.pBindings = &uboLayoutBinding;
+
+        if(device.createDescriptorSetLayout(&layoutInfo, nullptr, &descriptorSetLayout) != vk::Result::eSuccess){
+            return ERR_CANT_CREATE;
+        }
+        
+        return SUCCESS;
+    }
+
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue) {
         vk::CommandBufferAllocateInfo allocInfo{};
         allocInfo.level = vk::CommandBufferLevel::ePrimary;

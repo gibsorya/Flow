@@ -27,6 +27,12 @@ struct FlowIndexBuffers {
     std::vector<vk::DeviceMemory> bufferMemories;
 };
 
+struct FlowUniformBuffers {
+    std::vector<vk::DescriptorSetLayout> descriptorSetLayouts;
+    std::vector<std::vector<vk::Buffer>> uniformBuffers;
+    std::vector<std::vector<vk::DeviceMemory>> bufferMemories;
+};
+
 //TODO restructure this to fit DOD
 struct Vertex {
     glm::vec2 pos;
@@ -58,6 +64,12 @@ struct Vertex {
     }
 };
 
+struct UniformBufferObject {
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
+};
+
 global const std::vector<Vertex> vertices = {
     {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
     {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
@@ -81,6 +93,8 @@ namespace flow::vulkan::buffers {
     Error createIndexBuffer(vk::Buffer &indexBuffer, vk::DeviceMemory &indexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue graphicsQueue);
 
     Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Device device, vk::PhysicalDevice physicalDevice);
+
+    Error createDescriptorSetLayout(vk::DescriptorSetLayout &descriptorSetLayout, vk::Device device);
 
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue);
 

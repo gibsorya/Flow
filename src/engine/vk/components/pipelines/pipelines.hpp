@@ -59,7 +59,7 @@ namespace flow::vulkan
 
         Error createGraphicsPipeline(vk::Pipeline &pipeline, vk::Device device, vk::PipelineLayout layout, vk::RenderPass renderPass, PipelinePrimitive pPrimitive, vk::Extent2D pSwapExtent, const PipelineRasterizationState &pRasterizationState, const PipelineMultisampleState &pMultisampleState, const PipelineDepthStencilState &pDepthStencilState);
 
-        Error createPipelineLayout(vk::PipelineLayout &pipelineLayout, vk::Device device);
+        Error createPipelineLayout(vk::PipelineLayout &pipelineLayout, vk::Device device, vk::DescriptorSetLayout setLayout);
 
         Error createRenderPass(vk::RenderPass &renderPass, vk::Device device, vk::Format swapchainImageFormat);
 
