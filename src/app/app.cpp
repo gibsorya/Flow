@@ -51,6 +51,26 @@ namespace flow
     {
         cleanupSwapchain();
 
+        for(auto sampler : flow->flowTextures.textureSamplers)
+        {
+            flow->flowDevices.devices.at(0).destroySampler(sampler);
+        }
+
+        for(auto imageView : flow->flowTextures.textureImageViews)
+        {
+            flow->flowDevices.devices.at(0).destroyImageView(imageView);
+        }
+
+        for(auto image : flow->flowTextures.textureImages)
+        {
+            flow->flowDevices.devices.at(0).destroyImage(image);
+        }
+
+        for(auto memory : flow->flowTextures.textureImageMemories)
+        {
+            flow->flowDevices.devices.at(0).freeMemory(memory);
+        }
+
         for(auto setLayout : flow->flowUniformBuffers.descriptorSetLayouts)
         {
             flow->flowDevices.devices.at(0).destroyDescriptorSetLayout(setLayout);
@@ -235,7 +255,7 @@ namespace flow
             throw std::runtime_error("Failed to create descriptor pool!");
         }
 
-        err = vulkan::buffers::createDescriptorSets(flow->flowUniformBuffers.descriptorSets.at(0), flow->flowUniformBuffers.descriptorSetLayouts.at(0), flow->flowUniformBuffers.descriptorPools.at(0), flow->flowSwaps.swapchainImages, flow->flowUniformBuffers.uniformBuffers.at(0), flow->flowDevices.devices.at(0));
+        err = vulkan::buffers::createDescriptorSets(flow->flowUniformBuffers.descriptorSets.at(0), flow->flowUniformBuffers.descriptorSetLayouts.at(0), flow->flowUniformBuffers.descriptorPools.at(0), flow->flowSwaps.swapchainImages, flow->flowUniformBuffers.uniformBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowTextures.textureImageViews.at(0), flow->flowTextures.textureSamplers.at(0));
 
         if(err != SUCCESS)
         {

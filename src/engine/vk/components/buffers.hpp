@@ -50,6 +50,7 @@ struct Vertex
 {
     glm::vec2 pos;
     glm::vec3 color;
+    glm::vec2 texCoord;
 
     //Describes at which rate to load data from memory throughout the vertices
     local vk::VertexInputBindingDescription getBindingDescription()
@@ -62,18 +63,24 @@ struct Vertex
         return bindingDescription;
     };
 
-    local std::array<vk::VertexInputAttributeDescription, 2> getAttributeDescriptions()
+    local std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions()
     {
-        std::array<vk::VertexInputAttributeDescription, 2> attributeDescriptions{};
+        std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions{};
 
         attributeDescriptions.at(0).binding = 0;
         attributeDescriptions.at(0).location = 0;
         attributeDescriptions.at(0).format = vk::Format::eR32G32Sfloat;
         attributeDescriptions.at(0).offset = offsetof(Vertex, pos);
+
         attributeDescriptions.at(1).binding = 0;
         attributeDescriptions.at(1).location = 1;
         attributeDescriptions.at(1).format = vk::Format::eR32G32B32Sfloat;
         attributeDescriptions.at(1).offset = offsetof(Vertex, color);
+
+        attributeDescriptions.at(2).binding = 0;
+        attributeDescriptions.at(2).location = 2;
+        attributeDescriptions.at(2).format = vk::Format::eR32G32Sfloat;
+        attributeDescriptions.at(2).offset = offsetof(Vertex, texCoord);
 
         return attributeDescriptions;
     }
@@ -87,10 +94,10 @@ struct UniformBufferObject
 };
 
 global const std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
 
 global const std::vector<u16> indices = {
     0, 1, 2, 2, 3, 0};
@@ -115,11 +122,15 @@ namespace flow::vulkan::buffers
 
     Error createDescriptorPool(vk::DescriptorPool &descriptorPool, std::vector<vk::Image> swapchainImages, vk::Device device);
 
-    Error createDescriptorSets(std::vector<vk::DescriptorSet> &descriptorSets, vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorPool pool, std::vector<vk::Image> swapchainImages, std::vector<vk::Buffer> uniformBuffers, vk::Device device);
+    Error createDescriptorSets(std::vector<vk::DescriptorSet> &descriptorSets, vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorPool pool, std::vector<vk::Image> swapchainImages, std::vector<vk::Buffer> uniformBuffers, vk::Device device, vk::ImageView textureImageView, vk::Sampler textureSampler);
 
     void updateUniformBuffer(std::vector<vk::DeviceMemory> uniformBufferMemories, u32 currentImage, vk::Extent2D swapExtent, vk::Device device);
 
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue);
+
+    vk::CommandBuffer beginSingleTimeCommands(vk::Device device, vk::CommandPool commandPool);
+
+    void endSingleTimeCommands(vk::CommandBuffer commandBuffer, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue);
 
     u32 findMemoryType(u32 typeFilter, vk::MemoryPropertyFlags properties, vk::PhysicalDevice physicalDevice);
 }

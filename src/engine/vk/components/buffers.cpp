@@ -217,9 +217,17 @@ namespace flow::vulkan::buffers
         uboLayoutBinding.stageFlags = vk::ShaderStageFlagBits::eVertex;
         uboLayoutBinding.pImmutableSamplers = nullptr;
 
+        vk::DescriptorSetLayoutBinding samplerLayoutBinding{};
+        samplerLayoutBinding.binding = 1;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
+        samplerLayoutBinding.stageFlags = vk::ShaderStageFlagBits::eFragment;
+
+        std::array<vk::DescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding, samplerLayoutBinding};
         vk::DescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.bindingCount = 1;
-        layoutInfo.pBindings = &uboLayoutBinding;
+        layoutInfo.bindingCount = static_cast<u32>(bindings.size());
+        layoutInfo.pBindings = bindings.data();
 
         if(device.createDescriptorSetLayout(&layoutInfo, nullptr, &descriptorSetLayout) != vk::Result::eSuccess){
             return ERR_CANT_CREATE;
@@ -229,13 +237,16 @@ namespace flow::vulkan::buffers
     }
 
     Error createDescriptorPool(vk::DescriptorPool &descriptorPool, std::vector<vk::Image> swapchainImages, vk::Device device) {
-        vk::DescriptorPoolSize poolSize{};
-        poolSize.type = vk::DescriptorType::eUniformBuffer;
-        poolSize.descriptorCount = static_cast<u32>(swapchainImages.size());
+
+        std::array<vk::DescriptorPoolSize, 2> poolSizes{};
+        poolSizes[0].type = vk::DescriptorType::eUniformBuffer;
+        poolSizes[0].descriptorCount = static_cast<u32>(swapchainImages.size());
+        poolSizes[1].type = vk::DescriptorType::eCombinedImageSampler;
+        poolSizes[1].descriptorCount = static_cast<u32>(swapchainImages.size());
 
         vk::DescriptorPoolCreateInfo poolInfo{};
-        poolInfo.poolSizeCount = 1;
-        poolInfo.pPoolSizes = &poolSize;
+        poolInfo.poolSizeCount = static_cast<u32>(poolSizes.size());
+        poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = static_cast<u32>(swapchainImages.size());
 
         if(device.createDescriptorPool(&poolInfo, nullptr, &descriptorPool) != vk::Result::eSuccess)
@@ -265,18 +276,7 @@ namespace flow::vulkan::buffers
     }
 
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue) {
-        vk::CommandBufferAllocateInfo allocInfo{};
-        allocInfo.level = vk::CommandBufferLevel::ePrimary;
-        allocInfo.commandPool = commandPool;
-        allocInfo.commandBufferCount = 1;
-
-        vk::CommandBuffer commandBuffer;
-        vk::Result result =device.allocateCommandBuffers(&allocInfo, &commandBuffer);
-        
-        vk::CommandBufferBeginInfo beginInfo{};
-        beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-
-        result = commandBuffer.begin(&beginInfo);
+        vk::CommandBuffer commandBuffer = beginSingleTimeCommands(device, commandPool);
 
         vk::BufferCopy copyRegion{};
         copyRegion.srcOffset = 0;
@@ -285,16 +285,38 @@ namespace flow::vulkan::buffers
 
         commandBuffer.copyBuffer(srcBuffer, dstBuffer, 1, &copyRegion);
 
+        endSingleTimeCommands(commandBuffer, device, commandPool, graphicsQueue);
+    }
+
+    vk::CommandBuffer beginSingleTimeCommands(vk::Device device, vk::CommandPool commandPool) {
+        vk::CommandBufferAllocateInfo allocInfo{};
+        allocInfo.level = vk::CommandBufferLevel::ePrimary;
+        allocInfo.commandPool = commandPool;
+        allocInfo.commandBufferCount = 1;
+
+        vk::CommandBuffer commandBuffer;
+
+        vk::Result result = device.allocateCommandBuffers(&allocInfo, &commandBuffer);
+
+        vk::CommandBufferBeginInfo beginInfo{};
+        beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+
+        result = commandBuffer.begin(&beginInfo);
+
+        return commandBuffer;
+    }
+
+    void endSingleTimeCommands(vk::CommandBuffer commandBuffer, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue) {
         commandBuffer.end();
 
         vk::SubmitInfo submitInfo{};
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
 
-        result = graphicsQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+        vk::Result result = graphicsQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
         graphicsQueue.waitIdle();
-        
-        device.freeCommandBuffers(commandPool, 1, &commandBuffer);
+
+        device.freeCommandBuffers(commandPool, 1, &commandBuffer);       
     }
 
     u32 findMemoryType(u32 typeFilter, vk::MemoryPropertyFlags properties, vk::PhysicalDevice physicalDevice)
@@ -313,7 +335,7 @@ namespace flow::vulkan::buffers
         throw std::runtime_error("Failed to find suitable memory type!");
     }
 
-    Error createDescriptorSets(std::vector<vk::DescriptorSet> &descriptorSets, vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorPool pool, std::vector<vk::Image> swapchainImages, std::vector<vk::Buffer> uniformBuffers, vk::Device device) {
+    Error createDescriptorSets(std::vector<vk::DescriptorSet> &descriptorSets, vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorPool pool, std::vector<vk::Image> swapchainImages, std::vector<vk::Buffer> uniformBuffers, vk::Device device, vk::ImageView textureImageView, vk::Sampler textureSampler) {
         std::vector<vk::DescriptorSetLayout> layouts(swapchainImages.size(), descriptorSetLayout);
         vk::DescriptorSetAllocateInfo allocInfo{};
         allocInfo.descriptorPool = pool;
@@ -330,17 +352,27 @@ namespace flow::vulkan::buffers
             bufferInfo.offset = 0;
             bufferInfo.range = sizeof(UniformBufferObject);
 
-            vk::WriteDescriptorSet descriptorWrite{};
-            descriptorWrite.dstSet = descriptorSets.at(i);
-            descriptorWrite.dstBinding = 0;
-            descriptorWrite.dstArrayElement = 0;
-            descriptorWrite.descriptorType = vk::DescriptorType::eUniformBuffer;
-            descriptorWrite.descriptorCount = 1;
-            descriptorWrite.pBufferInfo = &bufferInfo;
-            descriptorWrite.pImageInfo = nullptr;
-            descriptorWrite.pTexelBufferView = nullptr;
+            vk::DescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+            imageInfo.imageView = textureImageView;
+            imageInfo.sampler = textureSampler;
 
-            device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+            std::array<vk::WriteDescriptorSet, 2> descriptorWrites{};
+            descriptorWrites[0].dstSet = descriptorSets.at(i);
+            descriptorWrites[0].dstBinding = 0;
+            descriptorWrites[0].dstArrayElement = 0;
+            descriptorWrites[0].descriptorType = vk::DescriptorType::eUniformBuffer;
+            descriptorWrites[0].descriptorCount = 1;
+            descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+            descriptorWrites[1].dstSet = descriptorSets.at(i);
+            descriptorWrites[1].dstBinding = 1;
+            descriptorWrites[1].dstArrayElement = 0;
+            descriptorWrites[1].descriptorType = vk::DescriptorType::eCombinedImageSampler;
+            descriptorWrites[1].descriptorCount = 1;
+            descriptorWrites[1].pImageInfo = &imageInfo;
+
+            device.updateDescriptorSets(static_cast<u32>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
         
         return SUCCESS;

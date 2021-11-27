@@ -4,7 +4,7 @@ namespace flow::vulkan
 {
     /*
 
-    * Initialize function for main Flow runtime. For examples, create your own init function.
+    * Initialize function for main Flow runtime. For creating examples using the engine, create your own init function.
 
     */
     Error initialize(FlowContext *flow)
@@ -102,6 +102,23 @@ namespace flow::vulkan
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command pool!");
             flow->flowCommandPools.commandPools.push_back(commandPool);
 
+            vk::Image textureImage;
+            vk::DeviceMemory textureImageMemory;
+            err = textures::createTextureImage(textureImage, textureImageMemory, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), commandPool, flow->flowDevices.graphicsQueues.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create texture image!");
+            flow->flowTextures.textureImages.push_back(textureImage);
+            flow->flowTextures.textureImageMemories.push_back(textureImageMemory);
+
+            vk::ImageView textureImageView;
+            err = textures::createTextureImageView(textureImageView, flow->flowDevices.devices.at(0), textureImage);
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create texture image view!");
+            flow->flowTextures.textureImageViews.push_back(textureImageView);
+
+            vk::Sampler textureSampler;
+            err = textures::createTextureSampler(textureSampler, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create texture sampler!");
+            flow->flowTextures.textureSamplers.push_back(textureSampler);
+
             vk::Buffer vertexBuffer;
             vk::DeviceMemory vertexBufferMemory;
             err = buffers::createVertexBuffer(vertexBuffer, vertexBufferMemory, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), commandPool, flow->flowDevices.graphicsQueues.at(0));
@@ -129,7 +146,7 @@ namespace flow::vulkan
             flow->flowUniformBuffers.descriptorPools.push_back(descriptorPool);
 
             std::vector<vk::DescriptorSet> descriptorSets;
-            err = buffers::createDescriptorSets(descriptorSets, flow->flowUniformBuffers.descriptorSetLayouts.at(0), descriptorPool, flow->flowSwaps.swapchainImages, uniformBuffers, flow->flowDevices.devices.at(0));
+            err = buffers::createDescriptorSets(descriptorSets, flow->flowUniformBuffers.descriptorSetLayouts.at(0), descriptorPool, flow->flowSwaps.swapchainImages, uniformBuffers, flow->flowDevices.devices.at(0), textureImageView, textureSampler);
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create descriptor sets!");
             flow->flowUniformBuffers.descriptorSets.push_back(descriptorSets);
 

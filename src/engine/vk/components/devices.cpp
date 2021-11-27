@@ -81,7 +81,17 @@ namespace flow::vulkan::devices
 
         bool extensionsSupported = checkDeviceExtensionSupport(device);
 
-        return extensionsSupported && indices.isComplete();
+        bool swapchainAdequate = false;
+        if(extensionsSupported)
+        {
+            SwapchainSupportDetails swapchainSupport = querySwapchainSupport(device, surface);
+            swapchainAdequate = !swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty();
+        }
+
+        // vk::PhysicalDeviceFeatures supportedFeatures;
+        // device.getFeatures(supportedFeatures);
+
+        return extensionsSupported && indices.isComplete() && swapchainAdequate;
     }
 
     Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue){
@@ -102,6 +112,7 @@ namespace flow::vulkan::devices
 
         vk::PhysicalDeviceFeatures2 deviceFeatures;
         physicalDevice.getFeatures2(&deviceFeatures);
+        deviceFeatures.features.samplerAnisotropy = VK_TRUE;
 
         auto createInfo = vk::DeviceCreateInfo({}, static_cast<u32>(queueCreateInfos.size()), queueCreateInfos.data(), 0, nullptr, 
         static_cast<u32>(deviceExtensions.size()), deviceExtensions.data(), &deviceFeatures.features);

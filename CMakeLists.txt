@@ -17,7 +17,7 @@ target_link_libraries(${FLOW_LIB_TARGET} PUBLIC
 	Vulkan-Headers
     # imgui
     glm
-    # stb
+    stb
 	glfw
 	tinyobjloader
 )

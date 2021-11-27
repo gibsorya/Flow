@@ -10,6 +10,7 @@
 #include "components/queues.hpp"
 #include "components/swapchains.hpp"
 #include "components/buffers.hpp"
+#include "components/texture_mapping.hpp"
 #include "components/syncobjects.hpp"
 #include "components/pipelines/pipelines.hpp"
 #include "components/pipelines/pipelineinfos.hpp"
@@ -27,6 +28,7 @@ struct FlowContext
     FlowVertexBuffers flowVertexBuffers;
     FlowIndexBuffers flowIndexBuffers;
     FlowUniformBuffers flowUniformBuffers;
+    FlowTextures flowTextures;
     FlowSyncObjects flowSyncObjects;
 };
 

@@ -105,26 +105,34 @@ namespace flow::vulkan
         {
             flowSwaps.swapchainImageViews.resize(flowSwaps.swapchainImages.size());
 
-            for (size_t i = 0; i < flowSwaps.swapchainImages.size(); i++)
-            {
-                auto createInfo = vk::ImageViewCreateInfo(
-                    {},                                    /* flags */
-                    flowSwaps.swapchainImages.at(i),       /* vk::Image image */
-                    vk::ImageViewType::e2D,                /* Image View Type */
-                    flowSwaps.swapchainImageFormats.at(0), /* Image Format */
-                    {
-                        vk::ComponentSwizzle::eIdentity,
-                        vk::ComponentSwizzle::eIdentity,
-                        vk::ComponentSwizzle::eIdentity,
-                        vk::ComponentSwizzle::eIdentity}, /* Components */
-                    {
-                        vk::ImageAspectFlagBits::eColor,
-                        0,
-                        1,
-                        0,
-                        1});
+            // for (size_t i = 0; i < flowSwaps.swapchainImages.size(); i++)
+            // {
+            //     auto createInfo = vk::ImageViewCreateInfo(
+            //         {},                                    /* flags */
+            //         flowSwaps.swapchainImages.at(i),       /* vk::Image image */
+            //         vk::ImageViewType::e2D,                /* Image View Type */
+            //         flowSwaps.swapchainImageFormats.at(0), /* Image Format */
+            //         {
+            //             vk::ComponentSwizzle::eIdentity,
+            //             vk::ComponentSwizzle::eIdentity,
+            //             vk::ComponentSwizzle::eIdentity,
+            //             vk::ComponentSwizzle::eIdentity}, /* Components */
+            //         {
+            //             vk::ImageAspectFlagBits::eColor,
+            //             0,
+            //             1,
+            //             0,
+            //             1});
 
-                if(device.createImageView(&createInfo, nullptr, &flowSwaps.swapchainImageViews.at(i)) != vk::Result::eSuccess){
+            //     if(device.createImageView(&createInfo, nullptr, &flowSwaps.swapchainImageViews.at(i)) != vk::Result::eSuccess){
+            //         return ERR_CANT_CREATE;
+            //     }
+            // }
+
+            for(u32 i = 0; i < flowSwaps.swapchainImages.size(); i++)
+            {
+                if(textures::createImageView(flowSwaps.swapchainImageViews[i], flowSwaps.swapchainImages[i], flowSwaps.swapchainImageFormats.at(0), device) != SUCCESS)
+                {
                     return ERR_CANT_CREATE;
                 }
             }
