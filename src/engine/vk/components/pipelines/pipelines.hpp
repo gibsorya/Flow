@@ -61,7 +61,7 @@ namespace flow::vulkan
 
         Error createPipelineLayout(vk::PipelineLayout &pipelineLayout, vk::Device device, vk::DescriptorSetLayout setLayout);
 
-        Error createRenderPass(vk::RenderPass &renderPass, vk::Device device, vk::Format swapchainImageFormat);
+        Error createRenderPass(vk::RenderPass &renderPass, vk::Device device, vk::PhysicalDevice physicalDevice, vk::Format swapchainImageFormat);
 
         Error createViewport(vk::Viewport &viewport, vk::Extent2D extent);
         

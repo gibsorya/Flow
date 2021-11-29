@@ -135,6 +135,20 @@ namespace flow
 
     void cleanupSwapchain()
     {
+        for(auto imageView : flow->flowDepthBuffers.depthImageViews)
+        {
+            flow->flowDevices.devices.at(0).destroyImageView(imageView);
+        }
+
+        for(auto image : flow->flowDepthBuffers.depthImages)
+        {
+            flow->flowDevices.devices.at(0).destroyImage(image);
+        }
+
+        for(auto memory : flow->flowDepthBuffers.depthImageMemories)
+        {
+            flow->flowDevices.devices.at(0).freeMemory(memory);
+        }
 
         for (auto framebuffer : flow->flowFrameBuffers.swapchainFrameBuffers.at(0))
         {
@@ -213,7 +227,7 @@ namespace flow
             throw std::runtime_error("Failed to create image views!");
         }
 
-        err = vulkan::pipelines::createRenderPass(flow->flowGraphics.renderPasses.at(0), flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageFormats.at(0));
+        err = vulkan::pipelines::createRenderPass(flow->flowGraphics.renderPasses.at(0), flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSwaps.swapchainImageFormats.at(0));
 
         if (err != SUCCESS)
         {
@@ -234,7 +248,14 @@ namespace flow
             throw std::runtime_error("Failed to create graphics pipeline!");
         }
 
-        err = vulkan::buffers::createFramebuffers(flow->flowFrameBuffers.swapchainFrameBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageViews, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0));
+        err = vulkan::buffers::createDepthResources(flow->flowDepthBuffers.depthImages.at(0), flow->flowDepthBuffers.depthImageMemories.at(0), flow->flowDepthBuffers.depthImageViews.at(0), flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowCommandPools.commandPools.at(0), flow->flowDevices.graphicsQueues.at(0));
+
+        if(err != SUCCESS)
+        {
+            throw std::runtime_error("Failed to create depth resources!");
+        }
+
+        err = vulkan::buffers::createFramebuffers(flow->flowFrameBuffers.swapchainFrameBuffers.at(0), flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageViews, flow->flowDepthBuffers.depthImageViews.at(0), flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0));
 
         if (err != SUCCESS)
         {

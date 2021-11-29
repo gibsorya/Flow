@@ -131,7 +131,7 @@ namespace flow::vulkan
 
             for(u32 i = 0; i < flowSwaps.swapchainImages.size(); i++)
             {
-                if(textures::createImageView(flowSwaps.swapchainImageViews[i], flowSwaps.swapchainImages[i], flowSwaps.swapchainImageFormats.at(0), device) != SUCCESS)
+                if(textures::createImageView(flowSwaps.swapchainImageViews[i], flowSwaps.swapchainImages[i], flowSwaps.swapchainImageFormats.at(0), vk::ImageAspectFlagBits::eColor, device) != SUCCESS)
                 {
                     return ERR_CANT_CREATE;
                 }

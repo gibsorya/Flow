@@ -28,6 +28,7 @@ struct FlowContext
     FlowVertexBuffers flowVertexBuffers;
     FlowIndexBuffers flowIndexBuffers;
     FlowUniformBuffers flowUniformBuffers;
+    FlowDepthBuffers flowDepthBuffers;
     FlowTextures flowTextures;
     FlowSyncObjects flowSyncObjects;
 };

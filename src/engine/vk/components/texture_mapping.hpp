@@ -25,7 +25,7 @@ namespace flow::vulkan::textures
 
     Error createTextureSampler(vk::Sampler &textureSampler, vk::Device device, vk::PhysicalDevice physicalDevice);
 
-    Error createImageView(vk::ImageView &imageView, vk::Image image, vk::Format format, vk::Device device);
+    Error createImageView(vk::ImageView &imageView, vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::Device device);
 
     void transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout, vk::Device device, vk::CommandPool commandPool, vk::Queue graphicsQueue);
 

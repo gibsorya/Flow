@@ -76,7 +76,7 @@ namespace flow::vulkan::textures
     }
 
     Error createTextureImageView(vk::ImageView &textureImageView, vk::Device device, vk::Image textureImage) {
-        if(createImageView(textureImageView, textureImage, vk::Format::eR8G8B8A8Srgb, device) != SUCCESS)
+        if(createImageView(textureImageView, textureImage, vk::Format::eR8G8B8A8Srgb, vk::ImageAspectFlagBits::eColor, device) != SUCCESS)
         {
             return ERR_CANT_CREATE;
         }
@@ -115,12 +115,12 @@ namespace flow::vulkan::textures
         return SUCCESS;
     }
 
-    Error createImageView(vk::ImageView &imageView, vk::Image image, vk::Format format, vk::Device device) {
+    Error createImageView(vk::ImageView &imageView, vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::Device device) {
         vk::ImageViewCreateInfo viewInfo{};
         viewInfo.image = image;
         viewInfo.viewType = vk::ImageViewType::e2D;
         viewInfo.format = format;
-        viewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+        viewInfo.subresourceRange.aspectMask = aspectFlags;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
         viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -143,13 +143,24 @@ namespace flow::vulkan::textures
         barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         barrier.image = image;
-        barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
         barrier.subresourceRange.baseMipLevel = 0;
         barrier.subresourceRange.levelCount = 1;
         barrier.subresourceRange.baseArrayLayer = 0;
         barrier.subresourceRange.layerCount = 1;
         barrier.srcAccessMask = {};
         barrier.dstAccessMask = {};
+
+        if(newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+        {
+            barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth;
+
+            if(buffers::hasStencilComponent(format))
+            {
+                barrier.subresourceRange.aspectMask |= vk::ImageAspectFlagBits::eStencil;
+            }
+        } else {
+            barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+        }
 
         vk::PipelineStageFlags sourceStage;
         vk::PipelineStageFlags destinationStage;
@@ -167,6 +178,12 @@ namespace flow::vulkan::textures
 
             sourceStage = vk::PipelineStageFlagBits::eTransfer;
             destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
+        } else if(oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal) {
+            barrier.srcAccessMask = {};
+            barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+
+            sourceStage = vk::PipelineStageFlagBits::eTopOfPipe;
+            destinationStage = vk::PipelineStageFlagBits::eEarlyFragmentTests;
         } else {
             throw std::invalid_argument("Unsupported layout transition!");
         }

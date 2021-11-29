@@ -67,7 +67,7 @@ namespace flow::vulkan
         }
 
         vk::RenderPass renderPass;
-        err = pipelines::createRenderPass(renderPass, flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageFormats.at(0));
+        err = pipelines::createRenderPass(renderPass, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSwaps.swapchainImageFormats.at(0));
         ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create render pass!");
         flow->flowGraphics.renderPasses.push_back(renderPass);
 
@@ -92,15 +92,24 @@ namespace flow::vulkan
 
         //*Buffers
         {
-            std::vector<vk::Framebuffer> frameBuffers;
-            err = buffers::createFramebuffers(frameBuffers, flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageViews, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0));
-            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create frame buffers!");
-            flow->flowFrameBuffers.swapchainFrameBuffers.push_back(frameBuffers);
-
             vk::CommandPool commandPool;
             err = buffers::createCommandPool(commandPool, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSurfaces.surfaces.at(0));
             ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command pool!");
             flow->flowCommandPools.commandPools.push_back(commandPool);
+
+            vk::Image depthImage;
+            vk::DeviceMemory depthImageMemory;
+            vk::ImageView depthImageView;
+            err = buffers::createDepthResources(depthImage, depthImageMemory, depthImageView, flow->flowDevices.devices.at(0), flow->flowDevices.physicalDevices.at(0), flow->flowSwaps.swapchainExtents.at(0), commandPool, flow->flowDevices.graphicsQueues.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create depth resources!");
+            flow->flowDepthBuffers.depthImages.push_back(depthImage);
+            flow->flowDepthBuffers.depthImageMemories.push_back(depthImageMemory);
+            flow->flowDepthBuffers.depthImageViews.push_back(depthImageView);
+
+            std::vector<vk::Framebuffer> frameBuffers;
+            err = buffers::createFramebuffers(frameBuffers, flow->flowDevices.devices.at(0), flow->flowSwaps.swapchainImageViews, depthImageView, flow->flowSwaps.swapchainExtents.at(0), flow->flowGraphics.renderPasses.at(0));
+            ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create frame buffers!");
+            flow->flowFrameBuffers.swapchainFrameBuffers.push_back(frameBuffers);
 
             vk::Image textureImage;
             vk::DeviceMemory textureImageMemory;

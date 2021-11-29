@@ -8,6 +8,7 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 struct FlowFrameBuffers
 {
@@ -45,10 +46,17 @@ struct FlowUniformBuffers
     std::vector<std::vector<vk::DeviceMemory>> bufferMemories;
 };
 
+struct FlowDepthBuffers
+{
+    std::vector<vk::Image> depthImages;
+    std::vector<vk::DeviceMemory> depthImageMemories;
+    std::vector<vk::ImageView> depthImageViews;
+};
+
 //TODO restructure this to fit DOD
 struct Vertex
 {
-    glm::vec2 pos;
+    glm::vec3 pos;
     glm::vec3 color;
     glm::vec2 texCoord;
 
@@ -69,7 +77,7 @@ struct Vertex
 
         attributeDescriptions.at(0).binding = 0;
         attributeDescriptions.at(0).location = 0;
-        attributeDescriptions.at(0).format = vk::Format::eR32G32Sfloat;
+        attributeDescriptions.at(0).format = vk::Format::eR32G32B32Sfloat;
         attributeDescriptions.at(0).offset = offsetof(Vertex, pos);
 
         attributeDescriptions.at(1).binding = 0;
@@ -94,17 +102,24 @@ struct UniformBufferObject
 };
 
 global const std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
+};
 
 global const std::vector<u16> indices = {
-    0, 1, 2, 2, 3, 0};
+    0, 1, 2, 2, 3, 0,
+    4, 5, 6, 6, 7, 4};
 
 namespace flow::vulkan::buffers
 {
-    Error createFramebuffers(std::vector<vk::Framebuffer> &frameBuffers, vk::Device device, std::vector<vk::ImageView> swapchainImageViews, vk::Extent2D swapExtent, vk::RenderPass renderpass);
+    Error createFramebuffers(std::vector<vk::Framebuffer> &frameBuffers, vk::Device device, std::vector<vk::ImageView> swapchainImageViews, vk::ImageView depthImageView, vk::Extent2D swapExtent, vk::RenderPass renderpass);
 
     Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface);
 
@@ -123,6 +138,14 @@ namespace flow::vulkan::buffers
     Error createDescriptorPool(vk::DescriptorPool &descriptorPool, std::vector<vk::Image> swapchainImages, vk::Device device);
 
     Error createDescriptorSets(std::vector<vk::DescriptorSet> &descriptorSets, vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorPool pool, std::vector<vk::Image> swapchainImages, std::vector<vk::Buffer> uniformBuffers, vk::Device device, vk::ImageView textureImageView, vk::Sampler textureSampler);
+
+    Error createDepthResources(vk::Image &depthImage, vk::DeviceMemory &depthImageMemory, vk::ImageView &depthImageView, vk::Device device, vk::PhysicalDevice physicalDevice, vk::Extent2D swapExtent, vk::CommandPool commandPool, vk::Queue graphicsQueue);
+
+    vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features, vk::PhysicalDevice physicalDevice);
+
+    vk::Format findDepthFormat(vk::PhysicalDevice physicalDevice);
+
+    bool hasStencilComponent(vk::Format format);
 
     void updateUniformBuffer(std::vector<vk::DeviceMemory> uniformBufferMemories, u32 currentImage, vk::Extent2D swapExtent, vk::Device device);
 

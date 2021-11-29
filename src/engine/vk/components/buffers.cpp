@@ -1,22 +1,24 @@
 #include "buffers.hpp"
 #include <engine/vk/components/queues.hpp>
+#include "texture_mapping.hpp"
 
 namespace flow::vulkan::buffers
 {
 
-    Error createFramebuffers(std::vector<vk::Framebuffer> &framebuffers, vk::Device device, std::vector<vk::ImageView> swapchainImageViews, vk::Extent2D swapExtent, vk::RenderPass renderpass)
+    Error createFramebuffers(std::vector<vk::Framebuffer> &framebuffers, vk::Device device, std::vector<vk::ImageView> swapchainImageViews, vk::ImageView depthImageView, vk::Extent2D swapExtent, vk::RenderPass renderpass)
     {
         framebuffers.resize(swapchainImageViews.size());
 
         for (size_t i = 0; i < swapchainImageViews.size(); i++)
         {
-            vk::ImageView attachments[] = {
-                swapchainImageViews.at(i)};
+            std::array<vk::ImageView, 2> attachments = {
+                swapchainImageViews.at(i),
+                depthImageView};
 
             vk::FramebufferCreateInfo createInfo;
             createInfo.renderPass = renderpass;
-            createInfo.attachmentCount = 1;
-            createInfo.pAttachments = attachments;
+            createInfo.attachmentCount = static_cast<u32>(attachments.size());
+            createInfo.pAttachments = attachments.data();
             createInfo.width = swapExtent.width;
             createInfo.height = swapExtent.height;
             createInfo.layers = 1;
@@ -65,8 +67,9 @@ namespace flow::vulkan::buffers
 
             ERROR_FAIL_COND(commandBuffers[i].begin(&beginInfo) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to begin recording command buffer!");
 
-            vk::ClearValue clearColor;
-            clearColor.color = {std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f}};
+            std::array<vk::ClearValue, 2> clearValues{};
+            clearValues[0].color = {std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f}};
+            clearValues[1].depthStencil = { { 1.0f, 0 } };
 
             vk::RenderPassBeginInfo renderPassInfo;
             renderPassInfo.renderPass = renderPass;
@@ -74,8 +77,8 @@ namespace flow::vulkan::buffers
             renderPassInfo.renderArea.offset.x = 0;
             renderPassInfo.renderArea.offset.y = 0;
             renderPassInfo.renderArea.extent = extent;
-            renderPassInfo.clearValueCount = 1;
-            renderPassInfo.pClearValues = &clearColor;
+            renderPassInfo.clearValueCount = static_cast<u32>(clearValues.size());
+            renderPassInfo.pClearValues = clearValues.data();
 
             vk::SubpassBeginInfo subpassInfo;
             subpassInfo.contents = vk::SubpassContents::eInline;
@@ -376,6 +379,53 @@ namespace flow::vulkan::buffers
         }
         
         return SUCCESS;
+    }
+
+    Error createDepthResources(vk::Image &depthImage, vk::DeviceMemory &depthImageMemory, vk::ImageView &depthImageView, vk::Device device, vk::PhysicalDevice physicalDevice, vk::Extent2D swapExtent, vk::CommandPool commandPool, vk::Queue graphicsQueue) {
+        vk::Format depthFormat = findDepthFormat(physicalDevice);
+
+        Error error = textures::createImage(swapExtent.width, swapExtent.height, depthFormat, vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eDepthStencilAttachment, vk::MemoryPropertyFlagBits::eDeviceLocal, depthImage, depthImageMemory, device, physicalDevice);
+
+        if(error != SUCCESS)
+        {
+            ERROR_FAIL(ERR_CANT_CREATE, "Cannot create image for depth resources");
+        }
+
+        error = textures::createImageView(depthImageView, depthImage, depthFormat, vk::ImageAspectFlagBits::eDepth, device);
+
+        if(error != SUCCESS)
+        {
+            ERROR_FAIL(ERR_CANT_CREATE, "Cannot create image view for depth resources");
+        }
+
+        textures::transitionImageLayout(depthImage, depthFormat, vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthStencilAttachmentOptimal, device, commandPool, graphicsQueue);
+        
+        return SUCCESS;
+    }
+
+    vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features, vk::PhysicalDevice physicalDevice) {
+        for(vk::Format format : candidates) {
+            vk::FormatProperties props;
+            physicalDevice.getFormatProperties(format, &props);
+
+            if(tiling == vk::ImageTiling::eLinear && (props.linearTilingFeatures & features) == features) {
+                return format;
+            } else if(tiling == vk::ImageTiling::eOptimal && (props.optimalTilingFeatures & features) == features)
+            {
+                return format;
+            }
+        }
+        
+        throw std::runtime_error("Failed to find supported format!");
+    }
+
+    vk::Format findDepthFormat(vk::PhysicalDevice physicalDevice) {    
+        return findSupportedFormat({vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint}, vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eDepthStencilAttachment, physicalDevice);    
+    }
+
+    bool hasStencilComponent(vk::Format format)
+    {
+        return format == vk::Format::eD32SfloatS8Uint || format == vk::Format::eD24UnormS8Uint;
     }
 
 }

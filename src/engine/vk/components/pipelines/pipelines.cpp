@@ -231,7 +231,7 @@ namespace flow::vulkan
             pipelineInfo.pViewportState = &viewportStateInfo;
             pipelineInfo.pRasterizationState = &rasterizationInfo;
             pipelineInfo.pMultisampleState = &multisamplerInfo;
-            pipelineInfo.pDepthStencilState = nullptr;
+            pipelineInfo.pDepthStencilState = &depthStencilInfo;
             pipelineInfo.pColorBlendState = &colorBlendInfo;
             pipelineInfo.pDynamicState = nullptr;
             pipelineInfo.layout = layout;
@@ -267,7 +267,7 @@ namespace flow::vulkan
             return SUCCESS;
         }
 
-        Error createRenderPass(vk::RenderPass &renderPass, vk::Device device, vk::Format swapchainImageFormat)
+        Error createRenderPass(vk::RenderPass &renderPass, vk::Device device, vk::PhysicalDevice physicalDevice, vk::Format swapchainImageFormat)
         {
             auto colorAttachment =
                 vk::AttachmentDescription2({},                               /* Flags */
@@ -282,22 +282,37 @@ namespace flow::vulkan
 
             auto colorAttachmentRef = vk::AttachmentReference2(0, vk::ImageLayout::eColorAttachmentOptimal);
 
-            auto subpass = vk::SubpassDescription2({}, vk::PipelineBindPoint::eGraphics, 0, 0, nullptr, 1, &colorAttachmentRef, nullptr, nullptr, 0, 0);
+            auto depthAttachment =
+                vk::AttachmentDescription2({},
+                                           buffers::findDepthFormat(physicalDevice),
+                                           vk::SampleCountFlagBits::e1,
+                                           vk::AttachmentLoadOp::eClear,
+                                           vk::AttachmentStoreOp::eDontCare,
+                                           vk::AttachmentLoadOp::eDontCare,
+                                           vk::AttachmentStoreOp::eDontCare,
+                                           vk::ImageLayout::eUndefined,
+                                           vk::ImageLayout::eDepthStencilAttachmentOptimal);
+
+            auto depthAttachmentRef = vk::AttachmentReference2(1, vk::ImageLayout::eDepthStencilAttachmentOptimal);
+
+            auto subpass = vk::SubpassDescription2({}, vk::PipelineBindPoint::eGraphics, 0, 0, nullptr, 1, &colorAttachmentRef, nullptr, &depthAttachmentRef, 0, 0);
 
             auto dependency =
                 vk::SubpassDependency2(VK_SUBPASS_EXTERNAL,                               /* Src Subpass */
                                        0,                                                 /* Dst Subpass */
-                                       vk::PipelineStageFlagBits::eColorAttachmentOutput, /* Src Stage Mask */
-                                       vk::PipelineStageFlagBits::eColorAttachmentOutput, /* Dst Stage Mask */
+                                       vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests, /* Src Stage Mask */
+                                       vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests, /* Dst Stage Mask */
                                        {},                                                /* Src Access Mask */
-                                       vk::AccessFlagBits::eColorAttachmentWrite,         /* Dst Access Mask */
+                                       vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite,         /* Dst Access Mask */
                                        {},                                                /* Dependency Flags */
                                        0);                                                /* View Offset */
 
+            std::array<vk::AttachmentDescription2, 2> attachments = {colorAttachment, depthAttachment};
+
             auto renderPassInfo =
                 vk::RenderPassCreateInfo2({},               /* Flags */
-                                          1,                /* Attachment Count */
-                                          &colorAttachment, /* Attachments */
+                                          static_cast<u32>(attachments.size()),                /* Attachment Count */
+                                          attachments.data(), /* Attachments */
                                           1,                /* Subpass Count */
                                           &subpass,         /* Subpasses */
                                           1,                /* Dependency Count */
