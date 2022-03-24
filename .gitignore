@@ -45,8 +45,10 @@ CTestTestfile.cmake
 _dep
 
 build/
+cmake-build-*/
 
-[Bb][Uu][Ii[Ll][Dd]/
+
+[Bb][Uu][Ii][Ll][Dd]/
 
 libs/
 external/vulkan/
