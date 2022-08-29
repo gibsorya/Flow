@@ -1,0 +1,1 @@
+sources += files(['windows_main.cpp'])

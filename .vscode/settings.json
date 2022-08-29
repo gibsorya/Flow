@@ -99,7 +99,9 @@
         "stack": "cpp",
         "string_view": "cpp",
         "variant": "cpp",
-        "__functional_base": "cpp"
+        "__functional_base": "cpp",
+        "cinttypes": "cpp",
+        "csignal": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

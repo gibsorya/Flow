@@ -6,6 +6,17 @@
             "cStandard": "c17",
             "includePath": [
                 "${workspaceFolder}/**",
+                "C:/VulkanSDK/**"
+            ],
+            "intelliSenseMode": "${default}",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "Mac",
+            "cppStandard": "c++20",
+            "cStandard": "c17",
+            "includePath": [
+                "${workspaceFolder}/**",
                 "$HOME"
             ],
             "intelliSenseMode": "${default}",

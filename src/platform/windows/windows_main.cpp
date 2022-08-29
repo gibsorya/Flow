@@ -1,7 +1,3 @@
-//
-// Created by Ryan Gibson on 3/24/22.
-//
-
 #include <app.hpp>
 
 int main() {
