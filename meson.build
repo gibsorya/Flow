@@ -1,5 +1,6 @@
 project('Flow', 'c', 'cpp', default_options : ['c_std=c11', 'cpp_std=c++20'])
-inc_dir = include_directories('include')
+inc_dir = []
+subdir('include')
 vulkan = dependency('vulkan')
 glfw = dependency('glfw3')
 glm = dependency('glm')

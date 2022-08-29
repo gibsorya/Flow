@@ -1,0 +1,1 @@
+sources += files(['errors/error.cpp', 'errors/error_macros.cpp'])

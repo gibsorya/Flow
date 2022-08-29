@@ -2,11 +2,15 @@
 // Created by Ryan Gibson on 3/24/22.
 //
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#include <vulkan/vulkan.hpp>
-#include <components/app.hpp>
+#include <app.hpp>
 
 int main() {
-    return flow::setup();
+    std::cout << "MAIN" << std::endl;
+    Error err = flow::setup();
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create Flow Vulkan instance");
+
+    flow::mainLoop();
+    flow::cleanup();
+
+    return 0;
 }

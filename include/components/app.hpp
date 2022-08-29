@@ -2,11 +2,15 @@
 #define FLOW_APP
 
 #include <vulkan/vulkan.hpp>
-#include <flow/foundation.hpp>
 #include <GLFW/glfw3.h>
 
+#include <foundation.hpp>
+#include <flow_vk.hpp>
+
 namespace flow {
-  int setup();
+  Error setup();
+  void mainLoop();
+  void cleanup();
 }
 
 #endif

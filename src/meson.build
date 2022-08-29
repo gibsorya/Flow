@@ -1,2 +1,3 @@
-# subdir('flow')
+subdir('flow')
+subdir('components')
 subdir('platform')
