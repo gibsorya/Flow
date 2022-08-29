@@ -10,7 +10,7 @@ Right now, Flow is in pre-alpha. In order for Flow to reach its alpha stage, the
 
 - [ ] Restructure project. Since the project is in its very early stages, this can be done. Checkout `CONTRIBUTING.md` for more info.
 - [ ] Figure out how a GUI will be implemented. Right now the idea is to us Imgui, but maybe it will be better to have a custom GUI implementation.
-- [ ] Possible switch window from GLFW to a custom implementation?
+- [ ] Possibly switch window from GLFW to a custom implementation?
 - [ ] Allow people to place objects in the world, and move them around.
 - [ ] Implement basic lighting
 - [ ] Implement simple animations
