@@ -1,13 +1,17 @@
-project('Flow', 'c', 'cpp', default_options : ['c_std=c11', 'cpp_std=c++20'])
+project('Flow', 'c', 'cpp', default_options : ['c_std=c11', 'cpp_std=gnu++20', 'build.cpp_std=gnu++20'])
 
 cmake = import('cmake')
-
+cpp = meson.get_compiler('cpp')
 inc_dir = []
 subdir('include')
 
-vulkan = dependency('vulkan')
+message(cpp.version())
+
+# vulkan = dependency('vulkan', method: 'system')
 glfw = dependency('glfw3', required : false)
 glm = dependency('glm', required : false)
+
+deps = [glfw, glm]
 
 if not glfw.found()
     glfw_cmake = cmake.subproject('glfw')
@@ -19,6 +23,14 @@ if not glm.found()
     glm = glm_cmake.dependency('glm')
 endif
 
+if build_machine.system() == 'darwin'
+    moltenvk = cpp.find_library('MoltenVK', required: true)
+
+    deps += moltenvk
+else
+    deps += dependency('vulkan', method: 'system')
+endif
+
 sources = []
 subdir('src')
-executable('Flow', sources, include_directories : inc_dir, dependencies : [vulkan, glfw, glm])
+executable('Flow', sources, include_directories : inc_dir, dependencies : deps)

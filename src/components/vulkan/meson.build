@@ -1,1 +1,7 @@
-sources += files(['flow_vk.cpp', 'surfaces.cpp'])
+sources += files(
+  [
+    'flow_vk.cpp', 
+    'surfaces.cpp',
+    'instances.cpp'
+  ]
+)
