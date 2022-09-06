@@ -17,7 +17,7 @@
             "cStandard": "c17",
             "includePath": [
                 "${workspaceFolder}/**",
-                "$HOME"
+                "${HOME}/VulkanSDK/**"
             ],
             "intelliSenseMode": "${default}",
             "configurationProvider": "ms-vscode.cmake-tools"
