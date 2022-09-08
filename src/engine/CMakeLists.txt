@@ -1,3 +1,5 @@
+target_sources(FLOW_SOURCES PRIVATE app.cpp)
+
 add_subdirectory(audio)
 add_subdirectory(physics)
 add_subdirectory(vk)

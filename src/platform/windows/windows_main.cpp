@@ -1,5 +1,5 @@
 #include "os_windows.hpp"
-#include <app/app.hpp>
+#include <app.hpp>
 
 int run(){
     int result = 0;

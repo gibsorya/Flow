@@ -1,1 +1,1 @@
-#Nothing here yet!
+target_sources(${PROJECT_NAME} PUBLIC macos_main.cpp)
