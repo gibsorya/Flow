@@ -17,5 +17,4 @@ namespace flow {
     void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 }
 
-
 #endif
