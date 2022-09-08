@@ -8,8 +8,6 @@ namespace flow::vulkan {
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create window!");
 
-    std::cout << "FIND EXTENSIONS" << std::endl;
-
     vkContext->instances.extensions = instances::findInstanceExtensions();
 
     err = instances::createInstance(vkContext->instances.instances, "Flow", "Flow", vkContext->instances.extensions);

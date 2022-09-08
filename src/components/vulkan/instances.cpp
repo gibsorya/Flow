@@ -12,8 +12,12 @@ namespace flow::vulkan::instances
     vk::Instance instance;
 
     auto appInfo = vk::ApplicationInfo(appName, VK_VERSION_1_3, engineName, VK_VERSION_1_3, VK_API_VERSION_1_3);
-  
+
     auto instanceInfo = vk::InstanceCreateInfo({}, &appInfo, 0, nullptr, static_cast<u32>(extensions.size()), extensions.data());
+
+    #if __APPLE__
+      instanceInfo.setFlags(vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR);
+    #endif
 
     vk::DebugUtilsMessengerCreateInfoEXT debugInfo;
 
@@ -46,23 +50,17 @@ namespace flow::vulkan::instances
     u32 glfwExtensionCount = 0;
     const char **glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    std::vector<const char *> extensions(glfwExtensions, glfwExtensionCount + glfwExtensions);
+    extensions.push_back(*glfwExtensions);
 
-    // std::cout << "GLFW EXTENSIONS: " << glfwExtensions << std::endl;
-    for (int i = 0; i < glfwExtensionCount; i++)
-    {
-      std::cout << "INDEX: " << i << " | " << glfwExtensions[i];
-    }
-
-    std::cout << std::endl;
-
-    std::vector<const char *> extensions;
+    #if __APPLE__
+      extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    #endif
 
     if (enabledValidationLayers)
     {
       extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
-
-    std::cout << "EX OVER 3?" << std::endl;
 
     extensions.push_back(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME);
     return extensions;

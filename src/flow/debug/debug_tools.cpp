@@ -8,15 +8,9 @@ namespace flow::debug
         vk::Result result;
         result = vk::enumerateInstanceLayerProperties(&layerCount, nullptr);
 
-        std::cout << "LAYER COUNT: " << layerCount << std::endl;
-
         std::vector<vk::LayerProperties> availableLayers(layerCount);
 
-        std::cout << availableLayers.data() << std::endl;
-
         result = vk::enumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-        std::cout << "LAYERS: " << layers.at(0) << std::endl;
 
         for (const char *layerName : layers)
         {
