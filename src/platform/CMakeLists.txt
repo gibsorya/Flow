@@ -1,0 +1,15 @@
+IF(UNIX AND NOT APPLE)
+	set(LINUX TRUE)
+ENDIF()
+
+IF(WIN32)
+  add_subdirectory(windows)
+ELSEIF(APPLE)
+  add_subdirectory(macos)
+ELSEIF(LINUX)
+  add_subdirectory(linux)
+ENDIF(WIN32)
+
+
+
+
