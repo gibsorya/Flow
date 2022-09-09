@@ -14,16 +14,13 @@ struct FlowVkDevices
 
 namespace flow::vulkan::devices
 {
-  Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance);
   Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance, vk::SurfaceKHR surface);
 
-  bool isDeviceSuitable(vk::PhysicalDevice device);
   bool isDeviceSuitable(vk::PhysicalDevice device, vk::SurfaceKHR surface);
 
   int rateDeviceSuitability(vk::PhysicalDevice device);
 
   Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue);
-  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::Queue &graphicsQueue);
 }
 
 #endif

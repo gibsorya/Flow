@@ -3,11 +3,9 @@
 
 namespace flow::vulkan::devices
 {
-  Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance)
+  Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance, vk::SurfaceKHR surface)
   {
     Error err;
-    // vk::PhysicalDevice physicalDevice;
-
     u32 deviceCount;
 
     vk::Result result = instance.enumeratePhysicalDevices(&deviceCount, nullptr);
@@ -40,7 +38,7 @@ namespace flow::vulkan::devices
     }
     else
     {
-      if (isDeviceSuitable(physicalDevices.at(0)))
+      if (isDeviceSuitable(physicalDevices.at(0), surface))
       {
         return SUCCESS;
       }
@@ -53,13 +51,9 @@ namespace flow::vulkan::devices
     return SUCCESS;
   }
 
-  Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance, vk::SurfaceKHR surface)
+  bool isDeviceSuitable(vk::PhysicalDevice device, vk::SurfaceKHR surface)
   {
-  }
-
-  bool isDeviceSuitable(vk::PhysicalDevice device)
-  {
-    QueueFamilyIndices indices = findQueueFamilies(device);
+    QueueFamilyIndices indices = findQueueFamilies(device, surface);
 
     return indices.isComplete();
   }
@@ -89,13 +83,11 @@ namespace flow::vulkan::devices
     return score;
   }
 
-  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::Queue &graphicsQueue)
+  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue)
   {
     Error err;
-
     vk::Device device;
-
-    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+    QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
 
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
     std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value()};
@@ -126,8 +118,10 @@ namespace flow::vulkan::devices
     }
 
     auto graphicsQueueInfo = vk::DeviceQueueInfo2({}, indices.graphicsFamily.value(), 0);
+    auto presentQueueInfo = vk::DeviceQueueInfo2({}, indices.presentFamily.value(), 0);
 
     device.getQueue2(&graphicsQueueInfo, &graphicsQueue);
+    device.getQueue2(&presentQueueInfo, &presentQueue);
 
     devices.push_back(device);
 

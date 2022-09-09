@@ -36,6 +36,13 @@ namespace flow
       }
     }
 
+    int i = 0;
+    for(auto instance : vkContext->instances.instances)
+    {
+      instance.destroySurfaceKHR(vkContext->surfaces.surfaces.at(i));
+      i++;
+    }
+
     for (auto instance : vkContext->instances.instances)
     {
       instance.destroy();

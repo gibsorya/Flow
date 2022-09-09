@@ -2,7 +2,7 @@
 
 namespace flow::vulkan
 {
-  QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device)
+  QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceKHR surface)
   {
     QueueFamilyIndices indices;
 
@@ -20,13 +20,13 @@ namespace flow::vulkan
         indices.graphicsFamily = i;
       }
 
-      // VkBool32 presentSupport = false;
-      // vk::Result result = device.getSurfaceSupportKHR(i, surface, &presentSupport);
+      VkBool32 presentSupport = false;
+      vk::Result result = device.getSurfaceSupportKHR(i, surface, &presentSupport);
 
-      // if (presentSupport)
-      // {
-      //   indices.presentFamily = i;
-      // }
+      if (presentSupport)
+      {
+        indices.presentFamily = i;
+      }
 
       if (indices.isComplete())
       {

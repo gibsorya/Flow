@@ -18,13 +18,18 @@ namespace flow::vulkan {
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to setup debug messenger!");
 
-    err = devices::pickPhysicalDevice(vkContext->devices.physicalDevices, vkContext->instances.instances.at(0));
+    err = surfaces::createSurface(vkContext->surfaces.surfaces, vkContext->instances.instances.at(0), vkContext->surfaces.window);
+
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create window surface!");
+
+    err = devices::pickPhysicalDevice(vkContext->devices.physicalDevices, vkContext->instances.instances.at(0), vkContext->surfaces.surfaces.at(0));
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_NOT_FOUND, "Failed to find physical device!");
 
     vk::Queue graphicsQueue;
+    vk::Queue presentQueue;
 
-    err = devices::createLogicalDevice(vkContext->devices.devices, vkContext->devices.physicalDevices.at(0), graphicsQueue);
+    err = devices::createLogicalDevice(vkContext->devices.devices, vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0), graphicsQueue, presentQueue);
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create logical device!");
 
