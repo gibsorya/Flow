@@ -1,5 +1,6 @@
 #include <devices.hpp>
 #include <queues.hpp>
+#include <swapchains.hpp>
 
 namespace flow::vulkan::devices
 {
@@ -55,7 +56,16 @@ namespace flow::vulkan::devices
   {
     QueueFamilyIndices indices = findQueueFamilies(device, surface);
 
-    return indices.isComplete();
+    bool extensionsSupported = checkDeviceExtensionSupport(device);
+
+    bool swapchainAdequate = false;
+    if (extensionsSupported)
+    {
+      SwapchainSupportDetails swapchainSupport = querySwapchainSupport(device, surface);
+      swapchainAdequate = !swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty();
+    }
+
+    return indices.isComplete() && extensionsSupported && swapchainAdequate;
   }
 
   int rateDeviceSuitability(vk::PhysicalDevice device)
@@ -104,7 +114,7 @@ namespace flow::vulkan::devices
     deviceFeatures.features.samplerAnisotropy = VK_TRUE;
 
     auto createInfo = vk::DeviceCreateInfo({}, static_cast<u32>(queueCreateInfos.size()), queueCreateInfos.data(), 0, nullptr,
-                                           0, nullptr, &deviceFeatures.features);
+                                           static_cast<uint32_t>(deviceExtensions.size()), deviceExtensions.data(), &deviceFeatures.features);
 
     if (enabledValidationLayers)
     {
@@ -126,5 +136,27 @@ namespace flow::vulkan::devices
     devices.push_back(device);
 
     return SUCCESS;
+  }
+
+  bool checkDeviceExtensionSupport(vk::PhysicalDevice device)
+  {
+    u32 extensionCount;
+
+    vk::Result result = device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, nullptr);
+    if (result != vk::Result::eSuccess)
+    {
+      return false;
+    }
+    std::vector<vk::ExtensionProperties> availableExtensions(extensionCount);
+    result = device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for (const auto &extension : availableExtensions)
+    {
+      requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
   }
 }

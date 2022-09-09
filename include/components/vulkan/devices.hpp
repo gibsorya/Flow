@@ -3,6 +3,9 @@
 
 #include <foundation.hpp>
 
+const std::vector<const char *> deviceExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
 struct FlowVkDevices
 {
   std::vector<vk::PhysicalDevice> physicalDevices;
@@ -10,6 +13,7 @@ struct FlowVkDevices
   std::vector<vk::Device> devices;
   std::vector<const char *> deviceExtensions; // All extensions for each logical device will be the same for now.
   std::vector<vk::Queue> graphicsQueues;
+  std::vector<vk::Queue> presentQueues;
 };
 
 namespace flow::vulkan::devices
@@ -17,6 +21,8 @@ namespace flow::vulkan::devices
   Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance, vk::SurfaceKHR surface);
 
   bool isDeviceSuitable(vk::PhysicalDevice device, vk::SurfaceKHR surface);
+
+  bool checkDeviceExtensionSupport(vk::PhysicalDevice device);
 
   int rateDeviceSuitability(vk::PhysicalDevice device);
 

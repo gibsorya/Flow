@@ -1,7 +1,9 @@
 #include <flow_vk.hpp>
 
-namespace flow::vulkan {
-  Error initalize(FlowVkContext *vkContext){
+namespace flow::vulkan
+{
+  Error initalize(FlowVkContext *vkContext)
+  {
     Error err;
 
     err = surfaces::initWindow(vkContext->surfaces.window, vkContext->surfaces.WIDTH, vkContext->surfaces.HEIGHT, "Flow Engine");
@@ -34,6 +36,20 @@ namespace flow::vulkan {
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create logical device!");
 
     vkContext->devices.graphicsQueues.push_back(graphicsQueue);
+    vkContext->devices.presentQueues.push_back(presentQueue);
+
+    vk::SwapchainKHR swapchain;
+    vk::Extent2D swapExtent;
+    vk::Format swapFormat;
+
+    err = swapchains::createSwapchain(swapchain, swapExtent, vkContext->swaps.swapchainImages, swapFormat, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0), vkContext->surfaces.window);
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create swapchain!");
+    vkContext->swaps.swapchains.push_back(swapchain);
+    vkContext->swaps.swapchainExtents.push_back(swapExtent);
+    vkContext->swaps.swapchainImageFormats.push_back(swapFormat);
+
+    err = swapchains::createImageViews(vkContext->swaps, vkContext->devices.devices.at(0));
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create image views!");
 
     return SUCCESS;
   }

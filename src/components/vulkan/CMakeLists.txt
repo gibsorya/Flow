@@ -5,6 +5,7 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/surfaces.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/devices.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/queues.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.cpp
 )
 
 MESSAGE(STATUS ${FLOW_SOURCES})
