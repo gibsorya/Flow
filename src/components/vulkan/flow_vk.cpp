@@ -20,7 +20,15 @@ namespace flow::vulkan {
 
     err = devices::pickPhysicalDevice(vkContext->devices.physicalDevices, vkContext->instances.instances.at(0));
 
-    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to find physical device!");
+    ERROR_FAIL_COND(err != SUCCESS, ERR_NOT_FOUND, "Failed to find physical device!");
+
+    vk::Queue graphicsQueue;
+
+    err = devices::createLogicalDevice(vkContext->devices.devices, vkContext->devices.physicalDevices.at(0), graphicsQueue);
+
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create logical device!");
+
+    vkContext->devices.graphicsQueues.push_back(graphicsQueue);
 
     return SUCCESS;
   }

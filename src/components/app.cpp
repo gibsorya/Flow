@@ -1,23 +1,32 @@
 #include <app.hpp>
 
-namespace flow {
+namespace flow
+{
   global FlowVkContext *vkContext = nullptr;
 
-  Error setup(){
+  Error setup()
+  {
     Error err = SUCCESS;
     vkContext = new FlowVkContext();
-    
+
     err = vulkan::initalize(vkContext);
     return err;
   }
 
-  void mainLoop() {
-    while(!glfwWindowShouldClose(vkContext->surfaces.window)){
+  void mainLoop()
+  {
+    while (!glfwWindowShouldClose(vkContext->surfaces.window))
+    {
       glfwPollEvents();
     }
   }
 
-  void cleanup() {
+  void cleanup()
+  {
+    for (auto device : vkContext->devices.devices)
+    {
+      device.destroy();
+    }
 
     if (enabledValidationLayers)
     {

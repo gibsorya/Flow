@@ -88,4 +88,49 @@ namespace flow::vulkan::devices
 
     return score;
   }
+
+  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::Queue &graphicsQueue)
+  {
+    Error err;
+
+    vk::Device device;
+
+    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+    std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+    std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value()};
+
+    float queuePriority = 1.0f;
+    for (u32 queueFamily : uniqueQueueFamilies)
+    {
+      auto createInfo = vk::DeviceQueueCreateInfo({}, indices.graphicsFamily.value(), 1, &queuePriority);
+      queueCreateInfos.push_back(createInfo);
+    }
+
+    vk::PhysicalDeviceFeatures2 deviceFeatures;
+    physicalDevice.getFeatures2(&deviceFeatures);
+    deviceFeatures.features.samplerAnisotropy = VK_TRUE;
+
+    auto createInfo = vk::DeviceCreateInfo({}, static_cast<u32>(queueCreateInfos.size()), queueCreateInfos.data(), 0, nullptr,
+                                           0, nullptr, &deviceFeatures.features);
+
+    if (enabledValidationLayers)
+    {
+      createInfo.enabledLayerCount = static_cast<u32>(layers.size());
+      createInfo.ppEnabledLayerNames = layers.data();
+    }
+
+    if (physicalDevice.createDevice(&createInfo, nullptr, &device) != vk::Result::eSuccess)
+    {
+      return ERR_CANT_CREATE;
+    }
+
+    auto graphicsQueueInfo = vk::DeviceQueueInfo2({}, indices.graphicsFamily.value(), 0);
+
+    device.getQueue2(&graphicsQueueInfo, &graphicsQueue);
+
+    devices.push_back(device);
+
+    return SUCCESS;
+  }
 }
