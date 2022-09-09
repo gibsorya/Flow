@@ -101,7 +101,9 @@
         "variant": "cpp",
         "__functional_base": "cpp",
         "cinttypes": "cpp",
-        "csignal": "cpp"
+        "csignal": "cpp",
+        "memory_resource": "cpp",
+        "__functional_03": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }
