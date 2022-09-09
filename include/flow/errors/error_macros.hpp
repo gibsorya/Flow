@@ -5,6 +5,7 @@ void print_error(const char *error, const char *message);
 
 #define check(x) x
 
+// Returns an ERROR if the condition fails.
 #define ERROR_FAIL_COND(condition, return_value, message) \
     if (check(condition))                                 \
     {                                                     \

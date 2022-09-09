@@ -18,6 +18,10 @@ namespace flow::vulkan {
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to setup debug messenger!");
 
+    err = devices::pickPhysicalDevice(vkContext->devices.physicalDevices, vkContext->instances.instances.at(0));
+
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to find physical device!");
+
     return SUCCESS;
   }
 }

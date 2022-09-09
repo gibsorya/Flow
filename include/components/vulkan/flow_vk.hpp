@@ -5,10 +5,13 @@
 #include <vulkan/vulkan.hpp>
 #include <surfaces.hpp>
 #include <instances.hpp>
+#include <devices.hpp>
+#include <queues.hpp>
 
 struct FlowVkContext {
   FlowVkSurfaces surfaces;
   FlowVkInstances instances;
+  FlowVkDevices devices;
 };
 
 namespace flow::vulkan {
