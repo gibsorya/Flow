@@ -18,6 +18,7 @@ namespace flow
     while (!glfwWindowShouldClose(vkContext->surfaces.window))
     {
       glfwPollEvents();
+      draw();
     }
   }
 
@@ -27,6 +28,11 @@ namespace flow
     // {
     //   flow->flowDevices.devices.at(0).destroyImageView(imageView);
     // }
+    for (auto commandPool : vkContext->commandPools.commandPools)
+    {
+      vkContext->devices.devices.at(0).destroyCommandPool(commandPool);
+    }
+
     for (auto frameBuffer : vkContext->frameBuffers.swapchainFrameBuffers.at(0))
     {
       vkContext->devices.devices.at(0).destroyFramebuffer(frameBuffer);
@@ -84,5 +90,10 @@ namespace flow
 
     glfwDestroyWindow(vkContext->surfaces.window);
     glfwTerminate();
+  }
+
+  void draw()
+  {
+    
   }
 }

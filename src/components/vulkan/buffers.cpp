@@ -1,4 +1,5 @@
 #include <buffers.hpp>
+#include <queues.hpp>
 
 namespace flow::vulkan::buffers
 {
@@ -23,6 +24,83 @@ namespace flow::vulkan::buffers
       {
         return ERR_CANT_CREATE;
       }
+    }
+  }
+
+  Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface)
+  {
+    QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
+
+    vk::CommandPoolCreateInfo poolInfo;
+    poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
+    poolInfo.flags = {};
+
+    if (device.createCommandPool(&poolInfo, nullptr, &commandPool) != vk::Result::eSuccess)
+    {
+      return ERR_CANT_CREATE;
+    }
+
+    return SUCCESS;
+  }
+
+  Error createCommandBuffer(vk::CommandBuffer &commandBuffer, vk::Device device, vk::CommandPool commandPool)
+  {
+    vk::CommandBufferAllocateInfo allocInfo;
+    allocInfo.commandPool = commandPool;
+    allocInfo.level = vk::CommandBufferLevel::ePrimary;
+    allocInfo.commandBufferCount = 1;
+
+    ERROR_FAIL_COND(device.allocateCommandBuffers(&allocInfo, &commandBuffer) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to allocate command buffer!");
+  }
+
+  Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline)
+  {
+    vk::CommandBufferBeginInfo beginInfo;
+    beginInfo.flags = {};
+    beginInfo.pInheritanceInfo = nullptr;
+
+    ERROR_FAIL_COND(commandBuffer.begin(&beginInfo) != vk::Result::eSuccess, FAILED, "Failed to begin recording command buffer!");
+
+    vk::ClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+
+    vk::RenderPassBeginInfo renderPassInfo;
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = swapchainFramebuffers[imageIndex];
+    renderPassInfo.renderArea.offset.x = 0;
+    renderPassInfo.renderArea.offset.y = 0;
+    renderPassInfo.renderArea.extent = extent;
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+
+    vk::SubpassBeginInfo subpassInfo;
+    subpassInfo.contents = vk::SubpassContents::eInline;
+    commandBuffer.beginRenderPass2(&renderPassInfo, &subpassInfo);
+
+    commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
+
+    vk::Viewport viewport;
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = static_cast<float>(extent.width);
+    viewport.height = static_cast<float>(extent.height);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    commandBuffer.setViewport(0, 1, &viewport);
+
+    vk::Rect2D scissor;
+    scissor.offset = {{0, 0}};
+    scissor.extent = extent;
+    commandBuffer.setScissor(0, 1, &scissor);
+
+    commandBuffer.draw(3, 1, 0, 0);
+
+    vk::SubpassEndInfo subpassEndInfo;
+
+    commandBuffer.endRenderPass2(&subpassEndInfo);
+
+    if(vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
+    {
+      ERROR_FAIL(FAILED, "Failed to record command buffer!");
     }
   }
 }

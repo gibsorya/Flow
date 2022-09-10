@@ -19,6 +19,8 @@ struct FlowVkContext {
   FlowVkSwapchains swaps;
   FlowVkGraphics graphics;
   FlowVkFrameBuffers frameBuffers;
+  FlowVkCommandPools commandPools;
+  FlowVkCommandBuffers commandBuffers;
 };
 
 namespace flow::vulkan {

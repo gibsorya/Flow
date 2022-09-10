@@ -64,6 +64,7 @@ namespace flow::vulkan
     vk::Pipeline graphicsPipeline;
     err = pipelines::createGraphicsPipeline(graphicsPipeline, vkContext->devices.devices.at(0), vkContext->graphics.pipelineLayouts.at(0), vkContext->graphics.renderPasses.at(0), PIPELINE_PRIMITIVE_TRIANGLES,
                                             vkContext->swaps.swapchainExtents.at(0), PipelineRasterizationState(), PipelineMultisampleState(), PipelineDepthStencilState(), "data/shaders/vert.spv", "data/shaders/frag.spv");
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create graphics pipeline!");
     vkContext->graphics.graphicsPipelines.push_back(graphicsPipeline);
 
     std::vector<vk::Framebuffer> frameBuffers;
@@ -71,6 +72,15 @@ namespace flow::vulkan
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create frame buffers!");
     vkContext->frameBuffers.swapchainFrameBuffers.push_back(frameBuffers);
 
+    vk::CommandPool commandPool;
+    err = buffers::createCommandPool(commandPool, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0));
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command pool!");
+    vkContext->commandPools.commandPools.push_back(commandPool);
+
+    vk::CommandBuffer commandBuffer;
+    err = buffers::createCommandBuffer(commandBuffer, vkContext->devices.devices.at(0), vkContext->commandPools.commandPools.at(0));
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");
+    vkContext->commandBuffers.commandBuffers.push_back(commandBuffer);
     return SUCCESS;
   }
 }
