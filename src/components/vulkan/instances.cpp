@@ -16,7 +16,7 @@ namespace flow::vulkan::instances
     auto instanceInfo = vk::InstanceCreateInfo({}, &appInfo, 0, nullptr, static_cast<u32>(extensions.size()), extensions.data());
 
     #if __APPLE__
-      instanceInfo.setFlags(vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR);
+      instanceInfo.flags = { vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR };
     #endif
 
     vk::DebugUtilsMessengerCreateInfoEXT debugInfo;
@@ -55,6 +55,8 @@ namespace flow::vulkan::instances
 
     #if __APPLE__
       extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+      extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+      extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
     #endif
 
     if (enabledValidationLayers)

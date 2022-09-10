@@ -27,14 +27,31 @@ namespace flow
     // {
     //   flow->flowDevices.devices.at(0).destroyImageView(imageView);
     // }
+    for (auto pipeline : vkContext->graphics.graphicsPipelines)
+    {
+      vkContext->devices.devices.at(0).destroyPipeline(pipeline);
+    }
+
+    for (auto pipelineLayout : vkContext->graphics.pipelineLayouts)
+    {
+      vkContext->devices.devices.at(0).destroyPipelineLayout(pipelineLayout);
+    }
+
+    for (auto renderPass : vkContext->graphics.renderPasses)
+    {
+      vkContext->devices.devices.at(0).destroyRenderPass(renderPass);
+    }
+
     for (auto imageView : vkContext->swaps.swapchainImageViews)
     {
       vkContext->devices.devices.at(0).destroyImageView(imageView);
     }
+
     for (size_t i = 0; i < vkContext->swaps.swapchains.size(); i++)
     {
       vkContext->devices.devices.at(0).destroySwapchainKHR(vkContext->swaps.swapchains.at(i));
     }
+
     for (auto device : vkContext->devices.devices)
     {
       device.destroy();

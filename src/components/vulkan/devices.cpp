@@ -6,8 +6,7 @@ namespace flow::vulkan::devices
 {
   Error pickPhysicalDevice(std::vector<vk::PhysicalDevice> &physicalDevices, vk::Instance instance, vk::SurfaceKHR surface)
   {
-    Error err;
-    u32 deviceCount;
+    u32 deviceCount = 0;
 
     vk::Result result = instance.enumeratePhysicalDevices(&deviceCount, nullptr);
 
@@ -100,12 +99,12 @@ namespace flow::vulkan::devices
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
 
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-    std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value()};
+    std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     float queuePriority = 1.0f;
     for (u32 queueFamily : uniqueQueueFamilies)
     {
-      auto createInfo = vk::DeviceQueueCreateInfo({}, indices.graphicsFamily.value(), 1, &queuePriority);
+      auto createInfo = vk::DeviceQueueCreateInfo({}, queueFamily, 1, &queuePriority);
       queueCreateInfos.push_back(createInfo);
     }
 

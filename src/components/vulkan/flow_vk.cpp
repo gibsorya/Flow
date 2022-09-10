@@ -16,13 +16,13 @@ namespace flow::vulkan
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create instance!");
 
-    err = instances::setupDebugMessenger(vkContext->instances.instances.at(0), vkContext->instances.debugMessengers);
-
-    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to setup debug messenger!");
-
     err = surfaces::createSurface(vkContext->surfaces.surfaces, vkContext->instances.instances.at(0), vkContext->surfaces.window);
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create window surface!");
+
+    err = instances::setupDebugMessenger(vkContext->instances.instances.at(0), vkContext->instances.debugMessengers);
+
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to setup debug messenger!");
 
     err = devices::pickPhysicalDevice(vkContext->devices.physicalDevices, vkContext->instances.instances.at(0), vkContext->surfaces.surfaces.at(0));
 
@@ -50,6 +50,21 @@ namespace flow::vulkan
 
     err = swapchains::createImageViews(vkContext->swaps, vkContext->devices.devices.at(0));
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create image views!");
+
+    vk::RenderPass renderPass;
+    err = pipelines::createRenderPass(renderPass, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->swaps.swapchainImageFormats.at(0));
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create render pass!");
+    vkContext->graphics.renderPasses.push_back(renderPass);
+
+    vk::PipelineLayout layout;
+    err = pipelines::createPipelineLayout(layout, vkContext->devices.devices.at(0), nullptr);
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create pipeline layout!");
+    vkContext->graphics.pipelineLayouts.push_back(layout);
+
+    vk::Pipeline graphicsPipeline;
+    err = pipelines::createGraphicsPipeline(graphicsPipeline, vkContext->devices.devices.at(0), vkContext->graphics.pipelineLayouts.at(0), vkContext->graphics.renderPasses.at(0), PIPELINE_PRIMITIVE_TRIANGLES,
+                                            vkContext->swaps.swapchainExtents.at(0), PipelineRasterizationState(), PipelineMultisampleState(), PipelineDepthStencilState(), "data/shaders/vert.spv", "data/shaders/frag.spv");
+    vkContext->graphics.graphicsPipelines.push_back(graphicsPipeline);
 
     return SUCCESS;
   }
