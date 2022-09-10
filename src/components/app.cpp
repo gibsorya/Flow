@@ -27,6 +27,11 @@ namespace flow
     // {
     //   flow->flowDevices.devices.at(0).destroyImageView(imageView);
     // }
+    for (auto frameBuffer : vkContext->frameBuffers.swapchainFrameBuffers.at(0))
+    {
+      vkContext->devices.devices.at(0).destroyFramebuffer(frameBuffer);
+    }
+
     for (auto pipeline : vkContext->graphics.graphicsPipelines)
     {
       vkContext->devices.devices.at(0).destroyPipeline(pipeline);

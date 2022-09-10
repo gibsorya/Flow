@@ -10,6 +10,7 @@
 #include <swapchains.hpp>
 #include <pipelines.hpp>
 #include <pipeline_infos.hpp>
+#include <buffers.hpp>
 
 struct FlowVkContext {
   FlowVkSurfaces surfaces;
@@ -17,6 +18,7 @@ struct FlowVkContext {
   FlowVkDevices devices;
   FlowVkSwapchains swaps;
   FlowVkGraphics graphics;
+  FlowVkFrameBuffers frameBuffers;
 };
 
 namespace flow::vulkan {

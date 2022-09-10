@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/swapchains.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pipelines.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pipeline_infos.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/buffers.cpp
 )
 
 MESSAGE(STATUS ${FLOW_SOURCES})

@@ -66,6 +66,11 @@ namespace flow::vulkan
                                             vkContext->swaps.swapchainExtents.at(0), PipelineRasterizationState(), PipelineMultisampleState(), PipelineDepthStencilState(), "data/shaders/vert.spv", "data/shaders/frag.spv");
     vkContext->graphics.graphicsPipelines.push_back(graphicsPipeline);
 
+    std::vector<vk::Framebuffer> frameBuffers;
+    err = buffers::createFramebuffers(frameBuffers, vkContext->devices.devices.at(0), vkContext->swaps.swapchainImageViews, vkContext->swaps.swapchainExtents.at(0), vkContext->graphics.renderPasses.at(0));
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create frame buffers!");
+    vkContext->frameBuffers.swapchainFrameBuffers.push_back(frameBuffers);
+
     return SUCCESS;
   }
 }
