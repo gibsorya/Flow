@@ -11,6 +11,7 @@
 #include <pipelines.hpp>
 #include <pipeline_infos.hpp>
 #include <buffers.hpp>
+#include <sync_objects.hpp>
 
 struct FlowVkContext {
   FlowVkSurfaces surfaces;
@@ -21,6 +22,7 @@ struct FlowVkContext {
   FlowVkFrameBuffers frameBuffers;
   FlowVkCommandPools commandPools;
   FlowVkCommandBuffers commandBuffers;
+  FlowVkSyncObjects syncObjects;
 };
 
 namespace flow::vulkan {
