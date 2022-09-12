@@ -77,10 +77,10 @@ namespace flow::vulkan
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command pool!");
     vkContext->commandPools.commandPools.push_back(commandPool);
 
-    vk::CommandBuffer commandBuffer;
-    err = buffers::createCommandBuffer(commandBuffer, vkContext->devices.devices.at(0), vkContext->commandPools.commandPools.at(0));
+    std::vector<vk::CommandBuffer> commandBuffers;
+    err = buffers::createCommandBuffers(commandBuffers, vkContext->devices.devices.at(0), vkContext->commandPools.commandPools.at(0));
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");
-    vkContext->commandBuffers.commandBuffers.push_back(commandBuffer);
+    vkContext->commandBuffers.commandBuffers.push_back(commandBuffers);
 
     err = syncobjects::createSyncObjects(vkContext->syncObjects, vkContext->devices.devices.at(0), vkContext->swaps.swapchainImages);
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create sync objects!");

@@ -37,11 +37,32 @@ namespace flow::vulkan
                                  const PipelineRasterizationState &pRasterizationState, const PipelineMultisampleState &pMultisampleState,
                                  const PipelineDepthStencilState &pDepthStencilState, std::string vertexShaderFile, std::string fragShaderFile)
     {
-      std::cout << "CREATE GRAPHICS PIPELINES" << std::endl;
+      auto vertexShaderCode = readFile(vertexShaderFile);
+      auto fragShaderCode = readFile(fragShaderFile);
+
+      vk::ShaderModule vertexShader;
+      vk::ShaderModule fragmentShader;
+      Error err = createShaderModule(vertexShader, vertexShaderCode, device);
+      ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create vertex shader module!");
+      err = createShaderModule(fragmentShader, fragShaderCode, device);
+      ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create fragment shader module!");
+
+      vk::PipelineShaderStageCreateInfo vertexInfo;
+      vertexInfo.stage = vk::ShaderStageFlagBits::eVertex;
+      vertexInfo.module = vertexShader;
+      vertexInfo.pName = "main";
+
+      vk::PipelineShaderStageCreateInfo fragInfo;
+      fragInfo.stage = vk::ShaderStageFlagBits::eFragment;
+      fragInfo.module = fragmentShader;
+      fragInfo.pName = "main";
+      vk::PipelineShaderStageCreateInfo stages[] = {vertexInfo, fragInfo};
+
       vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
       vertexInputInfo.vertexBindingDescriptionCount = 0;
       vertexInputInfo.vertexAttributeDescriptionCount = 0;
-      vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+
+      
 
       local const vk::PrimitiveTopology topologies[PIPELINE_PRIMITIVE_MAX] = {
           vk::PrimitiveTopology::ePointList,
@@ -56,6 +77,7 @@ namespace flow::vulkan
           vk::PrimitiveTopology::eTriangleStrip,
           vk::PrimitiveTopology::ePatchList};
 
+      vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
       inputAssemblyInfo.topology = topologies[pPrimitive];
       inputAssemblyInfo.primitiveRestartEnable = (pPrimitive == PIPELINE_PRIMITIVE_TRIANGLE_STRIPS_WITH_RESTART_INDEX);
 
@@ -68,7 +90,7 @@ namespace flow::vulkan
 
       rasterizationInfo.depthClampEnable = pRasterizationState.enableDepthClamp;
       rasterizationInfo.rasterizerDiscardEnable = pRasterizationState.discardPrimitives;
-      rasterizationInfo.polygonMode = (pRasterizationState.wireframeMode ? vk::PolygonMode::eLine : vk::PolygonMode::eFill);
+      rasterizationInfo.polygonMode = vk::PolygonMode::eFill;
 
       local vk::CullModeFlags cullMode[3] = {
           vk::CullModeFlagBits::eNone,
@@ -76,7 +98,7 @@ namespace flow::vulkan
           vk::CullModeFlagBits::eBack};
 
       rasterizationInfo.cullMode = cullMode[pRasterizationState.cullMode];
-      rasterizationInfo.frontFace = (pRasterizationState.frontFace == FRONT_FACE_CLOCKWISE ? vk::FrontFace::eClockwise : vk::FrontFace::eCounterClockwise);
+      rasterizationInfo.frontFace = vk::FrontFace::eClockwise;
       rasterizationInfo.depthBiasEnable = pRasterizationState.enableDepthBias;
       rasterizationInfo.depthBiasConstantFactor = pRasterizationState.depthBiasConstantFactor;
       rasterizationInfo.depthBiasClamp = pRasterizationState.depthBiasClamp;
@@ -110,32 +132,12 @@ namespace flow::vulkan
       colorBlendInfo.blendConstants[3] = 0.0f;
 
       vk::PipelineDynamicStateCreateInfo dynamicStateInfo;
-      std::vector<vk::DynamicState> dynamicStates;
-      dynamicStates.push_back(vk::DynamicState::eViewport);
-      dynamicStates.push_back(vk::DynamicState::eScissor);
+      std::vector<vk::DynamicState> dynamicStates = {
+        vk::DynamicState::eViewport,
+        vk::DynamicState::eScissor
+      };
       dynamicStateInfo.dynamicStateCount = static_cast<u32>(dynamicStates.size());
       dynamicStateInfo.pDynamicStates = dynamicStates.data();
-
-      auto vertexShaderCode = readFile(vertexShaderFile);
-      auto fragShaderCode = readFile(fragShaderFile);
-
-      vk::ShaderModule vertexShader;
-      vk::ShaderModule fragmentShader;
-      Error err = createShaderModule(vertexShader, vertexShaderCode, device);
-      ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create vertex shader module!");
-      err = createShaderModule(fragmentShader, fragShaderCode, device);
-      ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create fragment shader module!");
-
-      vk::PipelineShaderStageCreateInfo vertexInfo;
-      vertexInfo.stage = vk::ShaderStageFlagBits::eVertex;
-      vertexInfo.module = vertexShader;
-      vertexInfo.pName = "main";
-
-      vk::PipelineShaderStageCreateInfo fragInfo;
-      fragInfo.stage = vk::ShaderStageFlagBits::eFragment;
-      fragInfo.module = fragmentShader;
-      fragInfo.pName = "main";
-      vk::PipelineShaderStageCreateInfo stages[] = {vertexInfo, fragInfo};
 
       vk::GraphicsPipelineCreateInfo pipelineInfo;
       pipelineInfo.stageCount = 2;
@@ -153,7 +155,7 @@ namespace flow::vulkan
       pipelineInfo.renderPass = renderPass;
       pipelineInfo.subpass = 0;
       pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-      pipelineInfo.basePipelineIndex = -1;
+      // pipelineInfo.basePipelineIndex = -1;
 
       if (device.createGraphicsPipelines(VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != vk::Result::eSuccess)
       {

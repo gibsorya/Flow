@@ -6,22 +6,21 @@ namespace flow::vulkan
   {
     Error createSyncObjects(FlowVkSyncObjects &syncObjects, vk::Device device, std::vector<vk::Image> swapchainImages)
     {
+      syncObjects.imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+      syncObjects.renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+      syncObjects.inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
       vk::SemaphoreCreateInfo semaphoreInfo;
       vk::FenceCreateInfo fenceInfo;
       fenceInfo.flags = {vk::FenceCreateFlagBits::eSignaled};
 
-      vk::Semaphore imageSemaphore;
-      vk::Semaphore renderSemaphore;
-      vk::Fence fence;
-
-      if (device.createSemaphore(&semaphoreInfo, nullptr, &imageSemaphore) != vk::Result::eSuccess || device.createSemaphore(&semaphoreInfo, nullptr, &renderSemaphore) != vk::Result::eSuccess || device.createFence(&fenceInfo, nullptr, &fence) != vk::Result::eSuccess)
+      for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
       {
-        return ERR_CANT_CREATE;
+        if (device.createSemaphore(&semaphoreInfo, nullptr, &syncObjects.imageAvailableSemaphores[i]) != vk::Result::eSuccess || device.createSemaphore(&semaphoreInfo, nullptr, &syncObjects.renderFinishedSemaphores[i]) != vk::Result::eSuccess || device.createFence(&fenceInfo, nullptr, &syncObjects.inFlightFences[i]) != vk::Result::eSuccess)
+        {
+          return ERR_CANT_CREATE;
+        }
       }
-
-      syncObjects.imageAvailableSemaphores.push_back(imageSemaphore);
-      syncObjects.renderFinishedSemaphores.push_back(renderSemaphore);
-      syncObjects.inFlightFences.push_back(fence);
 
       return SUCCESS;
     }
