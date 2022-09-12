@@ -39,9 +39,9 @@ namespace flow::vulkan
     {
       std::cout << "CREATE GRAPHICS PIPELINES" << std::endl;
       vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
+      vertexInputInfo.vertexBindingDescriptionCount = 0;
+      vertexInputInfo.vertexAttributeDescriptionCount = 0;
       vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
-
-      populateVertexInputInfo(vertexInputInfo);
 
       local const vk::PrimitiveTopology topologies[PIPELINE_PRIMITIVE_MAX] = {
           vk::PrimitiveTopology::ePointList,
@@ -59,23 +59,10 @@ namespace flow::vulkan
       inputAssemblyInfo.topology = topologies[pPrimitive];
       inputAssemblyInfo.primitiveRestartEnable = (pPrimitive == PIPELINE_PRIMITIVE_TRIANGLE_STRIPS_WITH_RESTART_INDEX);
 
-      vk::Viewport viewport;
-      viewport.width = (float)pSwapExtent.width;
-      viewport.height = (float)pSwapExtent.height;
-      viewport.x = 0;
-      viewport.y = 0;
-      viewport.minDepth = 0.0f;
-      viewport.maxDepth = 1.0f;
-
-      vk::Rect2D scissor;
-      scissor.extent = pSwapExtent;
-      scissor.offset = vk::Offset2D(0, 0);
 
       vk::PipelineViewportStateCreateInfo viewportStateInfo;
       viewportStateInfo.viewportCount = 1;
-      viewportStateInfo.pViewports = &viewport;
       viewportStateInfo.scissorCount = 1;
-      viewportStateInfo.pScissors = &scissor;
 
       vk::PipelineRasterizationStateCreateInfo rasterizationInfo;
 
@@ -139,15 +126,20 @@ namespace flow::vulkan
       err = createShaderModule(fragmentShader, fragShaderCode, device);
       ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create fragment shader module!");
 
-      vk::PipelineShaderStageCreateInfo vertexInfo{};
-      vk::PipelineShaderStageCreateInfo fragInfo{};
-      populateShaderStageInfo(vertexInfo, vertexShader, vk::ShaderStageFlagBits::eVertex, "main");
-      populateShaderStageInfo(fragInfo, fragmentShader, vk::ShaderStageFlagBits::eFragment, "main");
-      std::vector<vk::PipelineShaderStageCreateInfo> shaderStages = {vertexInfo, fragInfo};
+      vk::PipelineShaderStageCreateInfo vertexInfo;
+      vertexInfo.stage = vk::ShaderStageFlagBits::eVertex;
+      vertexInfo.module = vertexShader;
+      vertexInfo.pName = "main";
+
+      vk::PipelineShaderStageCreateInfo fragInfo;
+      fragInfo.stage = vk::ShaderStageFlagBits::eFragment;
+      fragInfo.module = fragmentShader;
+      fragInfo.pName = "main";
+      vk::PipelineShaderStageCreateInfo stages[] = {vertexInfo, fragInfo};
 
       vk::GraphicsPipelineCreateInfo pipelineInfo;
       pipelineInfo.stageCount = 2;
-      pipelineInfo.pStages = shaderStages.data();
+      pipelineInfo.pStages = stages;
       pipelineInfo.pVertexInputState = &vertexInputInfo;
       pipelineInfo.pInputAssemblyState = &inputAssemblyInfo;
       pipelineInfo.pTessellationState = nullptr;
@@ -257,15 +249,13 @@ namespace flow::vulkan
       //                             0,                                /* Preserve Attachment Count */
       //                             0);                               /* Preserve Attachment(s) */
 
-      // auto dependency =
-      //     vk::SubpassDependency2(VK_SUBPASS_EXTERNAL,                                                                                /* Src Subpass */
-      //                            0,                                                                                                  /* Dst Subpass */
-      //                            vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests, /* Src Stage Mask */
-      //                            vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests, /* Dst Stage Mask */
-      //                            {},                                                                                                 /* Src Access Mask */
-      //                            vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite,       /* Dst Access Mask */
-      //                            {},                                                                                                 /* Dependency Flags */
-      //                            0);                                                                                                 /* View Offset */
+      auto dependency =
+          vk::SubpassDependency(VK_SUBPASS_EXTERNAL,                               /* Src Subpass */
+                                0,                                                 /* Dst Subpass */
+                                vk::PipelineStageFlagBits::eColorAttachmentOutput, /* Src Stage Mask */
+                                vk::PipelineStageFlagBits::eColorAttachmentOutput, /* Dst Stage Mask */
+                                {},                                                /* Src Access Mask */
+                                vk::AccessFlagBits::eColorAttachmentWrite);        /* Dst Access Mask */
 
       // std::array<vk::AttachmentDescription2, 1> attachments = {colorAttachment};
 
@@ -274,6 +264,8 @@ namespace flow::vulkan
       renderPassInfo.pAttachments = &colorAttachment;
       renderPassInfo.subpassCount = 1;
       renderPassInfo.pSubpasses = &subpass;
+      renderPassInfo.dependencyCount = 1;
+      renderPassInfo.pDependencies = &dependency;
 
       // auto renderPassInfo =
       //     vk::RenderPassCreateInfo2({},               /* Flags */
