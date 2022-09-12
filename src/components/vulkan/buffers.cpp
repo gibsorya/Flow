@@ -33,7 +33,7 @@ namespace flow::vulkan::buffers
 
     vk::CommandPoolCreateInfo poolInfo;
     poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    poolInfo.flags = {};
+    poolInfo.flags = {vk::CommandPoolCreateFlagBits::eResetCommandBuffer};
 
     if (device.createCommandPool(&poolInfo, nullptr, &commandPool) != vk::Result::eSuccess)
     {
@@ -51,6 +51,8 @@ namespace flow::vulkan::buffers
     allocInfo.commandBufferCount = 1;
 
     ERROR_FAIL_COND(device.allocateCommandBuffers(&allocInfo, &commandBuffer) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to allocate command buffer!");
+
+    return SUCCESS;
   }
 
   Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline)
@@ -61,7 +63,8 @@ namespace flow::vulkan::buffers
 
     ERROR_FAIL_COND(commandBuffer.begin(&beginInfo) != vk::Result::eSuccess, FAILED, "Failed to begin recording command buffer!");
 
-    vk::ClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+    vk::ClearValue clearColor;
+    clearColor.color.float32 = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
     vk::RenderPassBeginInfo renderPassInfo;
     renderPassInfo.renderPass = renderPass;
@@ -72,9 +75,7 @@ namespace flow::vulkan::buffers
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
-    vk::SubpassBeginInfo subpassInfo;
-    subpassInfo.contents = vk::SubpassContents::eInline;
-    commandBuffer.beginRenderPass2(&renderPassInfo, &subpassInfo);
+    commandBuffer.beginRenderPass(&renderPassInfo, vk::SubpassContents::eInline);
 
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
 
@@ -96,11 +97,13 @@ namespace flow::vulkan::buffers
 
     vk::SubpassEndInfo subpassEndInfo;
 
-    commandBuffer.endRenderPass2(&subpassEndInfo);
+    commandBuffer.endRenderPass();
 
     if(vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {
       ERROR_FAIL(FAILED, "Failed to record command buffer!");
     }
+
+    return SUCCESS;
   }
 }
