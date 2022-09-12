@@ -103,7 +103,7 @@ struct PipelineRasterizationState
         discardPrimitives = false;
         wireframeMode = false;
         cullMode = CULL_BACK;
-        frontFace = FRONT_FACE_COUNTER_CLOCKWISE;
+        frontFace = FRONT_FACE_CLOCKWISE;
         depthBiasConstantFactor = 0;
         depthBiasClamp = 0;
         depthBiasSlopeFactor = 0;

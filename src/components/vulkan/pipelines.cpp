@@ -90,7 +90,7 @@ namespace flow::vulkan
 
       rasterizationInfo.depthClampEnable = pRasterizationState.enableDepthClamp;
       rasterizationInfo.rasterizerDiscardEnable = pRasterizationState.discardPrimitives;
-      rasterizationInfo.polygonMode = vk::PolygonMode::eFill;
+      rasterizationInfo.polygonMode = (pRasterizationState.wireframeMode) ? vk::PolygonMode::eLine : vk::PolygonMode::eFill;
 
       local vk::CullModeFlags cullMode[3] = {
           vk::CullModeFlagBits::eNone,
@@ -98,7 +98,7 @@ namespace flow::vulkan
           vk::CullModeFlagBits::eBack};
 
       rasterizationInfo.cullMode = cullMode[pRasterizationState.cullMode];
-      rasterizationInfo.frontFace = vk::FrontFace::eClockwise;
+      rasterizationInfo.frontFace = (pRasterizationState.frontFace == FRONT_FACE_CLOCKWISE) ? vk::FrontFace::eClockwise : vk::FrontFace::eCounterClockwise;
       rasterizationInfo.depthBiasEnable = pRasterizationState.enableDepthBias;
       rasterizationInfo.depthBiasConstantFactor = pRasterizationState.depthBiasConstantFactor;
       rasterizationInfo.depthBiasClamp = pRasterizationState.depthBiasClamp;
