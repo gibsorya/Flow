@@ -18,15 +18,7 @@ namespace flow
     while (!glfwWindowShouldClose(vkContext->surfaces.window))
     {
       glfwPollEvents();
-      try
-      {
-        draw();
-      }
-      catch (const std::exception &e)
-      {
-        std::cerr << e.what() << std::endl;
-        break;
-      }
+      draw();
     }
 
     vkContext->devices.devices.at(0).waitIdle();
@@ -38,9 +30,12 @@ namespace flow
     // {
     //   flow->flowDevices.devices.at(0).destroyImageView(imageView);
     // }
-    vkContext->devices.devices.at(0).destroySemaphore(vkContext->syncObjects.imageAvailableSemaphores.at(0));
-    vkContext->devices.devices.at(0).destroySemaphore(vkContext->syncObjects.renderFinishedSemaphores.at(0));
-    vkContext->devices.devices.at(0).destroyFence(vkContext->syncObjects.inFlightFences.at(0));
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+      vkContext->devices.devices.at(0).destroySemaphore(vkContext->syncObjects.renderFinishedSemaphores[i], nullptr);
+      vkContext->devices.devices.at(0).destroySemaphore(vkContext->syncObjects.imageAvailableSemaphores[i], nullptr);
+      vkContext->devices.devices.at(0).destroyFence(vkContext->syncObjects.inFlightFences[i], nullptr);
+    }
 
     for (auto commandPool : vkContext->commandPools.commandPools)
     {
@@ -108,29 +103,29 @@ namespace flow
 
   void draw()
   {
-    vk::Result result = vkContext->devices.devices.at(0).waitForFences(1, &vkContext->syncObjects.inFlightFences.at(0), VK_TRUE, UINT64_MAX);
-    vkContext->devices.devices.at(0).resetFences(1, &vkContext->syncObjects.inFlightFences.at(0));
+    vk::Result result = vkContext->devices.devices.at(0).waitForFences(1, &vkContext->syncObjects.inFlightFences.at(vkContext->syncObjects.currentFrame), VK_TRUE, UINT64_MAX);
+    vkContext->devices.devices.at(0).resetFences(1, &vkContext->syncObjects.inFlightFences.at(vkContext->syncObjects.currentFrame));
 
     u32 imageIndex;
     vk::SubmitInfo submitInfo;
-    vk::AcquireNextImageInfoKHR acquireInfo;
-    acquireInfo.swapchain = vkContext->swaps.swapchains.at(0);
-    acquireInfo.timeout = UINT64_MAX;
-    acquireInfo.semaphore = vkContext->syncObjects.imageAvailableSemaphores.at(0);
-    acquireInfo.fence = VK_NULL_HANDLE;
-    acquireInfo.deviceMask = 1;
+    // vk::AcquireNextImageInfoKHR acquireInfo;
+    // acquireInfo.swapchain = vkContext->swaps.swapchains.at(0);
+    // acquireInfo.timeout = UINT64_MAX;
+    // acquireInfo.semaphore = vkContext->syncObjects.imageAvailableSemaphores.at(0);
+    // acquireInfo.fence = VK_NULL_HANDLE;
+    // acquireInfo.deviceMask = 1;
 
-    vkContext->devices.devices.at(0).acquireNextImageKHR(vkContext->swaps.swapchains.at(0), UINT64_MAX, vkContext->syncObjects.imageAvailableSemaphores.at(0), VK_NULL_HANDLE, &imageIndex);
+    vkContext->devices.devices.at(0).acquireNextImageKHR(vkContext->swaps.swapchains.at(0), UINT64_MAX, vkContext->syncObjects.imageAvailableSemaphores.at(vkContext->syncObjects.currentFrame), VK_NULL_HANDLE, &imageIndex);
 
     // vkContext->devices.devices.at(0).acquireNextImage2KHR(&acquireInfo, &imageIndex);
 
-    vkContext->commandBuffers.commandBuffers.at(0).reset();
-    Error err = vulkan::buffers::recordCommandBuffer(vkContext->commandBuffers.commandBuffers.at(0), imageIndex, vkContext->graphics.renderPasses.at(0), vkContext->swaps.swapchainExtents.at(0), vkContext->frameBuffers.swapchainFrameBuffers.at(0), vkContext->graphics.graphicsPipelines.at(0));
-    if(err != SUCCESS)
+    vkContext->commandBuffers.commandBuffers.at(0).at(vkContext->syncObjects.currentFrame).reset();
+    Error err = vulkan::buffers::recordCommandBuffer(vkContext->commandBuffers.commandBuffers.at(0).at(vkContext->syncObjects.currentFrame), imageIndex, vkContext->graphics.renderPasses.at(0), vkContext->swaps.swapchainExtents.at(0), vkContext->frameBuffers.swapchainFrameBuffers.at(0), vkContext->graphics.graphicsPipelines.at(0));
+    if (err != SUCCESS)
     {
       throw std::runtime_error("Failed to record command buffer!!");
     }
-    std::vector<vk::Semaphore> waitSemaphores = {vkContext->syncObjects.imageAvailableSemaphores.at(0)};
+    std::vector<vk::Semaphore> waitSemaphores = {vkContext->syncObjects.imageAvailableSemaphores.at(vkContext->syncObjects.currentFrame)};
     vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 
     // vk::SemaphoreSubmitInfo semaphoreSubmitInfo;
@@ -144,14 +139,14 @@ namespace flow
     submitInfo.pWaitSemaphores = waitSemaphores.data();
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &vkContext->commandBuffers.commandBuffers.at(0);
+    submitInfo.pCommandBuffers = &vkContext->commandBuffers.commandBuffers.at(0).at(vkContext->syncObjects.currentFrame);
 
-    std::vector<vk::Semaphore> signalSemaphores = {vkContext->syncObjects.renderFinishedSemaphores.at(0)};
+    std::vector<vk::Semaphore> signalSemaphores = {vkContext->syncObjects.renderFinishedSemaphores.at(vkContext->syncObjects.currentFrame)};
 
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores.data();
 
-    if (vkContext->devices.graphicsQueues.at(0).submit(1, &submitInfo, vkContext->syncObjects.inFlightFences.at(0)) != vk::Result::eSuccess)
+    if (vkContext->devices.graphicsQueues.at(0).submit(1, &submitInfo, vkContext->syncObjects.inFlightFences.at(vkContext->syncObjects.currentFrame)) != vk::Result::eSuccess)
     {
       throw std::runtime_error("failed to submit draw command buffer!");
     }
@@ -166,5 +161,7 @@ namespace flow
 
     presentInfo.pImageIndices = &imageIndex;
     vkContext->devices.presentQueues.at(0).presentKHR(&presentInfo);
+
+    vkContext->syncObjects.currentFrame = (vkContext->syncObjects.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
   }
 }
