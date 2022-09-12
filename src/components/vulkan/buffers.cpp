@@ -1,5 +1,6 @@
 #include <buffers.hpp>
 #include <queues.hpp>
+#include <sync_objects.hpp>
 
 namespace flow::vulkan::buffers
 {
@@ -43,14 +44,15 @@ namespace flow::vulkan::buffers
     return SUCCESS;
   }
 
-  Error createCommandBuffer(vk::CommandBuffer &commandBuffer, vk::Device device, vk::CommandPool commandPool)
+  Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, vk::Device device, vk::CommandPool commandPool)
   {
+    commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
     vk::CommandBufferAllocateInfo allocInfo;
     allocInfo.commandPool = commandPool;
     allocInfo.level = vk::CommandBufferLevel::ePrimary;
-    allocInfo.commandBufferCount = 1;
+    allocInfo.commandBufferCount = (u32)commandBuffers.size();
 
-    ERROR_FAIL_COND(device.allocateCommandBuffers(&allocInfo, &commandBuffer) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to allocate command buffer!");
+    ERROR_FAIL_COND(device.allocateCommandBuffers(&allocInfo, commandBuffers.data()) != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to allocate command buffer!");
 
     return SUCCESS;
   }
@@ -99,7 +101,7 @@ namespace flow::vulkan::buffers
 
     commandBuffer.endRenderPass();
 
-    if(vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
+    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {
       ERROR_FAIL(FAILED, "Failed to record command buffer!");
     }
