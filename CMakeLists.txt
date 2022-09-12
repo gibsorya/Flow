@@ -9,19 +9,11 @@ IF(UNIX AND NOT APPLE)
 	set(LINUX TRUE)
 ENDIF()
 
-# add_custom_target(FLOW_SOURCES ALL
-# 	COMMAND echo "FLOW_SOURCES target created successfully!"
-# )
-
 add_executable(${PROJECT_NAME})
 add_subdirectory(src/platform)
 add_subdirectory(src/flow)
 add_subdirectory(src/components)
 add_subdirectory(subprojects)
-
-
-
-
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
@@ -29,10 +21,7 @@ add_subdirectory(include)
 
 find_package(Vulkan REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
-
-find_package(glfw3 CONFIG REQUIRED)
-# target_link_libraries(${PROJECT_NAME} glfw)
+target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan glfw)
 
 IF(WIN32)
 	IF(NOT Vulkan_FOUND)
