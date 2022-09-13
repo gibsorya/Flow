@@ -23,6 +23,7 @@ struct FlowVkContext {
   FlowVkCommandPools commandPools;
   FlowVkCommandBuffers commandBuffers;
   FlowVkSyncObjects syncObjects;
+  FlowVkVertexBuffers vertexBuffers;
 };
 
 namespace flow::vulkan {

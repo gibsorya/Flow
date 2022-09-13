@@ -58,11 +58,14 @@ namespace flow::vulkan
       fragInfo.pName = "main";
       vk::PipelineShaderStageCreateInfo stages[] = {vertexInfo, fragInfo};
 
-      vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
-      vertexInputInfo.vertexBindingDescriptionCount = 0;
-      vertexInputInfo.vertexAttributeDescriptionCount = 0;
+      auto vertexBindingDescription = Vertex::getBindingDescription();
+      auto vertexAttributeDescriptions = Vertex::getAttributeDescription();
 
-      
+      vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
+      vertexInputInfo.vertexBindingDescriptionCount = 1;
+      vertexInputInfo.pVertexBindingDescriptions = &vertexBindingDescription;
+      vertexInputInfo.vertexAttributeDescriptionCount = static_cast<u32>(vertexAttributeDescriptions.size());
+      vertexInputInfo.pVertexAttributeDescriptions = vertexAttributeDescriptions.data();
 
       local const vk::PrimitiveTopology topologies[PIPELINE_PRIMITIVE_MAX] = {
           vk::PrimitiveTopology::ePointList,

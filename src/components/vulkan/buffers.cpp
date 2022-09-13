@@ -1,6 +1,7 @@
 #include <buffers.hpp>
 #include <queues.hpp>
 #include <sync_objects.hpp>
+#include <app.hpp>
 
 namespace flow::vulkan::buffers
 {
@@ -59,7 +60,41 @@ namespace flow::vulkan::buffers
     return SUCCESS;
   }
 
-  Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline)
+  Error createVertexBuffer(vk::Buffer &vertexBuffer, vk::DeviceMemory &vertexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue graphicsQueue)
+  {
+    // QueueFamilyIndices indices = findQueueFamilies()
+    vk::BufferCreateInfo bufferInfo;
+    bufferInfo.usage = vk::BufferUsageFlagBits::eVertexBuffer;
+    bufferInfo.sharingMode = vk::SharingMode::eExclusive;
+    bufferInfo.size = sizeof(vertices[0]) * vertices.size();
+
+    vk::Result result = device.createBuffer(&bufferInfo, nullptr, &vertexBuffer);
+
+    ERROR_FAIL_COND(result != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to create vertex buffer!");
+
+    vk::MemoryRequirements memRequirements;
+    device.getBufferMemoryRequirements(vertexBuffer, &memRequirements);
+
+    vk::MemoryAllocateInfo memoryInfo;
+    memoryInfo.allocationSize = memRequirements.size;
+    memoryInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits,
+                                                vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, physicalDevice);
+
+    result = device.allocateMemory(&memoryInfo, nullptr, &vertexBufferMemory);
+
+    ERROR_FAIL_COND(result != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to create vertex buffer memory!");
+
+    void *data;
+    result = device.mapMemory(vertexBufferMemory, 0, bufferInfo.size, {}, &data);
+      memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+    device.unmapMemory(vertexBufferMemory);
+
+    device.bindBufferMemory(vertexBuffer, vertexBufferMemory, 0);
+
+    return SUCCESS;
+  }
+
+  Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer)
   {
     vk::CommandBufferBeginInfo beginInfo;
     beginInfo.flags = {};
@@ -83,6 +118,9 @@ namespace flow::vulkan::buffers
 
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
 
+    vk::Buffer vertexBuffers[] = {vertexBuffer};
+    vk::DeviceSize offsets[] = {0};
+
     vk::Viewport viewport;
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -97,7 +135,9 @@ namespace flow::vulkan::buffers
     scissor.extent = extent;
     commandBuffer.setScissor(0, 1, &scissor);
 
-    commandBuffer.draw(3, 1, 0, 0);
+    commandBuffer.bindVertexBuffers(0, 1, vertexBuffers, offsets);
+
+    commandBuffer.draw(static_cast<u32>(vertices.size()), 1, 0, 0);
 
     vk::SubpassEndInfo subpassEndInfo;
 
@@ -109,5 +149,21 @@ namespace flow::vulkan::buffers
     }
 
     return SUCCESS;
+  }
+
+  u32 findMemoryType(u32 typeFilter, vk::MemoryPropertyFlags properties, vk::PhysicalDevice physicalDevice)
+  {
+    vk::PhysicalDeviceMemoryProperties2 memProperties;
+    physicalDevice.getMemoryProperties2(&memProperties);
+
+    for (u32 i = 0; i < memProperties.memoryProperties.memoryTypeCount; i++)
+    {
+      if ((typeFilter & (1 << i)) && (memProperties.memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+      {
+        return i;
+      }
+    }
+
+    throw std::runtime_error("Failed to find suitable memory type!");
   }
 }
