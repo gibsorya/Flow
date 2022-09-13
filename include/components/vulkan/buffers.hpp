@@ -37,7 +37,8 @@ namespace flow::vulkan::buffers
   Error createCommandBuffers(std::vector<vk::CommandBuffer> &commandBuffers, vk::Device device, vk::CommandPool commandPool);
 
   Error createVertexBuffer(vk::Buffer &vertexBuffer, vk::DeviceMemory &vertexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue graphicsQueue);
-
+  Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::DeviceSize size, vk::SharingMode sharingMode, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties);
+  void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::Device device, vk::CommandPool commandPool, vk::DeviceSize size, vk::Queue graphicsQueue);
   Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer);
 
   u32 findMemoryType(u32 typeFilter, vk::MemoryPropertyFlags properties, vk::PhysicalDevice physicalDevice);

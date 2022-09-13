@@ -62,36 +62,85 @@ namespace flow::vulkan::buffers
 
   Error createVertexBuffer(vk::Buffer &vertexBuffer, vk::DeviceMemory &vertexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue graphicsQueue)
   {
-    // QueueFamilyIndices indices = findQueueFamilies()
+    vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+
+    vk::Buffer stagingBuffer;
+    vk::DeviceMemory stagingBufferMemory;
+    Error err = createBuffer(stagingBuffer, stagingBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eExclusive, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create staging buffer!");
+
+    void *data;
+    vk::Result result = device.mapMemory(stagingBufferMemory, 0, bufferSize, {}, &data);
+      memcpy(data, vertices.data(), (size_t)bufferSize);
+    device.unmapMemory(stagingBufferMemory);
+
+    err = createBuffer(vertexBuffer, vertexBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eExclusive, vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal);
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create staging buffer!");
+
+    copyBuffer(stagingBuffer, vertexBuffer, device, commandPool, bufferSize, graphicsQueue);
+
+    device.destroyBuffer(stagingBuffer, nullptr);
+    device.freeMemory(stagingBufferMemory, nullptr);
+
+    return SUCCESS;
+  }
+
+  Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::DeviceSize size, vk::SharingMode sharingMode, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+  {
     vk::BufferCreateInfo bufferInfo;
-    bufferInfo.usage = vk::BufferUsageFlagBits::eVertexBuffer;
-    bufferInfo.sharingMode = vk::SharingMode::eExclusive;
-    bufferInfo.size = sizeof(vertices[0]) * vertices.size();
+    bufferInfo.size = size;
+    bufferInfo.sharingMode = sharingMode;
+    bufferInfo.usage = usage;
 
-    vk::Result result = device.createBuffer(&bufferInfo, nullptr, &vertexBuffer);
+    vk::Result result = device.createBuffer(&bufferInfo, nullptr, &buffer);
 
-    ERROR_FAIL_COND(result != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to create vertex buffer!");
+    ERROR_FAIL_COND(result != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to create buffer!");
 
     vk::MemoryRequirements memRequirements;
-    device.getBufferMemoryRequirements(vertexBuffer, &memRequirements);
+    device.getBufferMemoryRequirements(buffer, &memRequirements);
 
     vk::MemoryAllocateInfo memoryInfo;
     memoryInfo.allocationSize = memRequirements.size;
     memoryInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits,
                                                 vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, physicalDevice);
 
-    result = device.allocateMemory(&memoryInfo, nullptr, &vertexBufferMemory);
+    result = device.allocateMemory(&memoryInfo, nullptr, &bufferMemory);
 
-    ERROR_FAIL_COND(result != vk::Result::eSuccess, ERR_CANT_CREATE, "Failed to create vertex buffer memory!");
-
-    void *data;
-    result = device.mapMemory(vertexBufferMemory, 0, bufferInfo.size, {}, &data);
-      memcpy(data, vertices.data(), (size_t)bufferInfo.size);
-    device.unmapMemory(vertexBufferMemory);
-
-    device.bindBufferMemory(vertexBuffer, vertexBufferMemory, 0);
+    device.bindBufferMemory(buffer, bufferMemory, 0);
 
     return SUCCESS;
+  }
+
+  void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::Device device, vk::CommandPool commandPool, vk::DeviceSize size, vk::Queue graphicsQueue)
+  {
+    vk::CommandBufferAllocateInfo allocInfo;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+    allocInfo.level = vk::CommandBufferLevel::ePrimary;
+
+    vk::CommandBuffer commandBuffer;
+    device.allocateCommandBuffers(&allocInfo, &commandBuffer);
+
+    vk::CommandBufferBeginInfo beginInfo;
+    beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+    commandBuffer.begin(&beginInfo);
+
+    vk::BufferCopy bufferCopy;
+    bufferCopy.size = size;
+    bufferCopy.srcOffset = 0;
+    bufferCopy.dstOffset = 0;
+    commandBuffer.copyBuffer(srcBuffer, dstBuffer, 1, &bufferCopy);
+
+    commandBuffer.end();
+
+    vk::SubmitInfo submitInfo;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    graphicsQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+    graphicsQueue.waitIdle();
+
+    device.freeCommandBuffers(commandPool, 1, &commandBuffer);
   }
 
   Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer)
