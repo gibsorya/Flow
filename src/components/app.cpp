@@ -24,12 +24,65 @@ namespace flow
     vkContext->devices.devices.at(0).waitIdle();
   }
 
+  void recreateSwapchain()
+  {
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(vkContext->surfaces.window, &width, &height);
+    while (width == 0 || height == 0)
+    {
+      glfwGetFramebufferSize(vkContext->surfaces.window, &width, &height);
+      glfwWaitEvents();
+    }
+    
+    vkContext->devices.devices.at(0).waitIdle();
+
+    cleanupSwapchain();
+
+    Error err = vulkan::swapchains::createSwapchain(vkContext->swaps.swapchains.at(0), vkContext->swaps.swapchainExtents.at(0), vkContext->swaps.swapchainImages, vkContext->swaps.swapchainImageFormats.at(0), vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0), vkContext->surfaces.window);
+
+    if (err != SUCCESS)
+    {
+      throw std::runtime_error("Failed to recreate swapchain!");
+    }
+
+    err = vulkan::swapchains::createImageViews(vkContext->swaps, vkContext->devices.devices.at(0));
+
+    if (err != SUCCESS)
+    {
+      throw std::runtime_error("Failed to recreate image views!");
+    }
+
+    err = vulkan::buffers::createFramebuffers(vkContext->frameBuffers.swapchainFrameBuffers.at(0), vkContext->devices.devices.at(0), vkContext->swaps.swapchainImageViews, vkContext->swaps.swapchainExtents.at(0), vkContext->graphics.renderPasses.at(0));
+
+    if (err != SUCCESS)
+    {
+      print_error(errors[err], "Failed!");
+      throw std::runtime_error("Failed to recreate frame buffers!");
+    }
+  }
+
+  void cleanupSwapchain()
+  {
+    for (auto frameBuffer : vkContext->frameBuffers.swapchainFrameBuffers.at(0))
+    {
+      vkContext->devices.devices.at(0).destroyFramebuffer(frameBuffer);
+    }
+
+    for (auto imageView : vkContext->swaps.swapchainImageViews)
+    {
+      vkContext->devices.devices.at(0).destroyImageView(imageView);
+    }
+
+    for (size_t i = 0; i < vkContext->swaps.swapchains.size(); i++)
+    {
+      vkContext->devices.devices.at(0).destroySwapchainKHR(vkContext->swaps.swapchains.at(i));
+    }
+  }
+
   void cleanup()
   {
-    // for (auto imageView : flow->flowDepthBuffers.depthImageViews)
-    // {
-    //   flow->flowDevices.devices.at(0).destroyImageView(imageView);
-    // }
+    cleanupSwapchain();
+
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
       vkContext->devices.devices.at(0).destroySemaphore(vkContext->syncObjects.renderFinishedSemaphores[i], nullptr);
@@ -40,11 +93,6 @@ namespace flow
     for (auto commandPool : vkContext->commandPools.commandPools)
     {
       vkContext->devices.devices.at(0).destroyCommandPool(commandPool);
-    }
-
-    for (auto frameBuffer : vkContext->frameBuffers.swapchainFrameBuffers.at(0))
-    {
-      vkContext->devices.devices.at(0).destroyFramebuffer(frameBuffer);
     }
 
     for (auto pipeline : vkContext->graphics.graphicsPipelines)
@@ -60,16 +108,6 @@ namespace flow
     for (auto renderPass : vkContext->graphics.renderPasses)
     {
       vkContext->devices.devices.at(0).destroyRenderPass(renderPass);
-    }
-
-    for (auto imageView : vkContext->swaps.swapchainImageViews)
-    {
-      vkContext->devices.devices.at(0).destroyImageView(imageView);
-    }
-
-    for (size_t i = 0; i < vkContext->swaps.swapchains.size(); i++)
-    {
-      vkContext->devices.devices.at(0).destroySwapchainKHR(vkContext->swaps.swapchains.at(i));
     }
 
     for (auto device : vkContext->devices.devices)
@@ -104,20 +142,19 @@ namespace flow
   void draw()
   {
     vk::Result result = vkContext->devices.devices.at(0).waitForFences(1, &vkContext->syncObjects.inFlightFences.at(vkContext->syncObjects.currentFrame), VK_TRUE, UINT64_MAX);
-    vkContext->devices.devices.at(0).resetFences(1, &vkContext->syncObjects.inFlightFences.at(vkContext->syncObjects.currentFrame));
 
     u32 imageIndex;
     vk::SubmitInfo submitInfo;
-    // vk::AcquireNextImageInfoKHR acquireInfo;
-    // acquireInfo.swapchain = vkContext->swaps.swapchains.at(0);
-    // acquireInfo.timeout = UINT64_MAX;
-    // acquireInfo.semaphore = vkContext->syncObjects.imageAvailableSemaphores.at(0);
-    // acquireInfo.fence = VK_NULL_HANDLE;
-    // acquireInfo.deviceMask = 1;
 
-    vkContext->devices.devices.at(0).acquireNextImageKHR(vkContext->swaps.swapchains.at(0), UINT64_MAX, vkContext->syncObjects.imageAvailableSemaphores.at(vkContext->syncObjects.currentFrame), VK_NULL_HANDLE, &imageIndex);
+    result = vkContext->devices.devices.at(0).acquireNextImageKHR(vkContext->swaps.swapchains.at(0), UINT64_MAX, vkContext->syncObjects.imageAvailableSemaphores.at(vkContext->syncObjects.currentFrame), VK_NULL_HANDLE, &imageIndex);
 
-    // vkContext->devices.devices.at(0).acquireNextImage2KHR(&acquireInfo, &imageIndex);
+    if (result == vk::Result::eErrorOutOfDateKHR)
+    {
+      recreateSwapchain();
+      return;
+    }
+
+    vkContext->devices.devices.at(0).resetFences(1, &vkContext->syncObjects.inFlightFences.at(vkContext->syncObjects.currentFrame));
 
     vkContext->commandBuffers.commandBuffers.at(0).at(vkContext->syncObjects.currentFrame).reset();
     Error err = vulkan::buffers::recordCommandBuffer(vkContext->commandBuffers.commandBuffers.at(0).at(vkContext->syncObjects.currentFrame), imageIndex, vkContext->graphics.renderPasses.at(0), vkContext->swaps.swapchainExtents.at(0), vkContext->frameBuffers.swapchainFrameBuffers.at(0), vkContext->graphics.graphicsPipelines.at(0));
@@ -160,8 +197,24 @@ namespace flow
     presentInfo.pSwapchains = swapchains;
 
     presentInfo.pImageIndices = &imageIndex;
-    vkContext->devices.presentQueues.at(0).presentKHR(&presentInfo);
+    result = vkContext->devices.presentQueues.at(0).presentKHR(&presentInfo);
+
+    if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || vkContext->syncObjects.framebufferResized)
+    {
+      vkContext->syncObjects.framebufferResized = false;
+      recreateSwapchain();
+    }
+    else if (result != vk::Result::eSuccess)
+    {
+      throw std::runtime_error("Failed to present swap chain image!");
+    }
 
     vkContext->syncObjects.currentFrame = (vkContext->syncObjects.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+  }
+
+  void framebufferResizeCallback(GLFWwindow *window, int width, int height)
+  {
+    glfwGetWindowUserPointer(window);
+    vkContext->syncObjects.framebufferResized = true;
   }
 }

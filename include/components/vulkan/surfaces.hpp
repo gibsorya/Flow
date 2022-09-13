@@ -16,7 +16,7 @@ struct FlowVkSurfaces
 };
 
 namespace flow::vulkan::surfaces {
-  Error initWindow(GLFWwindow *&window, u32 WIDTH, u32 HEIGHT, const char *title);
+  Error initWindow(GLFWwindow *&window, u32 WIDTH, u32 HEIGHT, const char *title, FlowVkSurfaces *surface);
 
   Error createSurface(std::vector<vk::SurfaceKHR> &surfaces, vk::Instance instance, GLFWwindow* window);
 }

@@ -1,15 +1,17 @@
 #include <surfaces.hpp>
+#include <app.hpp>
 
 namespace flow::vulkan::surfaces
 {
-  Error initWindow(GLFWwindow *&window, u32 WIDTH, u32 HEIGHT, const char *title)
+  Error initWindow(GLFWwindow *&window, u32 WIDTH, u32 HEIGHT, const char *title, FlowVkSurfaces *surface)
   {
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     window = glfwCreateWindow(WIDTH, HEIGHT, title, nullptr, nullptr);
+    glfwSetWindowUserPointer(window, &surface->window);
+    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 
     return SUCCESS;
   }

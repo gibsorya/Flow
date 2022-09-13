@@ -6,7 +6,7 @@ namespace flow::vulkan
   {
     Error err;
 
-    err = surfaces::initWindow(vkContext->surfaces.window, vkContext->surfaces.WIDTH, vkContext->surfaces.HEIGHT, "Flow Engine");
+    err = surfaces::initWindow(vkContext->surfaces.window, vkContext->surfaces.WIDTH, vkContext->surfaces.HEIGHT, "Flow Engine", &vkContext->surfaces);
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create window!");
 

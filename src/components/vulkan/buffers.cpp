@@ -26,6 +26,8 @@ namespace flow::vulkan::buffers
         return ERR_CANT_CREATE;
       }
     }
+
+    return SUCCESS;
   }
 
   Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface)
