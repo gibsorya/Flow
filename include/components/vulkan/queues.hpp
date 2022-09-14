@@ -12,7 +12,7 @@ struct QueueFamilyIndices{
     float queuePriority = 1.0f;
 
     bool isComplete(){
-        return graphicsFamily.has_value() && presentFamily.has_value();
+        return graphicsFamily.has_value() && presentFamily.has_value() && transferFamily.has_value();
     }
 };
 

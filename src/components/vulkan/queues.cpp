@@ -19,7 +19,6 @@ namespace flow::vulkan
       if (queueFamily.queueFamilyProperties.queueFlags & vk::QueueFlagBits::eGraphics)
       {
         std::cout << "GRAPHICS: " << i << std::endl;
-        std::cout << queueFamilies.size() << std::endl;
         indices.graphicsFamily = i;
       }
 
@@ -34,6 +33,7 @@ namespace flow::vulkan
 
       if (presentSupport)
       {
+        std::cout << "Present: " << i << std::endl;
         indices.presentFamily = i;
       }
 
@@ -44,6 +44,8 @@ namespace flow::vulkan
 
       i++;
     }
+
+    std::cout << "INDICES: " << indices.graphicsFamily.value() << " | " << indices.presentFamily.value() << " | " << indices.transferFamily.value() << std::endl;
 
     return indices;
   }
