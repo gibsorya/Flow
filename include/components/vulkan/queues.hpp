@@ -7,6 +7,7 @@
 struct QueueFamilyIndices{
     std::optional<u32> graphicsFamily;
     std::optional<u32> presentFamily;
+    std::optional<u32> transferFamily;
 
     float queuePriority = 1.0f;
 
@@ -18,6 +19,8 @@ struct QueueFamilyIndices{
 namespace flow::vulkan
 {
   QueueFamilyIndices findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceKHR surface);
+
+  void printQueueFamilies(vk::PhysicalDevice device);
 }
 
 #endif

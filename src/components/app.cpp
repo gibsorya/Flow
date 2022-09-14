@@ -15,6 +15,8 @@ namespace flow
 
   void mainLoop()
   {
+    vulkan::printQueueFamilies(vkContext->devices.physicalDevices.at(0));
+
     while (!glfwWindowShouldClose(vkContext->surfaces.window))
     {
       glfwPollEvents();
