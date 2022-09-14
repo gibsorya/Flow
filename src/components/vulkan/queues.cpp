@@ -12,6 +12,14 @@ namespace flow::vulkan
     std::vector<vk::QueueFamilyProperties2> queueFamilies(queueFamilyCount);
     device.getQueueFamilyProperties2(&queueFamilyCount, queueFamilies.data());
 
+    // In MacOS, there is no queue count or queue family count on Metal devices, 
+    // so one could create 1 or any number of queues and get full utilization of the
+    // device.
+    if(__APPLE__)
+    {
+      indices.transferFamily = 0;
+    }
+
     int i = 0;
     for (const auto &queueFamily : queueFamilies)
     {
