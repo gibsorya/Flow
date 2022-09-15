@@ -92,14 +92,14 @@ namespace flow::vulkan::devices
     return score;
   }
 
-  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue)
+  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue, vk::Queue &transferQueue)
   {
     Error err;
     vk::Device device;
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
 
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-    std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+    std::set<u32> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value(), indices.transferFamily.value()};
 
     float queuePriority = 1.0f;
     for (u32 queueFamily : uniqueQueueFamilies)
@@ -128,9 +128,11 @@ namespace flow::vulkan::devices
 
     auto graphicsQueueInfo = vk::DeviceQueueInfo2({}, indices.graphicsFamily.value(), 0);
     auto presentQueueInfo = vk::DeviceQueueInfo2({}, indices.presentFamily.value(), 0);
+    auto transferQueueInfo = vk::DeviceQueueInfo2({}, indices.transferFamily.value(), 0);
 
     device.getQueue2(&graphicsQueueInfo, &graphicsQueue);
     device.getQueue2(&presentQueueInfo, &presentQueue);
+    device.getQueue2(&transferQueueInfo, &transferQueue);
 
     devices.push_back(device);
 

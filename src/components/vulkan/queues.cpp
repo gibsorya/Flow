@@ -22,16 +22,13 @@ namespace flow::vulkan
     int i = 0;
     for (const auto &queueFamily : queueFamilies)
     {
-      std::cout << "INDEX: " << i << std::endl;
       if (queueFamily.queueFamilyProperties.queueFlags & vk::QueueFlagBits::eGraphics)
       {
-        std::cout << "GRAPHICS: " << i << std::endl;
         indices.graphicsFamily = i;
       }
 
       if (queueFamily.queueFamilyProperties.queueFlags & vk::QueueFlagBits::eTransfer && !(queueFamily.queueFamilyProperties.queueFlags & vk::QueueFlagBits::eGraphics))
       {
-        std::cout << "TRANSFER: " << i << std::endl;
         indices.transferFamily = i;
       }
 
@@ -40,7 +37,6 @@ namespace flow::vulkan
 
       if (presentSupport)
       {
-        std::cout << "Present: " << i << std::endl;
         indices.presentFamily = i;
       }
 
@@ -51,8 +47,6 @@ namespace flow::vulkan
 
       i++;
     }
-
-    std::cout << "INDICES: " << indices.graphicsFamily.value() << " | " << indices.presentFamily.value() << " | " << indices.transferFamily.value() << std::endl;
 
     return indices;
   }

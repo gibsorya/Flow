@@ -30,13 +30,15 @@ namespace flow::vulkan
 
     vk::Queue graphicsQueue;
     vk::Queue presentQueue;
+    vk::Queue transferQueue;
 
-    err = devices::createLogicalDevice(vkContext->devices.devices, vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0), graphicsQueue, presentQueue);
+    err = devices::createLogicalDevice(vkContext->devices.devices, vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0), graphicsQueue, presentQueue, transferQueue);
 
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create logical device!");
 
     vkContext->devices.graphicsQueues.push_back(graphicsQueue);
     vkContext->devices.presentQueues.push_back(presentQueue);
+    vkContext->devices.transferQueues.push_back(transferQueue);
 
     vk::SwapchainKHR swapchain;
     vk::Extent2D swapExtent;
@@ -72,20 +74,28 @@ namespace flow::vulkan
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create frame buffers!");
     vkContext->frameBuffers.swapchainFrameBuffers.push_back(frameBuffers);
 
-    vk::CommandPool commandPool;
-    err = buffers::createCommandPool(commandPool, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0));
-    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command pool!");
-    vkContext->commandPools.commandPools.push_back(commandPool);
+    QueueFamilyIndices indices = findQueueFamilies(vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0)); 
+    std::array<u32, 2> queueFamilyIndices = {indices.graphicsFamily.value(), indices.transferFamily.value()};
+
+    vk::CommandPool graphicsCommandPool;
+    vk::CommandPool transferCommandPool;
+
+    err = buffers::createCommandPool(graphicsCommandPool, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0), indices.graphicsFamily.value());
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create graphics command pool!");
+    vkContext->commandPools.graphicsCommandPools.push_back(graphicsCommandPool);
+    err = buffers::createCommandPool(transferCommandPool, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->surfaces.surfaces.at(0), indices.transferFamily.value());
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create transfer command pool!");
+    vkContext->commandPools.transferCommandPools.push_back(transferCommandPool);
 
     vk::Buffer vertexBuffer;
     vk::DeviceMemory vertexBufferMemory;
-    err = buffers::createVertexBuffer(vertexBuffer, vertexBufferMemory, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->commandPools.commandPools.at(0), vkContext->devices.graphicsQueues.at(0));
+    err = buffers::createVertexBuffer(vertexBuffer, vertexBufferMemory, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->commandPools.transferCommandPools.at(0), vkContext->devices.transferQueues.at(0), queueFamilyIndices);
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create vertex buffer!");
     vkContext->vertexBuffers.vertexBuffers.push_back(vertexBuffer);
     vkContext->vertexBuffers.vertexMemories.push_back(vertexBufferMemory);
 
     std::vector<vk::CommandBuffer> commandBuffers;
-    err = buffers::createCommandBuffers(commandBuffers, vkContext->devices.devices.at(0), vkContext->commandPools.commandPools.at(0));
+    err = buffers::createCommandBuffers(commandBuffers, vkContext->devices.devices.at(0), vkContext->commandPools.graphicsCommandPools.at(0));
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");
     vkContext->commandBuffers.commandBuffers.push_back(commandBuffers);
 

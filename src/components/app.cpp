@@ -102,7 +102,12 @@ namespace flow
       vkContext->devices.devices.at(0).destroyFence(vkContext->syncObjects.inFlightFences[i], nullptr);
     }
 
-    for (auto commandPool : vkContext->commandPools.commandPools)
+    for (auto commandPool : vkContext->commandPools.graphicsCommandPools)
+    {
+      vkContext->devices.devices.at(0).destroyCommandPool(commandPool);
+    }
+
+    for (auto commandPool : vkContext->commandPools.transferCommandPools)
     {
       vkContext->devices.devices.at(0).destroyCommandPool(commandPool);
     }

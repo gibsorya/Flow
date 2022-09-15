@@ -19,6 +19,7 @@ struct FlowVkDevices
   std::vector<const char *> deviceExtensions; // All extensions for each logical device will be the same for now.
   std::vector<vk::Queue> graphicsQueues;
   std::vector<vk::Queue> presentQueues;
+  std::vector<vk::Queue> transferQueues;
 };
 
 namespace flow::vulkan::devices
@@ -31,7 +32,7 @@ namespace flow::vulkan::devices
 
   int rateDeviceSuitability(vk::PhysicalDevice device);
 
-  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue);
+  Error createLogicalDevice(std::vector<vk::Device> &devices, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, vk::Queue &graphicsQueue, vk::Queue &presentQueue, vk::Queue &transferQueue);
 }
 
 #endif

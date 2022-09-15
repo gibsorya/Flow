@@ -31,12 +31,12 @@ namespace flow::vulkan::buffers
     return SUCCESS;
   }
 
-  Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface)
+  Error createCommandPool(vk::CommandPool &commandPool, vk::Device device, vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface, u32 queueFamilyIndex)
   {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
 
     vk::CommandPoolCreateInfo poolInfo;
-    poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
+    poolInfo.queueFamilyIndex = queueFamilyIndex;
     poolInfo.flags = {vk::CommandPoolCreateFlagBits::eResetCommandBuffer};
 
     if (device.createCommandPool(&poolInfo, nullptr, &commandPool) != vk::Result::eSuccess)
@@ -60,13 +60,13 @@ namespace flow::vulkan::buffers
     return SUCCESS;
   }
 
-  Error createVertexBuffer(vk::Buffer &vertexBuffer, vk::DeviceMemory &vertexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue graphicsQueue)
+  Error createVertexBuffer(vk::Buffer &vertexBuffer, vk::DeviceMemory &vertexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue transferQueue, std::array<u32, 2> queueFamilyIndices)
   {
     vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
     vk::Buffer stagingBuffer;
     vk::DeviceMemory stagingBufferMemory;
-    Error err = createBuffer(stagingBuffer, stagingBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eExclusive, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+    Error err = createBuffer(stagingBuffer, stagingBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eConcurrent, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, queueFamilyIndices);
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create staging buffer!");
 
     void *data;
@@ -74,10 +74,10 @@ namespace flow::vulkan::buffers
       memcpy(data, vertices.data(), (size_t)bufferSize);
     device.unmapMemory(stagingBufferMemory);
 
-    err = createBuffer(vertexBuffer, vertexBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eExclusive, vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal);
+    err = createBuffer(vertexBuffer, vertexBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eConcurrent, vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal, queueFamilyIndices);
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create staging buffer!");
 
-    copyBuffer(stagingBuffer, vertexBuffer, device, commandPool, bufferSize, graphicsQueue);
+    copyBuffer(stagingBuffer, vertexBuffer, device, commandPool, bufferSize, transferQueue);
 
     device.destroyBuffer(stagingBuffer, nullptr);
     device.freeMemory(stagingBufferMemory, nullptr);
@@ -85,12 +85,14 @@ namespace flow::vulkan::buffers
     return SUCCESS;
   }
 
-  Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::DeviceSize size, vk::SharingMode sharingMode, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+  Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::DeviceSize size, vk::SharingMode sharingMode, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, std::array<u32, 2> queueFamilyIndices)
   {
     vk::BufferCreateInfo bufferInfo;
     bufferInfo.size = size;
     bufferInfo.sharingMode = sharingMode;
     bufferInfo.usage = usage;
+    bufferInfo.queueFamilyIndexCount = queueFamilyIndices.size();
+    bufferInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 
     vk::Result result = device.createBuffer(&bufferInfo, nullptr, &buffer);
 
@@ -111,7 +113,7 @@ namespace flow::vulkan::buffers
     return SUCCESS;
   }
 
-  void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::Device device, vk::CommandPool commandPool, vk::DeviceSize size, vk::Queue graphicsQueue)
+  void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::Device device, vk::CommandPool commandPool, vk::DeviceSize size, vk::Queue transferQueue)
   {
     vk::CommandBufferAllocateInfo allocInfo;
     allocInfo.commandPool = commandPool;
@@ -137,8 +139,8 @@ namespace flow::vulkan::buffers
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
 
-    graphicsQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
-    graphicsQueue.waitIdle();
+    transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+    transferQueue.waitIdle();
 
     device.freeCommandBuffers(commandPool, 1, &commandBuffer);
   }
