@@ -71,13 +71,38 @@ namespace flow::vulkan::buffers
 
     void *data;
     vk::Result result = device.mapMemory(stagingBufferMemory, 0, bufferSize, {}, &data);
-      memcpy(data, vertices.data(), (size_t)bufferSize);
+    memcpy(data, vertices.data(), (size_t)bufferSize);
     device.unmapMemory(stagingBufferMemory);
 
     err = createBuffer(vertexBuffer, vertexBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eConcurrent, vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal, queueFamilyIndices);
-    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create staging buffer!");
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create vertex buffer!");
 
     copyBuffer(stagingBuffer, vertexBuffer, device, commandPool, bufferSize, transferQueue);
+
+    device.destroyBuffer(stagingBuffer, nullptr);
+    device.freeMemory(stagingBufferMemory, nullptr);
+
+    return SUCCESS;
+  }
+
+  Error createIndexBuffer(vk::Buffer &indexBuffer, vk::DeviceMemory &indexBufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue transferQueue, std::array<u32, 2> queueFamilyIndices)
+  {
+    vk::DeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+    vk::Buffer stagingBuffer;
+    vk::DeviceMemory stagingBufferMemory;
+    Error err = createBuffer(stagingBuffer, stagingBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eConcurrent, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, queueFamilyIndices);
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create staging buffer!");
+
+    void *data;
+    vk::Result result = device.mapMemory(stagingBufferMemory, 0, bufferSize, {}, &data);
+    memcpy(data, indices.data(), (size_t)bufferSize);
+    device.unmapMemory(stagingBufferMemory);
+
+    err = createBuffer(indexBuffer, indexBufferMemory, device, physicalDevice, bufferSize, vk::SharingMode::eConcurrent, vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal, queueFamilyIndices);
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create index buffer!");
+
+    copyBuffer(stagingBuffer, indexBuffer, device, commandPool, bufferSize, transferQueue);
 
     device.destroyBuffer(stagingBuffer, nullptr);
     device.freeMemory(stagingBufferMemory, nullptr);
@@ -145,7 +170,7 @@ namespace flow::vulkan::buffers
     device.freeCommandBuffers(commandPool, 1, &commandBuffer);
   }
 
-  Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer)
+  Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer, vk::Buffer indexBuffer)
   {
     vk::CommandBufferBeginInfo beginInfo;
     beginInfo.flags = {};
@@ -188,7 +213,9 @@ namespace flow::vulkan::buffers
 
     commandBuffer.bindVertexBuffers(0, 1, vertexBuffers, offsets);
 
-    commandBuffer.draw(static_cast<u32>(vertices.size()), 1, 0, 0);
+    commandBuffer.bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint16);
+
+    commandBuffer.drawIndexed(static_cast<u32>(indices.size()), 1, 0, 0, 0);
 
     vk::SubpassEndInfo subpassEndInfo;
 

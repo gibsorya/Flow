@@ -94,6 +94,13 @@ namespace flow::vulkan
     vkContext->vertexBuffers.vertexBuffers.push_back(vertexBuffer);
     vkContext->vertexBuffers.vertexMemories.push_back(vertexBufferMemory);
 
+    vk::Buffer indexBuffer;
+    vk::DeviceMemory indexBufferMemory;
+    err = buffers::createIndexBuffer(indexBuffer, indexBufferMemory, vkContext->devices.devices.at(0), vkContext->devices.physicalDevices.at(0), vkContext->commandPools.transferCommandPools.at(0), vkContext->devices.transferQueues.at(0), queueFamilyIndices);
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create vertex buffer!");
+    vkContext->indexBuffers.indexBuffers.push_back(indexBuffer);
+    vkContext->indexBuffers.indexMemories.push_back(indexBufferMemory);
+
     std::vector<vk::CommandBuffer> commandBuffers;
     err = buffers::createCommandBuffers(commandBuffers, vkContext->devices.devices.at(0), vkContext->commandPools.graphicsCommandPools.at(0));
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create command buffers!");

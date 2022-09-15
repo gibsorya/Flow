@@ -85,6 +85,16 @@ namespace flow
   {
     cleanupSwapchain();
 
+    for (auto buffer : vkContext->indexBuffers.indexBuffers)
+    {
+      vkContext->devices.devices.at(0).destroyBuffer(buffer);
+    }
+
+    for (auto memory : vkContext->indexBuffers.indexMemories)
+    {
+      vkContext->devices.devices.at(0).freeMemory(memory);
+    }
+
     for (auto buffer : vkContext->vertexBuffers.vertexBuffers)
     {
       vkContext->devices.devices.at(0).destroyBuffer(buffer);
@@ -176,7 +186,7 @@ namespace flow
     vkContext->commandBuffers.commandBuffers.at(0).at(vkContext->syncObjects.currentFrame).reset();
     Error err = vulkan::buffers::recordCommandBuffer(vkContext->commandBuffers.commandBuffers.at(0).at(vkContext->syncObjects.currentFrame), imageIndex, vkContext->graphics.renderPasses.at(0),
                                                      vkContext->swaps.swapchainExtents.at(0), vkContext->frameBuffers.swapchainFrameBuffers.at(0), vkContext->graphics.graphicsPipelines.at(0),
-                                                     vkContext->vertexBuffers.vertexBuffers.at(0));
+                                                     vkContext->vertexBuffers.vertexBuffers.at(0), vkContext->indexBuffers.indexBuffers.at(0));
     if (err != SUCCESS)
     {
       throw std::runtime_error("Failed to record command buffer!!");
