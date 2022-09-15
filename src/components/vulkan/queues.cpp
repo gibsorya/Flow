@@ -13,10 +13,10 @@ namespace flow::vulkan
     device.getQueueFamilyProperties2(&queueFamilyCount, queueFamilies.data());
 
 // In MacOS, there is no queue count or queue family count on Metal devices,
-// so one could create 1 or any number of queues and get full utilization of the
+// so one could create any number of queues and get full utilization of the
 // device.
 #if defined(__APPLE__)
-    indices.transferFamily = 0;
+    indices.transferFamily = 1;
 #endif
 
     int i = 0;
