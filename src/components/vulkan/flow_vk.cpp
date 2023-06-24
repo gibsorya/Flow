@@ -58,8 +58,13 @@ namespace flow::vulkan
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create render pass!");
     vkContext->graphics.renderPasses.push_back(renderPass);
 
+    vk::DescriptorSetLayout descriptorLayout;
+    err = buffers::createDescriptorSetLayout(descriptorLayout, vkContext->devices.devices.at(0));
+    ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create descriptor layout!");
+    vkContext->uniformBuffers.layouts.push_back(descriptorLayout);
+
     vk::PipelineLayout layout;
-    err = pipelines::createPipelineLayout(layout, vkContext->devices.devices.at(0), nullptr);
+    err = pipelines::createPipelineLayout(layout, vkContext->devices.devices.at(0), vkContext->uniformBuffers.layouts.at(0));
     ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create pipeline layout!");
     vkContext->graphics.pipelineLayouts.push_back(layout);
 

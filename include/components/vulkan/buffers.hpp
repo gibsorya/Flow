@@ -37,6 +37,13 @@ struct FlowVkIndexBuffers
   std::vector<vk::DeviceMemory> indexMemories;
 };
 
+struct FlowVkUniformBuffers
+{
+  std::vector<vk::DescriptorSetLayout> layouts;
+  std::vector<std::vector<vk::Buffer>> uniformBuffers;
+  std::vector<std::vector<vk::DeviceMemory>> uniformBufferMemories;
+};
+
 namespace flow::vulkan::buffers
 {
   Error createFramebuffers(std::vector<vk::Framebuffer> &frameBuffers, vk::Device device, std::vector<vk::ImageView> swapchainImageViews, vk::Extent2D swapExtent, vk::RenderPass renderpass);
@@ -49,8 +56,10 @@ namespace flow::vulkan::buffers
   Error createBuffer(vk::Buffer &buffer, vk::DeviceMemory &bufferMemory, vk::Device device, vk::PhysicalDevice physicalDevice, vk::DeviceSize size, vk::SharingMode sharingMode, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, std::array<u32, 2> queueFamilyIndices);
   void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::Device device, vk::CommandPool commandPool, vk::DeviceSize size, vk::Queue transferQueue);
 
-  Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer, vk::Buffer indexBuffer);
+  Error createDescriptorSetLayout(vk::DescriptorSetLayout &layout, vk::Device device);
+  Error createUniformBuffers(std::vector<vk::Buffer> &uniformBuffers, std::vector<vk::DeviceMemory> &uniformBufferMemories, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue transferQueue, std::array<u32, 2> queueFamilyIndices);
 
+  Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer, vk::Buffer indexBuffer);
   u32 findMemoryType(u32 typeFilter, vk::MemoryPropertyFlags properties, vk::PhysicalDevice physicalDevice);
 }
 

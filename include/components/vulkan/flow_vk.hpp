@@ -25,6 +25,7 @@ struct FlowVkContext {
   FlowVkSyncObjects syncObjects;
   FlowVkVertexBuffers vertexBuffers;
   FlowVkIndexBuffers indexBuffers;
+  FlowVkUniformBuffers uniformBuffers;
 };
 
 namespace flow::vulkan {

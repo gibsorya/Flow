@@ -186,8 +186,8 @@ namespace flow::vulkan
     Error createPipelineLayout(vk::PipelineLayout &pipelineLayout, vk::Device device, vk::DescriptorSetLayout setLayout)
     {
       vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
-      pipelineLayoutInfo.setLayoutCount = 0;
-      pipelineLayoutInfo.pSetLayouts = nullptr;
+      pipelineLayoutInfo.setLayoutCount = 1;
+      pipelineLayoutInfo.pSetLayouts = &setLayout;
       pipelineLayoutInfo.pushConstantRangeCount = 0;
       pipelineLayoutInfo.pPushConstantRanges = nullptr;
 

@@ -85,6 +85,11 @@ namespace flow
   {
     cleanupSwapchain();
 
+    for(auto layout : vkContext->uniformBuffers.layouts)
+    {
+      vkContext->devices.devices.at(0).destroyDescriptorSetLayout(layout);
+    }
+
     for (auto buffer : vkContext->indexBuffers.indexBuffers)
     {
       vkContext->devices.devices.at(0).destroyBuffer(buffer);

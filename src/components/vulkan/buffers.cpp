@@ -170,6 +170,41 @@ namespace flow::vulkan::buffers
     device.freeCommandBuffers(commandPool, 1, &commandBuffer);
   }
 
+  Error createDescriptorSetLayout(vk::DescriptorSetLayout &layout, vk::Device device)
+  {
+    vk::DescriptorSetLayoutBinding uboLayoutBinding;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.descriptorType = vk::DescriptorType::eUniformBuffer;
+    uboLayoutBinding.stageFlags = vk::ShaderStageFlagBits::eVertex;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
+
+    vk::DescriptorSetLayoutCreateInfo createInfo;
+    createInfo.bindingCount = 1;
+    createInfo.pBindings = &uboLayoutBinding;
+    
+    if(device.createDescriptorSetLayout(&createInfo, nullptr, &layout) != vk::Result::eSuccess)
+    {
+      return ERR_CANT_CREATE;
+    }
+    
+    return SUCCESS;
+  }
+
+  Error createUniformBuffers(std::vector<vk::Buffer> &uniformBuffers, std::vector<vk::DeviceMemory> &uniformBufferMemories, vk::Device device, vk::PhysicalDevice physicalDevice, vk::CommandPool commandPool, vk::Queue transferQueue, std::array<u32, 2> queueFamilyIndices)
+  {
+    vk::DeviceSize bufferSize = sizeof(UniformBufferObject);
+    uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    uniformBufferMemories.resize(MAX_FRAMES_IN_FLIGHT);
+
+    for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+      Error err = createBuffer(uniformBuffers[i], uniformBufferMemories[i], device, physicalDevice, bufferSize, vk::SharingMode::eConcurrent, vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, queueFamilyIndices);
+      ERROR_FAIL_COND(err != SUCCESS, ERR_CANT_CREATE, "Failed to create staging buffer!");
+    }
+
+    return SUCCESS;
+  }
+
   Error recordCommandBuffer(vk::CommandBuffer commandBuffer, u32 imageIndex, vk::RenderPass renderPass, vk::Extent2D extent, std::vector<vk::Framebuffer> swapchainFramebuffers, vk::Pipeline graphicsPipeline, vk::Buffer vertexBuffer, vk::Buffer indexBuffer)
   {
     vk::CommandBufferBeginInfo beginInfo;
