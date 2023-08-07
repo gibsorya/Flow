@@ -52,3 +52,4 @@ cmake-build-*/
 
 libs/
 external/vulkan/
+subprojects/
