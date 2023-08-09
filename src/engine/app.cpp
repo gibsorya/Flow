@@ -6,9 +6,10 @@ namespace flow {
 
     auto entity = registry.create();
     FlowVkSurfaceComponent& surfaceComponent = registry.emplace<FlowVkSurfaceComponent>(entity);
+    FlowVkInstanceComponent& instanceComponent = registry.emplace<FlowVkInstanceComponent>(entity);
 
     FlowVkInitializationSystem initializationSystem;
-    initializationSystem.Initialize(surfaceComponent);
+    initializationSystem.Initialize(surfaceComponent, instanceComponent);
 
     run();
 
@@ -26,6 +27,11 @@ namespace flow {
   }
 
   void shutdown(entt::registry &registry, entt::entity &entity) {
+
+    if(registry.storage<FlowVkInstanceComponent>().contains(entity)) {
+      auto &instanceComponent = registry.get<FlowVkInstanceComponent>(entity);
+      vkDestroyInstance(instanceComponent.instance, nullptr);
+    }
 
     if(registry.storage<FlowVkSurfaceComponent>().contains(entity)) {
       auto &surfaceComponent = registry.get<FlowVkSurfaceComponent>(entity);

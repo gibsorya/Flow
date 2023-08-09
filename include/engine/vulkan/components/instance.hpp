@@ -4,8 +4,9 @@
 #include <vulkan/vulkan.h>
 
 namespace flow {
-  struct FlowVkInstance {
+  struct FlowVkInstanceComponent {
     VkInstance instance;
+    VkInstanceCreateInfo createInfo;
     VkDebugUtilsMessengerEXT debugMessenger;
   };
 }

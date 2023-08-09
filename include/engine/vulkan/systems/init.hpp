@@ -2,16 +2,22 @@
 #define VULKAN_INIT_SYSTEM
 
 #include <vulkan/vulkan.h>
+#include <iostream>
+#include <vector>
+#include <SDL_vulkan.h>
 #include "surface.hpp"
+#include "instance.hpp"
 
 namespace flow
 {
   struct FlowVkInitializationSystem
   {
-    void Initialize(FlowVkSurfaceComponent &surfaceComponent);
+    void Initialize(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent);
 
     private:
     void CreateVkSurface(FlowVkSurfaceComponent &surfaceComponent);
+
+    void CreateVkInstance(FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent);
   };
 
 }
