@@ -15,9 +15,13 @@ namespace flow
     void Initialize(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent);
 
     private:
-    void CreateVkSurface(FlowVkSurfaceComponent &surfaceComponent);
+    void CreateVkWindow(FlowVkSurfaceComponent &surfaceComponent);
 
     void CreateVkInstance(FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent);
+
+    void CreateVkDebugMessenger(FlowVkInstanceComponent &instanceComponent);
+
+    void CreateVkSurface(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent);
   };
 
 }

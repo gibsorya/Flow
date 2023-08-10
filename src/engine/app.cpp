@@ -27,9 +27,17 @@ namespace flow {
   }
 
   void shutdown(entt::registry &registry, entt::entity &entity) {
+    if(registry.storage<FlowVkSurfaceComponent>().contains(entity)) {
+      auto &instanceComponent = registry.get<FlowVkInstanceComponent>(entity);
+      auto &surfaceComponent = registry.get<FlowVkSurfaceComponent>(entity);
+      vkDestroySurfaceKHR(instanceComponent.instance, surfaceComponent.surface, nullptr);
+    }
 
     if(registry.storage<FlowVkInstanceComponent>().contains(entity)) {
       auto &instanceComponent = registry.get<FlowVkInstanceComponent>(entity);
+      if(enableValidationLayers) {
+        DestroyDebugUtilsMessengerEXT(instanceComponent.instance, instanceComponent.debugMessenger, nullptr);
+      }
       vkDestroyInstance(instanceComponent.instance, nullptr);
     }
 
