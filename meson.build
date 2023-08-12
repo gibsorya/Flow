@@ -12,6 +12,7 @@ incdir = include_directories('include',
 sources = files('src/platforms/macos.cpp',
   'src/engine/app.cpp',
   'src/engine/vulkan/components/instance.cpp',
+  'src/engine/vulkan/components/devices.cpp',
   'src/engine/vulkan/systems/init.cpp')
 
 deps = [

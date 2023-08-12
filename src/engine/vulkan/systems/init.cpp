@@ -1,11 +1,12 @@
 #include "init.hpp"
 
 namespace flow {
-  void FlowVkInitializationSystem::Initialize(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent) {
+  void FlowVkInitializationSystem::Initialize(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent, FlowVkPhysicalDeviceComponent &physicalDeviceComponent, FlowVkLogicalDeviceComponent &logicalDeviceComponent) {
     CreateVkWindow(surfaceComponent);
     CreateVkInstance(instanceComponent, surfaceComponent);
     CreateVkDebugMessenger(instanceComponent);
     CreateVkSurface(surfaceComponent, instanceComponent);
+    PickVkPhysicalDevice(physicalDeviceComponent, instanceComponent, surfaceComponent);
   }
 
   void FlowVkInitializationSystem::CreateVkWindow(FlowVkSurfaceComponent &surfaceComponent) {
@@ -82,4 +83,29 @@ namespace flow {
       throw std::runtime_error("Failed to set up debug messenger");
     }
   }
+
+  void FlowVkInitializationSystem::PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDeviceComponent, FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent) {
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(instanceComponent.instance, &deviceCount, nullptr);
+
+    if(deviceCount == 0) {
+      throw std::runtime_error("Failed to find GPUs with Vulkan support");
+    }
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(instanceComponent.instance, &deviceCount, devices.data());
+
+    for(const auto& device : devices) {
+      if(isDeviceSuitable(device)) {
+        physicalDeviceComponent.physicalDevice = device;
+        break;
+      }
+    }
+
+    if(physicalDeviceComponent.physicalDevice == VK_NULL_HANDLE) {
+      throw std::runtime_error("Failed to find a suitable GPU");
+    }
+  }
+
+
 }

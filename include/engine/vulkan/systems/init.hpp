@@ -7,12 +7,13 @@
 #include <SDL_vulkan.h>
 #include "surface.hpp"
 #include "instance.hpp"
+#include "devices.hpp"
 
 namespace flow
 {
   struct FlowVkInitializationSystem
   {
-    void Initialize(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent);
+    void Initialize(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent, FlowVkPhysicalDeviceComponent &physicalDeviceComponent, FlowVkLogicalDeviceComponent &logicalDeviceComponent);
 
     private:
     void CreateVkWindow(FlowVkSurfaceComponent &surfaceComponent);
@@ -22,6 +23,10 @@ namespace flow
     void CreateVkDebugMessenger(FlowVkInstanceComponent &instanceComponent);
 
     void CreateVkSurface(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent);
+
+    void PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDevice, FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent);
+
+    void CreateVkLogicalDevice(FlowVkLogicalDeviceComponent &device, FlowVkPhysicalDeviceComponent &physicalDevice, FlowVkSurfaceComponent &surfaceComponent);
   };
 
 }

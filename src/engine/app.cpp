@@ -7,9 +7,11 @@ namespace flow {
     auto entity = registry.create();
     FlowVkSurfaceComponent& surfaceComponent = registry.emplace<FlowVkSurfaceComponent>(entity);
     FlowVkInstanceComponent& instanceComponent = registry.emplace<FlowVkInstanceComponent>(entity);
+    FlowVkPhysicalDeviceComponent& physicalDeviceComponent = registry.emplace<FlowVkPhysicalDeviceComponent>(entity);
+    FlowVkLogicalDeviceComponent& logicalDeviceComponent = registry.emplace<FlowVkLogicalDeviceComponent>(entity);
 
     FlowVkInitializationSystem initializationSystem;
-    initializationSystem.Initialize(surfaceComponent, instanceComponent);
+    initializationSystem.Initialize(surfaceComponent, instanceComponent, physicalDeviceComponent, logicalDeviceComponent);
 
     run();
 
@@ -27,6 +29,11 @@ namespace flow {
   }
 
   void shutdown(entt::registry &registry, entt::entity &entity) {
+    if(registry.storage<FlowVkPhysicalDeviceComponent>().contains(entity)) {
+      auto &physicalDeviceComponent = registry.get<FlowVkPhysicalDeviceComponent>(entity);
+      // vkDestroyDevice(physicalDeviceComponent.physicalDevice, nullptr);
+    }
+
     if(registry.storage<FlowVkSurfaceComponent>().contains(entity)) {
       auto &instanceComponent = registry.get<FlowVkInstanceComponent>(entity);
       auto &surfaceComponent = registry.get<FlowVkSurfaceComponent>(entity);
