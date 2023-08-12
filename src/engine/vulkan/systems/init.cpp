@@ -6,7 +6,8 @@ namespace flow {
     CreateVkInstance(instanceComponent, surfaceComponent);
     CreateVkDebugMessenger(instanceComponent);
     CreateVkSurface(surfaceComponent, instanceComponent);
-    PickVkPhysicalDevice(physicalDeviceComponent, instanceComponent, surfaceComponent);
+    PickVkPhysicalDevice(physicalDeviceComponent, instanceComponent);
+    CreateVkLogicalDevice(logicalDeviceComponent, physicalDeviceComponent);
   }
 
   void FlowVkInitializationSystem::CreateVkWindow(FlowVkSurfaceComponent &surfaceComponent) {
@@ -84,7 +85,42 @@ namespace flow {
     }
   }
 
-  void FlowVkInitializationSystem::PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDeviceComponent, FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent) {
+  void FlowVkInitializationSystem::CreateVkLogicalDevice(FlowVkLogicalDeviceComponent &device, FlowVkPhysicalDeviceComponent &physicalDevice)
+  {
+    QueueFamilyIndices indices = findQueueFamilies(physicalDevice.physicalDevice);
+    VkDeviceQueueCreateInfo queueCreateInfo {};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+    queueCreateInfo.queueCount = 1;
+
+    float queuePriority = 1.0f;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    device.createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    device.createInfo.queueCreateInfoCount = 1;
+    device.createInfo.pQueueCreateInfos = &queueCreateInfo;
+
+    #ifdef __APPLE__
+      device.deviceExtensions.push_back("VK_KHR_portability_subset");
+    #endif
+    device.createInfo.enabledExtensionCount = device.deviceExtensions.size();
+    device.createInfo.ppEnabledExtensionNames = device.deviceExtensions.data();
+
+    VkResult result = vkCreateDevice(physicalDevice.physicalDevice, &device.createInfo, nullptr, &device.logicalDevice);
+
+    if(result != VK_SUCCESS) {
+      throw std::runtime_error("Failed to create logical device");
+    }
+
+    VkDeviceQueueInfo2 queueInfo {};
+    queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_INFO_2;
+    queueInfo.queueFamilyIndex = indices.graphicsFamily.value();
+    queueInfo.queueIndex = 0;
+
+    vkGetDeviceQueue2(device.logicalDevice, &queueInfo, &device.graphicsQueue);
+  }
+
+  void FlowVkInitializationSystem::PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDeviceComponent, FlowVkInstanceComponent &instanceComponent) {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instanceComponent.instance, &deviceCount, nullptr);
 
@@ -106,6 +142,4 @@ namespace flow {
       throw std::runtime_error("Failed to find a suitable GPU");
     }
   }
-
-
 }

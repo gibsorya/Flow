@@ -46,23 +46,14 @@ namespace flow {
   }
 
   std::vector<const char*> getRequiredExtensions(SDL_Window *window) {
-    std::vector<const char*> requiredExtensions;
     unsigned int extensionCount = 0;
-    const char** extensionNames; //Initializing this to nullptr causes a segfault. Why?
+    const char** extensionNames;
 
 
     SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, extensionNames);
-    std::cout << "Extension count: " << extensionCount << std::endl;
-    for(uint32_t i = 0; i < extensionCount; i++) {
-      std::cout << "Extension: " << extensionNames[i] << std::endl;
-      requiredExtensions.push_back(extensionNames[i]);
-    }
-
     std::vector<const char*> extensions(extensionNames, extensionNames + extensionCount);
 
-    std::cout << "Extensions created?" << std::endl;
     for(uint32_t i = 0; i < extensionCount; i++) {
-      std::cout << "Extension 2: " << extensionNames[i] << std::endl;
       extensions.push_back(extensionNames[i]);
     }
 
@@ -70,6 +61,7 @@ namespace flow {
 
     #ifdef __APPLE__
       extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+      extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
       extensions.push_back("VK_EXT_metal_surface");
     #endif
 

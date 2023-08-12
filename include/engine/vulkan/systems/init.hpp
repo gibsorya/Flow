@@ -24,9 +24,9 @@ namespace flow
 
     void CreateVkSurface(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent);
 
-    void PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDevice, FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent);
+    void PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDevice, FlowVkInstanceComponent &instanceComponent);
 
-    void CreateVkLogicalDevice(FlowVkLogicalDeviceComponent &device, FlowVkPhysicalDeviceComponent &physicalDevice, FlowVkSurfaceComponent &surfaceComponent);
+    void CreateVkLogicalDevice(FlowVkLogicalDeviceComponent &device, FlowVkPhysicalDeviceComponent &physicalDevice);
   };
 
 }

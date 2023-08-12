@@ -16,6 +16,12 @@ namespace flow {
 
   struct FlowVkLogicalDeviceComponent {
     VkDevice logicalDevice;
+
+    VkDeviceCreateInfo createInfo;
+    std::vector<const char*> deviceExtensions = {
+      VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+
     VkQueue graphicsQueue;
     VkQueue presentQueue;
   };

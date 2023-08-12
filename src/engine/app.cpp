@@ -29,9 +29,9 @@ namespace flow {
   }
 
   void shutdown(entt::registry &registry, entt::entity &entity) {
-    if(registry.storage<FlowVkPhysicalDeviceComponent>().contains(entity)) {
-      auto &physicalDeviceComponent = registry.get<FlowVkPhysicalDeviceComponent>(entity);
-      // vkDestroyDevice(physicalDeviceComponent.physicalDevice, nullptr);
+    if(registry.storage<FlowVkLogicalDeviceComponent>().contains(entity)) {
+      auto &deviceComponent = registry.get<FlowVkLogicalDeviceComponent>(entity);
+      vkDestroyDevice(deviceComponent.logicalDevice, nullptr);
     }
 
     if(registry.storage<FlowVkSurfaceComponent>().contains(entity)) {
