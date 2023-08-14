@@ -10,6 +10,7 @@ incdir = include_directories('include',
   'include/engine/vulkan/components')
 
 sources = files('src/platforms/macos.cpp',
+  'src/platforms/windows.cpp',
   'src/engine/app.cpp',
   'src/engine/vulkan/components/instance.cpp',
   'src/engine/vulkan/components/devices.cpp',

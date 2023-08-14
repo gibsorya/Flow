@@ -63,6 +63,8 @@ namespace flow {
       extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
       extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
       extensions.push_back("VK_EXT_metal_surface");
+    #elif defined(_WIN32)
+      extensions.push_back("VK_KHR_win32_surface");
     #endif
 
     if (enableValidationLayers) {
