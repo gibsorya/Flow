@@ -18,9 +18,6 @@ namespace flow {
     VkDevice logicalDevice;
 
     VkDeviceCreateInfo createInfo;
-    std::vector<const char*> deviceExtensions = {
-      VK_KHR_SWAPCHAIN_EXTENSION_NAME
-    };
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;
@@ -32,6 +29,13 @@ namespace flow {
     bool isComplete() {
       return graphicsFamily.has_value();
     }
+  };
+
+  const std::vector<const char*> deviceExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    #ifdef __APPLE__
+    , "VK_KHR_portability_subset"
+    #endif
   };
 
   bool isDeviceSuitable(VkPhysicalDevice device);

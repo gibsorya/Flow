@@ -100,11 +100,8 @@ namespace flow {
     device.createInfo.queueCreateInfoCount = 1;
     device.createInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    #ifdef __APPLE__
-      device.deviceExtensions.push_back("VK_KHR_portability_subset");
-    #endif
-    device.createInfo.enabledExtensionCount = device.deviceExtensions.size();
-    device.createInfo.ppEnabledExtensionNames = device.deviceExtensions.data();
+    device.createInfo.enabledExtensionCount = deviceExtensions.size();
+    device.createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
     VkResult result = vkCreateDevice(physicalDevice.physicalDevice, &device.createInfo, nullptr, &device.logicalDevice);
 
