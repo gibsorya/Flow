@@ -1,14 +1,21 @@
 #include "devices.hpp"
 
 namespace flow {
-  bool isDeviceSuitable(VkPhysicalDevice device)
+  bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
   {
     QueueFamilyIndices indices = findQueueFamilies(device);
+    bool extensionsSupported = checkDeviceExtensionSupport(device);
+    bool swapChainAdequate = false;
 
-    return indices.isComplete();
+    if(extensionsSupported) {
+      SwapchainSupportDetails swapchainSupport = querySwapchainSupport(device, surface);
+      swapChainAdequate = !swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty();
+    }
+
+    return indices.isComplete() && extensionsSupported && swapChainAdequate;
   }
 
-QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
+  QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
   {
     QueueFamilyIndices indices;
     uint32_t queueFamilyCount = 0;
@@ -38,5 +45,23 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
 
     return indices;
   }
+
+  bool checkDeviceExtensionSupport(VkPhysicalDevice device)
+  {
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for(const auto& extension : availableExtensions) {
+      requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
+  }
+
 }
 

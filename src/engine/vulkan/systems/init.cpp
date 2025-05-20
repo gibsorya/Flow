@@ -19,8 +19,8 @@ namespace flow {
       "Flow",
       SDL_WINDOWPOS_UNDEFINED,
       SDL_WINDOWPOS_UNDEFINED,
-      800,
-      600,
+      surfaceComponent.width,
+      surfaceComponent.height,
       window_flags
     );
   }
@@ -117,7 +117,7 @@ namespace flow {
     vkGetDeviceQueue2(device.logicalDevice, &queueInfo, &device.graphicsQueue);
   }
 
-  void FlowVkInitializationSystem::PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDeviceComponent, FlowVkInstanceComponent &instanceComponent) {
+  void FlowVkInitializationSystem::PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDeviceComponent, FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent) {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instanceComponent.instance, &deviceCount, nullptr);
 
@@ -129,7 +129,7 @@ namespace flow {
     vkEnumeratePhysicalDevices(instanceComponent.instance, &deviceCount, devices.data());
 
     for(const auto& device : devices) {
-      if(isDeviceSuitable(device)) {
+      if(isDeviceSuitable(device, surfaceComponent.surface)) {
         physicalDeviceComponent.physicalDevice = device;
         break;
       }
@@ -138,5 +138,27 @@ namespace flow {
     if(physicalDeviceComponent.physicalDevice == VK_NULL_HANDLE) {
       throw std::runtime_error("Failed to find a suitable GPU");
     }
+  }
+
+  void FlowVkInitializationSystem::CreateVkSwapchain(FlowVkSwapchainComponent &swapchain, FlowVkLogicalDeviceComponent &device, FlowVkSurfaceComponent &surfaceComponent)
+  {
+    // QueueFamilyIndices indices = findQueueFamilies(device.physicalDevice);
+
+    swapchain.createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchain.createInfo.surface = surfaceComponent.surface;
+    swapchain.createInfo.minImageCount = 2;
+    // swapchain.createInfo.queueFamilyIndexCount;
+    swapchain.createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    swapchain.createInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    swapchain.createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchain.createInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    swapchain.createInfo.clipped = VK_TRUE;
+    swapchain.createInfo.oldSwapchain = VK_NULL_HANDLE;
+    swapchain.createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchain.createInfo.imageFormat = VK_FORMAT_B8G8R8_SRGB;
+    swapchain.createInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    swapchain.createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    vkCreateSwapchainKHR(device.logicalDevice, &swapchain.createInfo, nullptr, &swapchain.swapchain);
   }
 }

@@ -5,6 +5,8 @@
 #include <vector>
 #include <optional>
 #include <iostream>
+#include <set>
+#include "swapchain.hpp"
 #include "surface.hpp"
 
 namespace flow {
@@ -38,7 +40,8 @@ namespace flow {
     #endif
   };
 
-  bool isDeviceSuitable(VkPhysicalDevice device);
+  bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
+  bool checkDeviceExtensionSupport(VkPhysicalDevice device);
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 }
 

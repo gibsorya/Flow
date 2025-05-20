@@ -8,6 +8,7 @@
 #include "surface.hpp"
 #include "instance.hpp"
 #include "devices.hpp"
+#include "swapchain.hpp"
 
 namespace flow
 {
@@ -24,9 +25,13 @@ namespace flow
 
     void CreateVkSurface(FlowVkSurfaceComponent &surfaceComponent, FlowVkInstanceComponent &instanceComponent);
 
-    void PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDevice, FlowVkInstanceComponent &instanceComponent);
+    void PickVkPhysicalDevice(FlowVkPhysicalDeviceComponent &physicalDevice, FlowVkInstanceComponent &instanceComponent, FlowVkSurfaceComponent &surfaceComponent);
 
     void CreateVkLogicalDevice(FlowVkLogicalDeviceComponent &device, FlowVkPhysicalDeviceComponent &physicalDevice);
+
+    // void CreateVkCommandBuffer
+
+    void CreateVkSwapchain(FlowVkSwapchainComponent &swapchain, FlowVkLogicalDeviceComponent &device, FlowVkSurfaceComponent &surfaceComponent);
   };
 
 }
