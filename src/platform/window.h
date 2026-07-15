@@ -16,6 +16,8 @@ struct NativeWindowInfo {
     NativeWindowKind kind;
     void*    handle1 = nullptr;
     uint64_t handle2 = 0;
+
+    void* (*getProcAddress)(const char*);
 };
 
 struct WindowDesc {

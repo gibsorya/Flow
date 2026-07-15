@@ -1,6 +1,8 @@
-#include <GLFW/glfw3.h>
-#include "platform/window.h"
 #include <iostream>
+
+#include <GLFW/glfw3.h>
+
+#include "platform/window.h"
 
 namespace
 {
@@ -88,7 +90,7 @@ static uint32_t glfw_pollEvents(Event* out, uint32_t cap) {
 }
 
 static NativeWindowInfo glfw_nativeInfo() {
-    return { NativeWindowKind::GLFW, window, 0 };
+    return { NativeWindowKind::GLFW, window, 0, reinterpret_cast<void*(*)(const char*)>(glfwGetProcAddress) };
 }
 
 static void glfw_present() {
