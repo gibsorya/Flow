@@ -70,6 +70,10 @@ target_link_libraries(renderer_gl
     PUBLIC  engine_core
     PRIVATE glad
 )
+
+target_compile_definitions(renderer_gl PRIVATE
+    PROJECT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
  
 # ------------------------------------------------------------
 # renderer_null — headless backend and boundary canary.

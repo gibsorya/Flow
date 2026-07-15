@@ -1,5 +1,6 @@
 #include <iostream>
 #include "platform/window.h"
+#include "renderer/renderer.h"
 
 int main()
 {
@@ -9,7 +10,26 @@ int main()
     window_desc.title = "Flow Engine";
     window.create(&window_desc);
 
-    NativeWindowInfo native = window.getNativeInfo();
+    const float vertices[] = {
+        0.0f, 1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f
+    };
+    MeshDesc mesh_desc;
+    mesh_desc.positions = vertices;
+    mesh_desc.vertexCount = sizeof(vertices);
+
+    const NativeWindowInfo native = window.getNativeInfo();
+    
+    RendererAPI renderer = createGLRenderer();
+    renderer.init(&native);
+    MeshHandle mesh = renderer.createMesh(&mesh_desc);
+    DrawCommand draws;
+    draws.mesh = mesh;
+
+    FramePacket packet;
+    packet.drawCount = 1;
+    packet.draws = &draws;
 
     Event events[256];
     bool running = true;
@@ -33,6 +53,11 @@ int main()
                 break;
             }
         }
+
+        // MeshHandle
+        
+
+        renderer.renderFrame(&packet);
 
         window.present();
     }
