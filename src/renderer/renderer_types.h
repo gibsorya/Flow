@@ -15,8 +15,11 @@ struct MeshDesc {
     uint32_t        indexCount  = 0;
 };
 
+struct Mat4 { float m[16]; };
+
 struct DrawCommand {
     MeshHandle mesh;
+    Mat4 model;
     // later, in this order: MaterialHandle material;
     //                       uint32_t transformIndex;
     //                       uint64_t sortKey;
@@ -31,5 +34,5 @@ struct FramePacket {
     uint32_t           drawCount = 0;
  
     // later: view/proj matrices, transforms array, lights...
-    float projMatrix[16];
+    Mat4 viewProj;
 };

@@ -3,6 +3,10 @@
 #include "renderer/renderer.h"
 #include "core/math.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 int main()
 {
     WindowAPI window = createGLFWWindowAPI();
@@ -25,9 +29,9 @@ int main()
 
     MeshDesc mesh_desc;
     mesh_desc.positions = vertices;
-    mesh_desc.vertexCount = sizeof(vertices);
+    mesh_desc.vertexCount = sizeof(vertices) / sizeof(float);
     mesh_desc.indices = indices;
-    mesh_desc.indexCount = sizeof(indices);
+    mesh_desc.indexCount = sizeof(indices) / sizeof(uint32_t);
 
     const NativeWindowInfo native = window.getNativeInfo();
     
@@ -35,12 +39,14 @@ int main()
     renderer.init(&native);
     MeshHandle mesh = renderer.createMesh(&mesh_desc);
     DrawCommand draws;
-    draws.mesh = mesh;
+    
 
     FramePacket packet;
 
     Event events[256];
     bool running = true;
+
+    /** MAIN LOOP */
     while (running)
     {
         uint32_t n = window.pollEvents(events, 256);
@@ -65,7 +71,16 @@ int main()
         uint32_t w, h;
         window.getFramebufferSize(&w, &h);
         float aspect = (float)w/(float)h;
-        makeOrtho(packet.projMatrix, aspect);
+
+        glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        glm::mat4 view          = glm::mat4(1.0f);
+        glm::mat4 projection    = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        draws.mesh = mesh;
+        draws.model = *reinterpret_cast<const Mat4*>(glm::value_ptr(model));
+        packet.viewProj = *reinterpret_cast<const Mat4*>(glm::value_ptr(projection * view));
         packet.viewportHeight = h;
         packet.viewportWidth = w;
         packet.drawCount = 1;

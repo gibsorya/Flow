@@ -6,14 +6,14 @@
 #include "core/file_io.h"
 
 #include <glad/gl.h>
-#include <glm/glm.hpp>
 
 namespace
 {
     struct GLState {
         GLuint   programID = 0;
         // grows: default framebuffer info, cached GL state, big buffers...
-        GLuint uProj = 0;
+        GLuint uVP = 0;
+        GLuint uModel = 0;
     };
     GLState g_state;
 
@@ -38,8 +38,10 @@ namespace
             return false;
         }
 
+        glEnable(GL_DEPTH_TEST);
+
         printf("GL VERSION: %s\n", glGetString(GL_VERSION));
-        printf("GL RENDERER: %s", glGetString(GL_RENDERER));
+        printf("GL RENDERER: %s\n", glGetString(GL_RENDERER));
 
         std::string vertCode = read_shader_file("main.vert");
         std::string fragCode = read_shader_file("main.frag");
@@ -87,7 +89,8 @@ namespace
             return false;
         }
         
-        g_state.uProj = glGetUniformLocation(g_state.programID, "projection");
+        g_state.uVP = glGetUniformLocation(g_state.programID, "vp");
+        g_state.uModel = glGetUniformLocation(g_state.programID, "model");
 
         glDetachShader(g_state.programID, vertex);
         glDetachShader(g_state.programID, fragment);
@@ -107,7 +110,7 @@ namespace
         GLuint vbo;
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, desc->vertexCount, desc->positions, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, desc->vertexCount * sizeof(float), desc->positions, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -128,7 +131,7 @@ namespace
         GLuint index_vbo;
         glGenBuffers(1, &index_vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_vbo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, desc->indexCount, desc->indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, desc->indexCount * sizeof(uint32_t), desc->indices, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -150,14 +153,22 @@ namespace
 
     void render_frame(const FramePacket *packet)
     {
-        glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(g_state.programID);
-        glUniformMatrix4fv(g_state.uProj, 1, GL_FALSE, packet->projMatrix);
+        
+        glUniformMatrix4fv(g_state.uVP, 1, GL_FALSE, packet->viewProj.m);
+        // for(auto f : packet->viewProj.m) {
+        //     std::cout << f << ", " << std::ends;
+        // }
+        // std::cout << std::endl;
         for (uint32_t i = 0; i < packet->drawCount; i++)
         {
-            GLMesh &mesh = g_meshes.get(packet->draws[i].mesh);
-            glBindVertexArray(mesh.vao);            
+            DrawCommand draw = packet->draws[i];
+            GLMesh &mesh = g_meshes.get(draw.mesh);
+            glBindVertexArray(mesh.vao);
+            glUniformMatrix4fv(g_state.uModel, 1, GL_FALSE, draw.model.m);
+                     
             glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
         }
     }

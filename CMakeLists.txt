@@ -78,7 +78,6 @@ add_library(renderer_gl STATIC
 target_link_libraries(renderer_gl
     PUBLIC  engine_core
     PRIVATE glad
-    PRIVATE glm::glm
 )
 
 target_compile_definitions(renderer_gl PRIVATE
@@ -108,6 +107,7 @@ target_link_libraries(engine
         platform_glfw
         renderer_gl
         renderer_null
+        glm::glm
 )
 
 # ---- warnings: on for OUR targets, not for dependencies ----
