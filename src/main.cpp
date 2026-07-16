@@ -11,13 +11,22 @@ int main()
     window.create(&window_desc);
 
     const float vertices[] = {
-        0.0f, 1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f
+        1.0f, -1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f
     };
+
+    const uint32_t indices[] = {
+        0, 1, 3,
+        3, 1, 2
+    };
+
     MeshDesc mesh_desc;
     mesh_desc.positions = vertices;
     mesh_desc.vertexCount = sizeof(vertices);
+    mesh_desc.indices = indices;
+    mesh_desc.indexCount = sizeof(indices);
 
     const NativeWindowInfo native = window.getNativeInfo();
     

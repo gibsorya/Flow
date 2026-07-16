@@ -20,6 +20,7 @@ namespace
         uint32_t vao;
         uint32_t vbo;
         uint32_t vertexCount;
+        uint32_t indexCount;
     };
 
     static Pool<GLMesh, MeshTag> g_meshes;
@@ -109,8 +110,10 @@ namespace
         const float colors[] = {
             1.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 1.0f
+            0.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 1.0f
         };
+
         GLuint color_vbo;
         glGenBuffers(1, &color_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
@@ -118,10 +121,15 @@ namespace
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+        GLuint index_vbo;
+        glGenBuffers(1, &index_vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_vbo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, desc->indexCount, desc->indices, GL_STATIC_DRAW);
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 
-        return g_meshes.create({vao, vbo, desc->vertexCount});
+        return g_meshes.create({vao, vbo, desc->vertexCount, desc->indexCount});
     }
 
     void shutdown()
@@ -144,8 +152,8 @@ namespace
         for (uint32_t i = 0; i < packet->drawCount; i++)
         {
             GLMesh &mesh = g_meshes.get(packet->draws[i].mesh);
-            glBindVertexArray(mesh.vao);
-            glDrawArrays(GL_TRIANGLES, 0, mesh.vertexCount);
+            glBindVertexArray(mesh.vao);            
+            glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
         }
     }
 }
