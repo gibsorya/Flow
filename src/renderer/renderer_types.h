@@ -31,4 +31,5 @@ struct FramePacket {
     uint32_t           drawCount = 0;
  
     // later: view/proj matrices, transforms array, lights...
+    float projMatrix[16];
 };

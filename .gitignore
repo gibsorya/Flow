@@ -52,3 +52,5 @@ cmake-build-*/
 
 libs/
 external/vulkan/
+
+.vscode/

@@ -6,12 +6,14 @@
 #include "core/file_io.h"
 
 #include <glad/gl.h>
+#include <glm/glm.hpp>
 
 namespace
 {
     struct GLState {
         GLuint   programID = 0;
         // grows: default framebuffer info, cached GL state, big buffers...
+        GLuint uProj = 0;
     };
     GLState g_state;
 
@@ -84,6 +86,8 @@ namespace
                       << infoLog << std::endl;
             return false;
         }
+        
+        g_state.uProj = glGetUniformLocation(g_state.programID, "projection");
 
         glDetachShader(g_state.programID, vertex);
         glDetachShader(g_state.programID, fragment);
@@ -149,6 +153,7 @@ namespace
         glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(g_state.programID);
+        glUniformMatrix4fv(g_state.uProj, 1, GL_FALSE, packet->projMatrix);
         for (uint32_t i = 0; i < packet->drawCount; i++)
         {
             GLMesh &mesh = g_meshes.get(packet->draws[i].mesh);

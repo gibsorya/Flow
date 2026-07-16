@@ -1,6 +1,7 @@
 #include <iostream>
 #include "platform/window.h"
 #include "renderer/renderer.h"
+#include "core/math.h"
 
 int main()
 {
@@ -37,8 +38,6 @@ int main()
     draws.mesh = mesh;
 
     FramePacket packet;
-    packet.drawCount = 1;
-    packet.draws = &draws;
 
     Event events[256];
     bool running = true;
@@ -63,8 +62,14 @@ int main()
             }
         }
 
-        // MeshHandle
-        
+        uint32_t w, h;
+        window.getFramebufferSize(&w, &h);
+        float aspect = (float)w/(float)h;
+        makeOrtho(packet.projMatrix, aspect);
+        packet.viewportHeight = h;
+        packet.viewportWidth = w;
+        packet.drawCount = 1;
+        packet.draws = &draws;
 
         renderer.renderFrame(&packet);
 

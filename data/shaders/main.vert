@@ -5,7 +5,9 @@ layout (location = 1) in vec3 color;
 
 out vec3 outColor;
 
+uniform mat4 projection;
+
 void main() {
-    gl_Position = vec4(position, 1.0);
+    gl_Position = projection * vec4(position, 1.0);
     outColor = color;
 }

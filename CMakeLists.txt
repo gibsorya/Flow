@@ -27,6 +27,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG 0af55ccecd98d4e5a8d1fad7de25ba429d60e863 # Corresponds to GLM 1.0.1+
+)
+
+# Make the library available to your build
+FetchContent_MakeAvailable(glm)
+
 add_subdirectory(external/glad)
 
 # ------------------------------------------------------------
@@ -69,6 +78,7 @@ add_library(renderer_gl STATIC
 target_link_libraries(renderer_gl
     PUBLIC  engine_core
     PRIVATE glad
+    PRIVATE glm::glm
 )
 
 target_compile_definitions(renderer_gl PRIVATE
