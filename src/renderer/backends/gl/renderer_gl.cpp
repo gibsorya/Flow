@@ -4,6 +4,7 @@
 #include "core/pool.h"
 #include "platform/window.h"
 #include "core/file_io.h"
+#include "renderer/backends/gl/gl_mesh.h"
 
 #include <glad/gl.h>
 
@@ -16,14 +17,6 @@ namespace
         GLuint uModel = 0;
     };
     GLState g_state;
-
-    struct GLMesh
-    {
-        uint32_t vao;
-        uint32_t vbo;
-        uint32_t vertexCount;
-        uint32_t indexCount;
-    };
 
     static Pool<GLMesh, MeshTag> g_meshes;
 
@@ -101,54 +94,50 @@ namespace
         return true;
     }
 
-    MeshHandle create_mesh(const MeshDesc *desc)
-    {
-        GLuint vao;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+    // MeshHandle create_mesh(const MeshDesc *desc)
+    // {
 
-        GLuint vbo;
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, desc->vertexCount * sizeof(float), desc->positions, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-        const float colors[] = {
-            1.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 1.0f
-        };
+    //     GLuint vbo;
+    //     glGenBuffers(1, &vbo);
+    //     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    //     glBufferData(GL_ARRAY_BUFFER, desc->vertexCount * sizeof(float), desc->positions, GL_STATIC_DRAW);
+    //     glEnableVertexAttribArray(0);
+    //     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    //     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-        GLuint color_vbo;
-        glGenBuffers(1, &color_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    //     // const float colors[] = {
+    //     //     1.0f, 0.0f, 0.0f,
+    //     //     0.0f, 1.0f, 0.0f,
+    //     //     0.0f, 0.0f, 1.0f,
+    //     //     1.0f, 1.0f, 1.0f,
+    //     //     1.0f, 0.0f, 0.0f,
+    //     //     0.0f, 1.0f, 0.0f,
+    //     //     0.0f, 0.0f, 1.0f,
+    //     //     1.0f, 1.0f, 1.0f
+    //     // };
 
-        GLuint index_vbo;
-        glGenBuffers(1, &index_vbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_vbo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, desc->indexCount * sizeof(uint32_t), desc->indices, GL_STATIC_DRAW);
+    //     // GLuint color_vbo;
+    //     // glGenBuffers(1, &color_vbo);
+    //     // glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
+    //     // glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+    //     // glEnableVertexAttribArray(1);
+    //     // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+    //     // GLuint index_vbo;
+    //     // glGenBuffers(1, &index_vbo);
+    //     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_vbo);
+    //     // glBufferData(GL_ELEMENT_ARRAY_BUFFER, desc->indexCount * sizeof(uint32_t), desc->indices, GL_STATIC_DRAW);
 
-        return g_meshes.create({vao, vbo, desc->vertexCount, desc->indexCount});
-    }
+    //     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //     glBindVertexArray(0);
+
+    //     return g_meshes.create({vao, vbo, 0, desc->vertexCount, desc->indexCount});
+    // }
 
     void shutdown()
     {
         glDeleteProgram(g_state.programID);
-    }
-
-    void destroy_mesh(MeshHandle mesh)
-    {
-        GLMesh &m = g_meshes.get(mesh);
-        glDeleteBuffers(1, &m.vbo);
-        g_meshes.destroy(mesh);
     }
 
     void render_frame(const FramePacket *packet)
@@ -177,6 +166,6 @@ namespace
 RendererAPI createGLRenderer()
 {
     return {RENDERER_API_VERSION, "OpenGL",
-            gl_init, shutdown, create_mesh,
-            destroy_mesh, render_frame};
+            gl_init, shutdown, gl_createMesh,
+            gl_destroyMesh, render_frame};
 }
