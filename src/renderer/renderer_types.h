@@ -1,3 +1,5 @@
+#pragma once
+
 #include "core/pool.h"
 
 enum class RendererKind : uint32_t {
@@ -16,6 +18,7 @@ struct MeshDesc {
 };
 
 struct Mat4 { float m[16]; };
+struct Vec3 { float x; float y; float z; };
 
 struct DrawCommand {
     MeshHandle mesh;
@@ -35,4 +38,8 @@ struct FramePacket {
  
     // later: view/proj matrices, transforms array, lights...
     Mat4 viewProj;
+
+    Vec3 camUp;
+    Vec3 camDir;
+    Vec3 camPos;
 };

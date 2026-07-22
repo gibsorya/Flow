@@ -28,3 +28,7 @@ void gl_destroyMesh(MeshHandle mesh) {
     glDeleteBuffers(1, &m.vbo);
     g_meshes.destroy(mesh);
 }
+
+GLMesh* gl_resolveMesh(MeshHandle h) { 
+    return g_meshes.tryGet(h); 
+}

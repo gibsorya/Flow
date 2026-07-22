@@ -74,6 +74,8 @@ target_link_libraries(platform_glfw
  
 add_library(renderer_gl STATIC
     src/renderer/backends/gl/renderer_gl.cpp
+    src/renderer/backends/gl/gl_shader.cpp
+    src/renderer/backends/gl/gl_mesh.cpp
 )
 target_link_libraries(renderer_gl
     PUBLIC  engine_core

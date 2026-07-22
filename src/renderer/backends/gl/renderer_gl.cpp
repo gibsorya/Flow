@@ -5,6 +5,7 @@
 #include "platform/window.h"
 #include "core/file_io.h"
 #include "renderer/backends/gl/gl_mesh.h"
+#include "renderer/backends/gl/gl_shader.h"
 
 #include <glad/gl.h>
 
@@ -15,16 +16,70 @@ namespace
         // grows: default framebuffer info, cached GL state, big buffers...
         GLuint uVP = 0;
         GLuint uModel = 0;
+        GLuint textureID = 0;
+        GLuint uCameraPos = 0;
+        GLuint uCameraDir = 0;
+        GLuint uCameraUp = 0;
+        GLuint uResolution = 0;
     };
     GLState g_state;
 
-    static Pool<GLMesh, MeshTag> g_meshes;
+    // static Pool<GLMesh, MeshTag> g_meshes;
+
+    const int GRID_WIDTH = 64;
+    const int GRID_HEIGHT = 64;
+    const int GRID_DEPTH = 64;  
+    GLuint create3DVoxelTexture()
+    {
+        std::vector<unsigned char> voxelData(GRID_WIDTH * GRID_HEIGHT * GRID_DEPTH * 4);
+
+        for (int z = 0; z < GRID_DEPTH; ++z)
+        {
+            for (int y = 0; y < GRID_HEIGHT; ++y)
+            {
+                for (int x = 0; x < GRID_WIDTH; ++x)
+                {
+                    int index = (x + y * GRID_WIDTH + z * GRID_WIDTH * GRID_HEIGHT) * 4;
+
+                    // Simple generation logic: Build a floor and a few random floating islands
+                    if (y < 10 || (y < 30 && std::rand() % 100 > 98))
+                    {
+                        voxelData[index + 0] = static_cast<unsigned char>(x * 4); // R
+                        voxelData[index + 1] = static_cast<unsigned char>(y * 4); // G
+                        voxelData[index + 2] = static_cast<unsigned char>(z * 4); // B
+                        voxelData[index + 3] = 255;                               // Alpha (Solid)
+                    }
+                    else
+                    {
+                        // Empty space
+                        voxelData[index + 0] = 0;
+                        voxelData[index + 1] = 0;
+                        voxelData[index + 2] = 0;
+                        voxelData[index + 3] = 0; // Alpha (Empty)
+                    }
+                }
+            }
+        }
+
+        GLuint textureID;
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_3D, textureID);
+
+        // Upload texture configuration parameters
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        // Load data to GPU
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, GRID_WIDTH, GRID_HEIGHT, GRID_DEPTH, 0, GL_RGBA, GL_UNSIGNED_BYTE, voxelData.data());
+
+        return textureID;
+    }
 
     bool gl_init(const NativeWindowInfo *native)
     {
-        char infoLog[512];
-        int success;
-
         if (!gladLoadGL((GLADloadfunc)native->getProcAddress))
         {
             std::cerr << "Error loading GL functions" << std::endl;
@@ -36,54 +91,24 @@ namespace
         printf("GL VERSION: %s\n", glGetString(GL_VERSION));
         printf("GL RENDERER: %s\n", glGetString(GL_RENDERER));
 
-        std::string vertCode = read_shader_file("main.vert");
-        std::string fragCode = read_shader_file("main.frag");
+        const GLuint vertex = gl_loadShader("voxels.vert", GL_VERTEX_SHADER);
+        const GLuint fragment = gl_loadShader("voxels.frag", GL_FRAGMENT_SHADER);
 
-        const char* vertSrc = vertCode.c_str();
-        const char* fragSrc = fragCode.c_str();
+        if(!vertex || !fragment) return false;
 
-        const GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vertSrc, NULL);
-        glCompileShader(vertex);
-
-        glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                      << infoLog << std::endl;
-            return false;
-        };
-
-        const GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fragSrc, NULL);
-        glCompileShader(fragment);
-
-        glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                      << infoLog << std::endl;
-            return false;
-        };
-
-        g_state.programID = glCreateProgram();
-        glAttachShader(g_state.programID, vertex);
-        glAttachShader(g_state.programID, fragment);
-        glLinkProgram(g_state.programID);
-
-        glGetProgramiv(g_state.programID, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(g_state.programID, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                      << infoLog << std::endl;
-            return false;
-        }
+        g_state.programID = gl_loadProgram(vertex, fragment);
         
-        g_state.uVP = glGetUniformLocation(g_state.programID, "vp");
-        g_state.uModel = glGetUniformLocation(g_state.programID, "model");
+        if(!g_state.programID) return false;
+        
+        // g_state.uVP = glGetUniformLocation(g_state.programID, "vp");
+        // g_state.uModel = glGetUniformLocation(g_state.programID, "model");
+
+        g_state.uCameraPos    = glGetUniformLocation(g_state.programID, "u_CameraPos");
+        g_state.uCameraDir    = glGetUniformLocation(g_state.programID, "u_CameraDir");
+        g_state.uCameraUp     = glGetUniformLocation(g_state.programID, "u_CameraUp");
+        g_state.uResolution   = glGetUniformLocation(g_state.programID, "u_Resolution");
+
+        g_state.textureID = create3DVoxelTexture();
 
         glDetachShader(g_state.programID, vertex);
         glDetachShader(g_state.programID, fragment);
@@ -140,26 +165,39 @@ namespace
         glDeleteProgram(g_state.programID);
     }
 
-    void render_frame(const FramePacket *packet)
+    void render_frame(const FramePacket* packet)
     {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(g_state.programID);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, g_state.textureID);
+        GLint voxelGridLocation = glGetUniformLocation(g_state.programID, "u_VoxelGrid");
+        glUniform1i(voxelGridLocation, 0);
         
-        glUniformMatrix4fv(g_state.uVP, 1, GL_FALSE, packet->viewProj.m);
+        // glUniformMatrix4fv(g_state.uVP, 1, GL_FALSE, packet->viewProj.m);
         // for(auto f : packet->viewProj.m) {
         //     std::cout << f << ", " << std::ends;
         // }
         // std::cout << std::endl;
+        glUniform3f(g_state.uCameraPos, packet->camPos.x,packet->camPos.y,packet->camPos.z);
+        glUniform3f(g_state.uCameraDir, packet->camDir.x,packet->camDir.y,packet->camDir.z);
+        glUniform3f(g_state.uCameraUp, packet->camUp.x,packet->camUp.y,packet->camUp.z);
+        glUniform2f(g_state.uResolution, (float)packet->viewportWidth, (float)packet->viewportHeight);
+
         for (uint32_t i = 0; i < packet->drawCount; i++)
         {
-            DrawCommand draw = packet->draws[i];
-            GLMesh &mesh = g_meshes.get(draw.mesh);
-            glBindVertexArray(mesh.vao);
-            glUniformMatrix4fv(g_state.uModel, 1, GL_FALSE, draw.model.m);
-                     
-            glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+            const DrawCommand& draw = packet->draws[i];
+            GLMesh* mesh = gl_resolveMesh(draw.mesh);
+            glBindVertexArray(mesh->vao);
+
+            // glUniformMatrix4fv(g_state.uModel, 1, GL_FALSE, draw.model.m);
+
+            // glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
         }
+        // glBindVertexArray(0);
     }
 }
 
