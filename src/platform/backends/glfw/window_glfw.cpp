@@ -19,17 +19,31 @@ namespace
 
     Key translateKey(int glfwKey)
     {
-        switch (glfwKey)
-        {
-        case GLFW_KEY_ESCAPE:
-            return Key::Escape;
-        case GLFW_KEY_SPACE:
-            return Key::Space;
-        case GLFW_KEY_A:
-            return Key::A;
-        // ... table-driven in real code
-        default:
-            return Key::Unknown;
+        if (glfwKey >= GLFW_KEY_A  && glfwKey <= GLFW_KEY_Z)
+            return Key((int)Key::A    + (glfwKey - GLFW_KEY_A));
+        if (glfwKey >= GLFW_KEY_0  && glfwKey <= GLFW_KEY_9)
+            return Key((int)Key::Num0 + (glfwKey - GLFW_KEY_0));
+        if (glfwKey >= GLFW_KEY_F1 && glfwKey <= GLFW_KEY_F12)
+            return Key((int)Key::F1   + (glfwKey - GLFW_KEY_F1));
+
+        switch (glfwKey) {
+            case GLFW_KEY_ESCAPE:        return Key::Escape;
+            case GLFW_KEY_SPACE:         return Key::Space;
+            case GLFW_KEY_ENTER:         return Key::Enter;
+            case GLFW_KEY_TAB:           return Key::Tab;
+            case GLFW_KEY_BACKSPACE:     return Key::Backspace;
+            case GLFW_KEY_DELETE:        return Key::Delete;
+            case GLFW_KEY_LEFT:          return Key::Left;
+            case GLFW_KEY_RIGHT:         return Key::Right;
+            case GLFW_KEY_UP:            return Key::Up;
+            case GLFW_KEY_DOWN:          return Key::Down;
+            case GLFW_KEY_LEFT_SHIFT:    return Key::LShift;
+            case GLFW_KEY_RIGHT_SHIFT:   return Key::RShift;
+            case GLFW_KEY_LEFT_CONTROL:  return Key::LCtrl;
+            case GLFW_KEY_RIGHT_CONTROL: return Key::RCtrl;
+            case GLFW_KEY_LEFT_ALT:      return Key::LAlt;
+            case GLFW_KEY_RIGHT_ALT:     return Key::RAlt;
+            default:                     return Key::Unknown;
         }
     }
 
