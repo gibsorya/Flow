@@ -26,9 +26,9 @@ namespace
 
     // static Pool<GLMesh, MeshTag> g_meshes;
 
-    const int GRID_WIDTH = 64;
-    const int GRID_HEIGHT = 64;
-    const int GRID_DEPTH = 64;  
+    const int GRID_WIDTH = 256;
+    const int GRID_HEIGHT = 256;
+    const int GRID_DEPTH = 256;  
     GLuint create3DVoxelTexture()
     {
         std::vector<unsigned char> voxelData(GRID_WIDTH * GRID_HEIGHT * GRID_DEPTH * 4);

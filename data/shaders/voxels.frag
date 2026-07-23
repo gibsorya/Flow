@@ -11,7 +11,7 @@ uniform vec2 u_Resolution;
 // 3D Texture where each voxel holds structural data (0 = empty, >0 = solid)
 uniform sampler3D u_VoxelGrid; 
 
-const vec3 GRID_SIZE = vec3(64.0, 64.0, 64.0); // Adjust based on your texture resolution
+const vec3 GRID_SIZE = vec3(256.0, 256.0, 256.0); // Adjust based on your texture resolution
 
 // Structure to hold ray hit data
 struct RayHit {

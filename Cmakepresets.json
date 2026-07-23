@@ -4,6 +4,7 @@
   "configurePresets": [
     {
       "name": "debug",
+      "generator": "Ninja",
       "displayName": "Debug",
       "binaryDir": "${sourceDir}/build/debug",
       "cacheVariables": {
