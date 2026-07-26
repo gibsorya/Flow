@@ -13,6 +13,11 @@ using MeshHandle = Handle<MeshTag>;
 struct MeshDesc {
     const float*    positions   = nullptr;  // 3 floats per vertex
     uint32_t        vertexCount = 0;
+
+    const float*    normals     = nullptr;
+    const float*    colors      = nullptr;
+    const float*    uvs         = nullptr;
+    
     const uint32_t* indices     = nullptr;  // optional: null = non-indexed
     uint32_t        indexCount  = 0;
 };

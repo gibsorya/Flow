@@ -5,8 +5,8 @@
 struct GLMesh
 {
     uint32_t vao;
-    uint32_t vbo;
-    uint32_t color_vbo;
+    uint32_t vbos[4];
+    uint32_t ebo;
     uint32_t vertexCount;
     uint32_t indexCount;
 };
