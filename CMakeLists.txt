@@ -39,14 +39,14 @@ FetchContent_MakeAvailable(glm)
 add_subdirectory(external/glad)
 
 # ------------------------------------------------------------
-# engine_core — contracts and core utilities (headers only)
+# engine_core — contracts + engine-agnostic utilities.
 # ------------------------------------------------------------
-# INTERFACE because it has no .cpp files: Handle<>, Pool<>,
-# window.h, renderer.h, renderer_types.h, input_events.h.
-# Everything links this; it depends on nothing.
  
-add_library(engine_core INTERFACE)
-target_include_directories(engine_core INTERFACE ${CMAKE_SOURCE_DIR}/src)
+add_library(engine_core STATIC
+    src/core/file_io.cpp
+    src/core/executable_path.cpp
+)
+target_include_directories(engine_core PUBLIC ${CMAKE_SOURCE_DIR}/src)
 target_compile_features(engine_core INTERFACE cxx_std_20)
 
 # ------------------------------------------------------------
