@@ -8,7 +8,9 @@ enum class RendererKind : uint32_t {
 };
 
 struct MeshTag {};
+struct MaterialTag {};
 using MeshHandle = Handle<MeshTag>;
+using MaterialHandle = Handle<MaterialTag>;
 
 struct MeshDesc {
     const float*    positions   = nullptr;  // 3 floats per vertex
@@ -22,12 +24,23 @@ struct MeshDesc {
     uint32_t        indexCount  = 0;
 };
 
+struct MaterialDesc {
+    const char* vertexShaderPath   = nullptr;
+    const char* fragmentShaderPath = nullptr;
+    TextureHandle textures[4];
+    uint32_t    textureCount = 0;
+    // uniform params: SKIP for now — the surface params are all frame-level.
+    //   Add a small fixed param block ONLY when a shader needs a per-material
+    //   value (a tint, a roughness). We don't have one yet.
+};
+
 struct Mat4 { float m[16]; };
 struct Vec3 { float x; float y; float z; };
 
 struct DrawCommand {
     MeshHandle mesh;
     Mat4 model;
+    MaterialHandle material;
     // later, in this order: MaterialHandle material;
     //                       uint32_t transformIndex;
     //                       uint64_t sortKey;

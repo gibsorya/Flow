@@ -16,6 +16,8 @@ struct RendererAPI {
     void (*shutdown)(void)                         = nullptr;
     MeshHandle (*createMesh)(const MeshDesc* desc) = nullptr;
     void       (*destroyMesh)(MeshHandle mesh)     = nullptr;
+    MaterialHandle (*createMaterial)(const MaterialDesc* desc) = nullptr;
+    void           (*destroyMaterial)(MaterialHandle material) = nullptr;
     void (*renderFrame)(const FramePacket* packet) = nullptr;
 };
 
