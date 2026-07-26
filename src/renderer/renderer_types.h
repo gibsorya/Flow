@@ -9,8 +9,11 @@ enum class RendererKind : uint32_t {
 
 struct MeshTag {};
 struct MaterialTag {};
+struct TextureTag {};
+
 using MeshHandle = Handle<MeshTag>;
 using MaterialHandle = Handle<MaterialTag>;
+using TextureHandle = Handle<TextureTag>;
 
 struct MeshDesc {
     const float*    positions   = nullptr;  // 3 floats per vertex

@@ -76,14 +76,11 @@ add_library(renderer_gl STATIC
     src/renderer/backends/gl/renderer_gl.cpp
     src/renderer/backends/gl/gl_shader.cpp
     src/renderer/backends/gl/gl_mesh.cpp
+    src/renderer/backends/gl/gl_material.cpp
 )
 target_link_libraries(renderer_gl
     PUBLIC  engine_core
     PRIVATE glad
-)
-
-target_compile_definitions(renderer_gl PRIVATE
-    PROJECT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
 )
  
 # ------------------------------------------------------------
@@ -99,21 +96,21 @@ add_library(renderer_null STATIC
 target_link_libraries(renderer_null PUBLIC engine_core)
 
 # ------------------------------------------------------------
-# engine — the executable
+# engine library — the public interface. Links all backends and
+# core. Consumers link this and get everything.
 # ------------------------------------------------------------
  
-add_executable(engine src/main.cpp)
-target_link_libraries(engine
-    PRIVATE
-        engine_core
-        platform_glfw
-        renderer_gl
-        renderer_null
-        glm::glm
+add_library(engine INTERFACE)
+target_link_libraries(engine INTERFACE
+    engine_core
+    platform_glfw
+    renderer_gl
+    renderer_null
+    glm::glm
 )
 
 # ---- warnings: on for OUR targets, not for dependencies ----
-set(ENGINE_TARGETS engine platform_glfw renderer_gl renderer_null)
+set(ENGINE_TARGETS platform_glfw renderer_gl renderer_null)
 foreach(t IN LISTS ENGINE_TARGETS)
     if(MSVC)
         target_compile_options(${t} PRIVATE /W4)
@@ -123,12 +120,23 @@ foreach(t IN LISTS ENGINE_TARGETS)
 endforeach()
 
 # ---- shaders: copy next to the binary after every build ----
-add_custom_command(TARGET engine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/data/shaders
-        $<TARGET_FILE_DIR:engine>/data/shaders
-    COMMENT "Copying shaders"
-)
+function(add_example name)
+    add_executable(${name} examples/${name}/main.cpp)
+    target_link_libraries(${name} PRIVATE engine)
+
+    # copy this example's shaders next to its binary — but only if it has any
+    if(EXISTS ${CMAKE_SOURCE_DIR}/examples/${name}/shaders)
+        add_custom_command(TARGET ${name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/examples/${name}/shaders
+                $<TARGET_FILE_DIR:${name}>/shaders
+            COMMENT "Copying ${name} shaders"
+        )
+    endif()
+endfunction()
+
+# --- Examples: add new ones here, no changes elsewhere ---
+add_example(HelloTriangle)
 
 # ------------------------------------------------------------
 # Future backends slot in as new targets, no changes elsewhere:
