@@ -1,5 +1,6 @@
 #include <cstdint>
 #include "platform/input_events.h"
+#include "core/config.h"
 
 enum class NativeWindowKind : uint32_t {
     Win32,      // handle1 = HWND,     handle2 = HINSTANCE
@@ -25,6 +26,8 @@ struct WindowDesc {
     uint32_t    width  = 1280;
     uint32_t    height = 720;
     bool        resizable = true;
+
+    WindowConfig requirements;
 };
 
 struct WindowAPI {

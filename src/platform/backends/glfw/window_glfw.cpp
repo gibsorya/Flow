@@ -76,11 +76,18 @@ static bool glfw_create(const WindowDesc *desc)
         return false;
     }
 
-    glfwDefaultWindowHints();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    if(desc->requirements.needsGraphicsContext) {
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, desc->requirements.contextMajor);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, desc->requirements.contextMinor);
+
+        if(desc->requirements.contextCoreProfile) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+        }
+    } else {
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    }
 
     window = glfwCreateWindow(desc->width, desc->height, desc->title, nullptr, nullptr);
     if(!window) {
@@ -90,7 +97,8 @@ static bool glfw_create(const WindowDesc *desc)
 
     glfwSetWindowCloseCallback(window, onClose);
     glfwSetKeyCallback(window, onKey);
-    glfwMakeContextCurrent(window);
+
+    if(desc->requirements.needsGraphicsContext) glfwMakeContextCurrent(window);
 
     return window != nullptr;
 }

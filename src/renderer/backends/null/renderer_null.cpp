@@ -11,7 +11,7 @@ namespace {
 }
 
 RendererAPI createNullRenderer() {
-    return { RENDERER_API_VERSION, "Null",
+    return { RENDERER_API_VERSION, "Null", WindowConfig{},
              null_init, null_shutdown,
              null_createMesh, null_destroyMesh,
              null_createMaterial, null_destroyMaterial,

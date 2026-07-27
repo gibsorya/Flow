@@ -152,7 +152,7 @@ namespace
 
 RendererAPI createGLRenderer()
 {
-    return {RENDERER_API_VERSION, "OpenGL",
+    return {RENDERER_API_VERSION, "OpenGL", WindowConfig{},
             gl_init, shutdown, gl_createMesh,
             gl_destroyMesh, gl_createMaterial, gl_destroyMaterial, render_frame};
 }

@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include "renderer/renderer_types.h"
+#include "core/config.h"
 
 #define RENDERER_API_VERSION 1
 
@@ -11,6 +12,7 @@ struct NativeWindowInfo;
 struct RendererAPI {
     uint32_t apiVersion = 0;
     const char* name = "unknown";
+    WindowConfig requirements;
 
     bool (*init)(const NativeWindowInfo* native)   = nullptr;
     void (*shutdown)(void)                         = nullptr;
