@@ -1,5 +1,6 @@
 #include <iostream>
 
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 #include "platform/window.h"
@@ -82,8 +83,8 @@ static bool glfw_create(const WindowDesc *desc)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, desc->requirements.contextMinor);
 
         if(desc->requirements.contextCoreProfile) {
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         }
     } else {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -111,8 +112,22 @@ static uint32_t glfw_pollEvents(Event* out, uint32_t cap) {
     return n;
 }
 
+static int32_t glfw_createVulkanSurface(uint64_t instance, uint64_t* outSurface) {
+    VkSurfaceKHR surface = VK_NULL_HANDLE;
+    VkResult r = glfwCreateWindowSurface((VkInstance)instance, window, nullptr, &surface);
+    *outSurface = (uint64_t)surface;
+    return (int32_t)r; 
+}
+
 static NativeWindowInfo glfw_nativeInfo() {
-    return { NativeWindowKind::GLFW, window, 0, reinterpret_cast<void*(*)(const char*)>(glfwGetProcAddress) };
+    return { 
+        NativeWindowKind::GLFW,
+        window,
+        0,
+        reinterpret_cast<void*(*)(const char*)>(glfwGetProcAddress),
+        reinterpret_cast<int32_t(*)(uint64_t,uint64_t*)>(glfw_createVulkanSurface),
+        reinterpret_cast<const char** (*)(uint32_t*)>(glfwGetRequiredInstanceExtensions)
+    };
 }
 
 static void glfw_present() {

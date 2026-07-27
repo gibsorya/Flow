@@ -38,6 +38,10 @@ FetchContent_MakeAvailable(glm)
 
 add_subdirectory(external/glad)
 
+find_package(Vulkan REQUIRED)
+
+include_directories(${Vulkan_INCLUDE_DIRS})
+
 # ------------------------------------------------------------
 # engine_core — contracts + engine-agnostic utilities.
 # ------------------------------------------------------------
@@ -61,7 +65,7 @@ add_library(platform_glfw STATIC
 )
 target_link_libraries(platform_glfw
     PUBLIC  engine_core
-    PRIVATE glfw
+    PRIVATE glfw Vulkan::Vulkan
 )
 
 # ------------------------------------------------------------
@@ -81,6 +85,16 @@ add_library(renderer_gl STATIC
 target_link_libraries(renderer_gl
     PUBLIC  engine_core
     PRIVATE glad
+)
+
+# ------------------------------------------------------------
+# renderer_vk — Vulkan backend
+# ------------------------------------------------------------
+add_library(renderer_vk STATIC src/renderer/backends/vk/renderer_vk.cpp)
+target_link_libraries(renderer_vk PUBLIC engine_core PRIVATE Vulkan::Vulkan)
+
+target_compile_definitions(renderer_vk PRIVATE
+    $<$<CONFIG:Debug>:DEBUG_BUILD>
 )
  
 # ------------------------------------------------------------
@@ -105,12 +119,13 @@ target_link_libraries(engine INTERFACE
     engine_core
     platform_glfw
     renderer_gl
+    renderer_vk
     renderer_null
     glm::glm
 )
 
 # ---- warnings: on for OUR targets, not for dependencies ----
-set(ENGINE_TARGETS platform_glfw renderer_gl renderer_null)
+set(ENGINE_TARGETS platform_glfw renderer_gl renderer_vk renderer_null)
 foreach(t IN LISTS ENGINE_TARGETS)
     if(MSVC)
         target_compile_options(${t} PRIVATE /W4)
@@ -137,6 +152,7 @@ endfunction()
 
 # --- Examples: add new ones here, no changes elsewhere ---
 add_example(HelloTriangle)
+add_example(HelloTriangleVK)
 
 # ------------------------------------------------------------
 # Future backends slot in as new targets, no changes elsewhere:

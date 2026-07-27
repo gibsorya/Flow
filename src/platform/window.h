@@ -19,6 +19,8 @@ struct NativeWindowInfo {
     uint64_t handle2 = 0;
 
     void* (*getProcAddress)(const char*);
+    int32_t (*createVulkanSurface)(uint64_t instance, uint64_t* outSurface);
+    const char** (*getRequiredInstanceExtensions)(uint32_t* count);
 };
 
 struct WindowDesc {

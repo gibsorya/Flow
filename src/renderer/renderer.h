@@ -25,5 +25,6 @@ struct RendererAPI {
 
 RendererAPI createGLRenderer();
 RendererAPI createNullRenderer();
+RendererAPI createVKRenderer();
 
 #endif
