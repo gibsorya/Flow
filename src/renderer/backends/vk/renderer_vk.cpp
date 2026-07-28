@@ -10,6 +10,7 @@
 
 #include "renderer/backends/vk/helpers.h"
 #include "renderer/backends/vk/engine/instance.h"
+#include "renderer/backends/vk/engine/device.h"
 
 namespace
 {
@@ -42,6 +43,8 @@ namespace
         }
     
         vk_state.surface = reinterpret_cast<VkSurfaceKHR>(surfaceRaw);
+
+        vk_state.physicalGPU = engine::pickPhysicalGPU(vk_state.instance);
         return true;
     }
 

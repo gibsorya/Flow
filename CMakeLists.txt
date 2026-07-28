@@ -91,7 +91,8 @@ target_link_libraries(renderer_gl
 # renderer_vk — Vulkan backend
 # ------------------------------------------------------------
 add_library(renderer_vk STATIC src/renderer/backends/vk/renderer_vk.cpp
- src/renderer/backends/vk/engine/instance.cpp)
+ src/renderer/backends/vk/engine/instance.cpp
+ src/renderer/backends/vk/engine/device.cpp)
 target_include_directories(renderer_vk PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(renderer_vk PUBLIC engine_core PRIVATE Vulkan::Vulkan)
 

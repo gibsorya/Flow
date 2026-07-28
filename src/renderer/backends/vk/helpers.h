@@ -3,6 +3,8 @@
 #include <vulkan/vulkan.h>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
+#include <cstring>
 
 inline void checkVkResult(const VkResult result, const char* what = "Vulkan call")
 {
