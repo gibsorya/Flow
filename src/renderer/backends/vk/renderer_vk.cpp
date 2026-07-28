@@ -1,16 +1,22 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.h>
-
-#include "renderer/renderer.h"
-#include "platform/window.h"
+#include <vma/vk_mem_alloc.h>
 
 #include <iostream>
 #include <cstdio>
 
+#include "renderer/renderer.h"
+#include "platform/window.h"
+
+#include "renderer/backends/vk/helpers.h"
+#include "renderer/backends/vk/engine/instance.h"
+
 namespace
 {
     struct VKState {
-        VkInstance instance;
+        VkInstance instance{VK_NULL_HANDLE};
+        VkDebugUtilsMessengerEXT debugMessenger{VK_NULL_HANDLE};
+        VkPhysicalDevice physicalGPU{VK_NULL_HANDLE};
         VkSurfaceKHR surface;
     };
     VKState vk_state;
@@ -19,43 +25,11 @@ namespace
     {
         VkResult result;
         
-        VkApplicationInfo appInfo{};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Unknown";
-        appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 1);
-        appInfo.pEngineName = "Flow Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(0, 0, 1);
-        appInfo.apiVersion = VK_API_VERSION_1_4;
+        engine::createVulkanInstance(native, vk_state.instance);
 
-        uint32_t windowExtCount = 0;
-        const char** windowExts = native->getRequiredInstanceExtensions(&windowExtCount);
+        VkDebugUtilsMessengerCreateInfoEXT debugMessengerInfo = engine::createDebugMessengerInfo();
 
-        std::vector<const char*> extensions(windowExts, windowExts + windowExtCount);
-
-        #ifdef DEBUG_BUILD
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-            const bool enableValidationLayers = true;
-        #else
-            const bool enableValidationLayers = false;
-        #endif
-    
-        VkInstanceCreateInfo instanceInfo;
-        instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        instanceInfo.pNext = nullptr;
-        instanceInfo.pApplicationInfo = &appInfo;
-        // instanceInfo.flags = ENABLE FOR MACOS
-        instanceInfo.enabledExtensionCount = (uint32_t)extensions.size();
-        instanceInfo.ppEnabledExtensionNames = extensions.data();
-
-        instanceInfo.enabledLayerCount = 0;
-
-        result = vkCreateInstance(&instanceInfo, nullptr, &vk_state.instance);
-
-        if(result != VK_SUCCESS)
-        {
-            fprintf(stderr, "Instance creation failed: %d\n", result);
-            return false;
-        }
+        checkVkResult(engine::CreateDebugUtilsMessengerEXT(vk_state.instance, &debugMessengerInfo, nullptr, &vk_state.debugMessenger));
 
         uint64_t surfaceRaw = 0;
         result = static_cast<VkResult>(
@@ -73,6 +47,7 @@ namespace
 
     void vk_shutdown()
     {
+        engine::DestroyDebugUtilsMessengerEXT(vk_state.instance, vk_state.debugMessenger, nullptr);
         vkDestroySurfaceKHR(vk_state.instance, vk_state.surface, nullptr);
         vkDestroyInstance(vk_state.instance, nullptr);
     }
@@ -82,7 +57,7 @@ namespace
         
     }
 
-    // MeshHandle *
+    
 }
 
 bool checkValidationLayerSupport() {

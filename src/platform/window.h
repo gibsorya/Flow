@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 #include "platform/input_events.h"
 #include "core/config.h"
