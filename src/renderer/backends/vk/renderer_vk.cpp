@@ -19,6 +19,11 @@ namespace
         VkDebugUtilsMessengerEXT debugMessenger{VK_NULL_HANDLE};
         VkPhysicalDevice physicalGPU{VK_NULL_HANDLE};
         VkSurfaceKHR surface;
+
+        QueueFamilyIndices queueFamilies;
+        VkQueue graphicsQueue{VK_NULL_HANDLE};
+
+        VkDevice device;
     };
     VKState vk_state;
 
@@ -43,13 +48,23 @@ namespace
         }
     
         vk_state.surface = reinterpret_cast<VkSurfaceKHR>(surfaceRaw);
-
         vk_state.physicalGPU = engine::pickPhysicalGPU(vk_state.instance);
+
+        vk_state.queueFamilies = engine::findQueueFamilies(vk_state.physicalGPU, vk_state.surface);
+
+        VkDeviceQueueCreateInfo deviceQueueCI{};
+        std::vector<float> priorities = { 1.0f };
+        engine::setQueueCreateInfo(vk_state.queueFamilies.graphics, priorities, deviceQueueCI);
+        engine::createLogicalDevice(vk_state.physicalGPU, deviceQueueCI, vk_state.device);
+
+        vkGetDeviceQueue(vk_state.device, vk_state.queueFamilies.graphics, 0, &vk_state.graphicsQueue);
+
         return true;
     }
 
     void vk_shutdown()
     {
+        vkDestroyDevice(vk_state.device, nullptr);
         engine::DestroyDebugUtilsMessengerEXT(vk_state.instance, vk_state.debugMessenger, nullptr);
         vkDestroySurfaceKHR(vk_state.instance, vk_state.surface, nullptr);
         vkDestroyInstance(vk_state.instance, nullptr);
